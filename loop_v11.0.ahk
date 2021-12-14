@@ -27,7 +27,8 @@ Browser_Back::     ;Browser_Back regedit_hexadecimal=3
 #f::SendInput {LWin down}{LCtrl down}{Right}{LCtrl up}{LWin up} ;desktop_switch_left  regedit_hexadecimal=a0f
 #w::run chrome
 #v::run alacritty.exe -e lf, C:\Users\yeff
-#b::run alacritty.exe -e arch run lf /home/yeff
+#+v::run alacritty.exe -e arch run lf /home/yeff
+#b::run explorer.exe
 ;#n::run arch run ranger /mnt/c/Users/yeff
 #n::
    WinGet, active_id, ID, A
@@ -49,7 +50,6 @@ Browser_Back::     ;Browser_Back regedit_hexadecimal=3
    WinGet, active_id, ID, A
    WinMove, ahk_id %active_id%, , 675, 0, 698, 775
    return
-#m::run explorer.exe
 ^enter::run alacritty.exe -e arch run source ~/.zprofile && bash, \\wsl$\Arch_Linux\home\yeff
 #enter::run alacritty.exe -e arch
 !enter::run alacritty.exe -e Powershell -NoLogo, C:\Users\yeff
