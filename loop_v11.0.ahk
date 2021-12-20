@@ -14,7 +14,7 @@ Browser_Back::     ;Browser_Back regedit_hexadecimal=3
       Sleep 100
    }
    return
-   
+
 ;Turn_screen_off regedit_hexadecimal=1d
 ;#a::SendInput {LWin down}{m}{LWin up} 	           				;actioncenter         regedit_hexadecimal=a02==2b
 ;#s::SendInput {LCtrl down}{w}{LCtrl up} 		               		;cortana              regedit_hexadecimal=a01==1a
@@ -26,8 +26,8 @@ Browser_Back::     ;Browser_Back regedit_hexadecimal=3
 #s::SendInput {LWin down}{LCtrl down}{Left}{LCtrl up}{LWin up}  ;desktop_switch_right regedit_hexadecimal=a0e
 #f::SendInput {LWin down}{LCtrl down}{Right}{LCtrl up}{LWin up} ;desktop_switch_left  regedit_hexadecimal=a0f
 #w::run chrome
-#v::run alacritty.exe -e lf, C:\Users\yeff
-#+v::run alacritty.exe -e arch run lf /home/yeff
+#v::run C:\Users\yeste\scoop\apps\alacritty\current\alacritty.exe -e pwsh -command lf && pwsh, C:\Users\yeste
+#+v::run C:\Users\yeste\scoop\apps\alacritty\current\alacritty.exe -e arch run cd $HOME && ranger && bash
 #b::run explorer.exe
 ;#n::run arch run ranger /mnt/c/Users/yeff
 #n::
@@ -50,9 +50,12 @@ Browser_Back::     ;Browser_Back regedit_hexadecimal=3
    WinGet, active_id, ID, A
    WinMove, ahk_id %active_id%, , 675, 0, 698, 775
    return
-^enter::run alacritty.exe -e arch run source ~/.zprofile && bash, \\wsl$\Arch_Linux\home\yeff
-#enter::run alacritty.exe -e arch
-!enter::run alacritty.exe -e Powershell -NoLogo, C:\Users\yeff
+
+;^enter::run C:\Users\yeste\scoop\apps\alacritty\current\alacritty.exe -e arch run source ~/.zprofile && bash, \\wsl$\Arch_Linux\home\yeff
+^enter::run C:\Users\yeste\scoop\apps\alacritty\current\alacritty.exe -e arch run cd $HOME && bash
+;!enter::run wt.exe ;foccusing not working
+!enter::run C:\Users\yeste\scoop\apps\windows-terminal\current\WindowsTerminal.exe
+#enter::run C:\Users\yeste\scoop\apps\alacritty\current\alacritty.exe -e pwsh -NoLogo, C:\Users\yeste
 
 WheelRight::
    Send ^{Tab}
@@ -74,10 +77,10 @@ WheelLeft::
 ;>!s::Send {Home}
 ;>!d::Send {End}
 ;>!+s::Send {Home}
-;>!+d::Send {End}	
+;>!+d::Send {End}
 <!e::SendInput {WheelUp}
-<!d::SendInput {WheelDown} 
-<!s::Send ^+{tab} 
+<!d::SendInput {WheelDown}
+<!s::Send ^+{tab}
 <!f::Send ^{tab}
 
 #+j::
@@ -112,9 +115,9 @@ WheelLeft::
 
 RAlt::send {RShift down}
 RAlt up::send % (a_priorkey = "RAlt") ? "{RShift up}{RAlt up}{BS}" : "{RShift up}{RAlt up}"
-;LWin & RAlt::SendInput {Lwin down}{LAlt down}{LAlt up}{Lwin Up} ;notworking	
+;LWin & RAlt::SendInput {Lwin down}{LAlt down}{LAlt up}{Lwin Up} ;notworking
 ;RAlt & space::Send {enter}
-;RAlt & LAlt::Send ^{z} 
+;RAlt & LAlt::Send ^{z}
 
 LWin::LWin
 ;$~LWin up::send % instr(A_PriorKey, "LWin") ? "{LButton}" : "{LWin up}"
@@ -122,7 +125,7 @@ LWin up::
   if instr(A_PriorKey, "LWin")
     send {LButton}
   send {LWin up}
-  return 
+  return
 
 ;LAlt::LAlt
 $~LAlt up::send % instr(A_PriorKey, "LAlt") ? "{MButton}" : "{LAlt up}"
@@ -130,7 +133,7 @@ $~LAlt up::send % instr(A_PriorKey, "LAlt") ? "{MButton}" : "{LAlt up}"
 ;  if instr(A_PriorKey, "LAlt")
 ;    send {MButton}
 ;  send {LAlt up}
-;  return 
+;  return
 
 
 ;CapsLock::send {LCtrl down}
