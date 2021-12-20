@@ -1,6 +1,6 @@
 {
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
+    "actions":
     [
         {
             "command": "unbound",
@@ -15,7 +15,7 @@
             "keys": "ctrl+w"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "copy",
                 "singleLine": false
@@ -23,7 +23,7 @@
             "keys": "alt+c"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "newTab"
             },
@@ -38,7 +38,7 @@
             "keys": "ctrl+shift+f"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "splitPane",
                 "split": "auto",
@@ -48,7 +48,7 @@
         },
         {
             "command": "closePane",
-            "keys": "alt+w"
+            "keys": "alt+q"
         },
         {
             "command": "closePane",
@@ -58,10 +58,10 @@
     "copyFormatting": "none",
     "copyOnSelect": false,
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-    "profiles": 
+    "profiles":
     {
         "defaults": {},
-        "list": 
+        "list":
         [
             {
                 "commandline": "powershell.exe",
@@ -95,7 +95,7 @@
             }
         ]
     },
-    "schemes": 
+    "schemes":
     [
         {
             "background": "#0C0C0C",
