@@ -5,12 +5,23 @@
 # You may also like to assign a key to this command:
 #
     Set-PSReadLineOption -EditMode Vi
+    Set-PSReadLineOption -PredictionSource History
     Set-PSReadLineKeyHandler -Chord Alt+o -ScriptBlock {
         [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
         #[Microsoft.PowerShell.PSConsoleReadLine]::Insert('lfcd.ps1')
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert('lfcd')
         [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
     }
+
+# Shows navigable menu of all options when hitting Tab
+Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+
+# Autocompletion for arrow keys
+Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
+Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+# pwsh prompt
+Invoke-Expression (&starship init powershell)
 
 #
 # You may put this in one of the profiles found in $PROFILE.
