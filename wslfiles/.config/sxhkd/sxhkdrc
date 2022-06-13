@@ -1,0 +1,249 @@
+#
+# wm independent hotkeys
+#
+
+# terminal emulator
+super + {_,shift +,ctrl +}Return
+	{ \
+	  nixGL wezterm --config initial_rows=47 --config initial_cols=169; \
+	, nixGL wezterm --config initial_rows=30 --config initial_cols=90; \
+	, nixGL wezterm; \
+	}
+
+# terminal emulator
+mod1 + {_,shift +,ctrl +}Return
+  {nixGL kitty, nixGL alacritty,cool-retro-term}
+
+# dunst close/reopen notification
+ctrl + {_,shift + }space
+	dunstctl {close, history-pop}
+
+# make sxhkd reload its configuration files:
+super + Escape
+	pkill -USR1 -x sxhkd
+
+#
+# window-manager
+#
+
+# xdo close
+super + q
+	xdo close
+
+# focus or send to the given desktop
+super + {_,shift + }{1-9,0,minus,equal}
+	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11}'
+
+# increase/decrease window size (zoom in/out)
+super + alt + {i,o}
+	{ \
+	  xdotool getactivewindow windowmove --relative -- -52 -51 ; xdo resize -w +100 -h +50; \
+	, xdotool getactivewindow windowmove --relative -- +50 -1 ; xdo resize -w -100 -h -50; \
+	}
+
+# hover window to left/down/up/right
+super + alt + shift + {u,i,o,p}
+  xdotool getactivewindow { \
+	  windowsize 50%  95% windowmove 0%  0% ; \
+	, windowsize 100% 46% windowmove 0%  51%; \
+	, windowsize 100% 45% windowmove 0%  0% ; \
+	, windowsize 50%  95% windowmove 50% 0% ; \
+	}
+
+# move floating window by 10px
+super + alt + {h,j,k,l}
+  xdotool getactivewindow windowmove --relative -- {-10 -26, -1 -16, -1 -36, +10 -26}
+
+# hover window to corner
+super + alt + shift + {h,j,k,l}
+	W=$(xdotool getwindowfocus getwindowgeometry | awk '/Geometry/ \{print $2\}' | awk -F'x' '\{print $1\}'); \
+	H=$(xdotool getwindowfocus getwindowgeometry | awk '/Geometry/ \{print $2\}' | awk -F'x' '\{print $2\}'); \
+  xdotool getactivewindow windowmove --sync --relative -- -2 -52  windowmove \
+	{ \
+		0% y							  ; \ 
+	, x $((768 - H - 26)) ; \
+	, x 0%							  ; \
+	, $((1366 - W - 2)) y ; \
+	}
+
+# increase/expand/grow window edges 
+super + alt + {m,comma,period,slash}
+	{ xdotool getactivewindow windowmove --relative -- -11 -26; xdo resize -w +10; \
+  ,	                                                       		xdo resize -h +10; \
+  ,	xdotool getactivewindow windowmove --relative -- -1 -36;  xdo resize -h +10; \
+  ,	                                                          xdo resize -w +10; \
+	}
+
+# decrease/contract/shrink window edges
+super + alt + shift + {m,comma,period,slash}
+	{ xdotool getactivewindow windowmove --relative -- +9 -26; xdo resize -w -10; \
+	,																													 xdo resize -h -10; \
+  , xdotool getactivewindow windowmove --relative -- -1 -16; xdo resize -h -10; \
+	,																													 xdo resize -w -10; \
+	}
+
+# xdo fixedscreen 50%/75% (small/medium)
+super + alt + {_,shift + } n
+	xdotool getactivewindow windowsize { 75% 75%, 50% 50% }
+
+# xdo fixedscreen 1366x768 (min-max window)
+super + {_,shift + }n
+	xdotool getactivewindow windowsize { 100% 94%, 80% 95% windowmove 20% x}
+
+########################################
+###      alphabetic_hotkeys          ###
+#######################################
+
+# signs
+#F{1,2,3,4,5,6,7,8,9,10}
+#	xdotool key {exclam,at,numbersign,dollar,percent,asciicircum,ampersand,asterisk,parenleft,parenright}
+
+# super/alt click
+{XF86Finance,XF86Game}
+  xdotool click {1,2}
+
+# super volume
+super + XF86Audio{Raise,Lower}Volume
+  pactl set-sink-volume @DEFAULT_SINK@ {+,-}5%
+
+# volume
+XF86Audio{Raise,Lower}Volume
+  pactl set-sink-volume @DEFAULT_SINK@ {+,-}2%
+
+# (un)mute audio
+XF86AudioMute
+  pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+# (un)mute mic
+XF86AudioMicMute
+  pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+# backlight
+XF86MonBrightness{Down,Up}
+  light -{U,A} .11
+
+# super backlight
+super + XF86MonBrightness{Down,Up}
+  light -{U,A} 2
+
+# dimmer
+shift + XF86MonBrightness{Down,Up}
+  xcalib {-co 75 -a,-c}
+
+# dmenu(u)mount
+super + {F11,F12}
+  {dmenumount,dmenuumount}
+
+# chromium play-pause
+shift + space
+  playerctl --player=chromium play-pause
+
+# chromium rewind-forward
+alt + {a,s}
+	playerctl --player=chromium position {5-,5+}
+
+# mpv next-toggle-prev
+super + KP_{Right,Begin,Left}
+  playerctl --player=mpv {next,play-pause,previous}
+
+# mpv vol (down,up)
+super + KP_{Down,Up}
+	{ \
+	  playerctl --player=mpv volume 0.1-; \
+	, [[ "$(playerctl -p mpv volume)" < 1 ]]&& playerctl --player=mpv volume 0.1+; \
+	}
+
+# spotify next-toggle-prev
+mod1 + KP_{Right,Begin,Left}
+  playerctl --player=spotify {next,play-pause,previous}
+
+# spotify vol (down/up)
+mod1 + KP_{Down,Up}
+	{ \
+		playerctl --player=spotify volume 0.1-; \
+	, [[ "$(playerctl -p mpv volume)" < 1 ]]&& playerctl --player=spotify volume 0.1+; \
+	}
+
+# mpc next-toggle-prev
+KP_{Right,Begin,Left,Down,Up}
+  mpc --port=6601 {next,toggle,prev,volume -2,volume +2}
+
+# mpc next-toggle-prev
+KP_{Right,Begin,Left,Down,Up}
+  mpc --port=6601 {next,toggle,prev,volume -2,volume +2}
+
+# mpc next-toggle-prev
+mod1 + XF86Audio{RaiseVolume,Mute,LowerVolume}
+  mpc --port=6601 {next,toggle,prev}
+
+# screenshot (fullscreen,_)
+{super,alt} + Print
+	maimpick {fullscreen,_}
+
+# redshift
+mod1 + ctrl + {1,2,3,4,5}
+  redshift {-x, -O 2222, -O 3333, -O 4444, -O 5555}
+
+# compositor start/end
+super + BackSpace
+	{\
+		picom --glx-no-rebind-pixmap \
+        --use-damage \
+        --xrender-sync-fence \
+        --backend glx \
+        --experimental-backends \
+        --transparent-clipping \
+        # --active-opacity=0.90 \
+        # --inactive-opacity=0.90 \
+        # --refresh-rate 30\
+				,\
+    killall picom\
+	}
+
+# compositor keep background
+super + ctrl + BackSpace
+	{picom,killall picom}
+
+# compositor decrease/increase trasnparency
+super + ctrl + {minus,equal}
+  xdo id -d -c | xargs -I id -n 1 picom-trans -w id {-2,+4}
+  # xdo pid $ID  		# xdotool getactivewindow getwindowpid
+  # xdo id -p $PID  # xdotool getactivewindow
+
+# TextToSpeech
+super + {_,shift,ctrl} + Next
+  {xclip -o | mimic, xsel -b | festival --tts, killall mimic festival}
+
+# browser media
+super + shift + b
+  nixGL wezterm start ncmpcpp
+
+# dmenu launcher
+super + {_,shift +,ctrl +}d
+	{ \
+		dmenu_run; \
+	, wezterm start $(dmenu_path | dmenu); \
+  , source $HOME/.config/shell/aliasrc && \
+		alias | dmenu -i -l 10 | awk -F'=' '\{print $2\}' | xargs -I_ wezterm start -- bash -c "_"; \
+	}
+
+# lf user/root
+super + {_,shift +} e
+	{LF_CD=true wezterm, sudo -i LF_CD=true LS_COLORS="" $TERMINAL}
+
+# browser
+super + {_,shift +} w
+  { google-chrome-stable --process-per-site, killall chrome}
+
+# skippy
+#mod1 + BackSpace
+#   skippy-xd-runner --activate {--prev,--next}
+
+# skippy
+#mod1 + {~Tab,space}
+#   skippy-xd-runner {--activate --next,--toggle}
+
+# skippy
+#XF86Shop
+#  skippy-xd-runner --toggle
+

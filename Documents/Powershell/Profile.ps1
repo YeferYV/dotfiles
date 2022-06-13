@@ -1,7 +1,11 @@
+# FAST-WINRICING:
+# curl -L get.scoop.sh | pwsh
+# scoop install wezterm-nightly lf neovim touchcursor git
+# git clonw https://github.com/nvchad/nvchad $HOME/AppData/Local/nvim
+# touchcursor
+
 # Change working dir in powershell to last dir in lf on exit.
-#
 # You need to put this file to a folder in $ENV:PATH variable.
-#
 # You may also like to assign a key to this command:
 #
     Set-PSReadLineOption -EditMode Vi
@@ -60,10 +64,25 @@ Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $function:OnVi
 ## Enviroment variables
 # $env:ASD="asd"
 # echo $env:ASD
+$env:EDITOR="nvim"
+$env:OPENER="start"
+$env:XDG_CONFIG_HOME="$HOME\.config"
+# $env:MPV_HOME="$HOME\.config\mpv"
+$env:PATH+=";$HOME\.cargo\bin"
+$EDITOR="nvim"
+$OPENER="start"
+$XDG_CONFIG_HOME="$HOME\.config"
+
+Function lf_dir {
+  lf -command 'source C:\\Users\\yeste\\.config\\lf\\lfrc'
+}
+
+Set-Alias -Name lfdir -Value lf_dir
 
 # function Do-ActualThing {
 #     nvim
 # }
 # Set-Alias n Do-ActualThing
 Set-Alias n nvim
-Set-Alias solc solcjs
+
+

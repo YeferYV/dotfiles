@@ -1,0 +1,43 @@
+#!/bin/sh
+
+## to avoid multiple instances at restart bspwm
+killall xcape && setxkbmap
+
+## Increase key speed via a rate change
+xset r rate 300 50
+
+#########################################################
+xmodmap -e 'clear shift'
+xmodmap -e 'clear lock'
+xmodmap -e 'clear control'
+xmodmap -e 'clear mod1'
+
+## To use Caps_Lock as Control_L
+xmodmap -e 'keycode 66 = Control_L'
+
+## To use Alt_R as Shift_R
+xmodmap -e 'keycode 108 = Shift_R'
+
+## To use Menu as mod5
+xmodmap -e 'keycode 135 = Control_R'
+
+xmodmap -e 'add shift   = Shift_L Shift_R'
+xmodmap -e 'add control = Control_L Control_R'
+xmodmap -e 'add mod1    = Alt_L Meta_L'
+#########################################################
+
+## to use Control_L as Escape
+xcape -e 'Control_L=Escape'
+
+## to use Super_L as left click
+xcape -e 'Super_L=XF86Finance'
+
+## to use Alt_L as middle click
+xcape -e 'Alt_L=XF86Game'
+
+## to use Alt_R key as BackSpace
+xcape -e 'Shift_R=BackSpace'
+
+## to use Menu as Task-Switcher
+xcape -e 'Control_R=XF86Shop'
+

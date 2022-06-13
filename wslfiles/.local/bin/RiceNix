@@ -1,0 +1,204 @@
+#!/bin/bash
+# exit on error
+set -eu
+
+# docker install:
+# docker run -it
+#            --name nixrice \
+#            --volume=$(pwd):/root/.config/dotfiles/winfiles \
+#            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#            archlinux/archlinux:base-devel
+# useradd -mG sudo -s /bin/bash drksl && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl && sudo sed -i 's/Defaults/#Defaults/g' /etc/sudoers
+# useradd -mG wheel drksl             && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
+# su - drksl
+# mkdir {.config,.local}
+# sudo cp -r /root/.config/dotfiles ~/.config/dotfiles
+# sudo chown -R drksl:drksl ~/.config/dotfiles
+# sudo chown -R drksl:drksl /run/user/1000
+# cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin
+# ./RiceNix
+
+# Arch/Debian dependencies
+[ -e /etc/arch-release ]&&{
+    # sudo pacman -R fakeroot-tcp #WSL
+    # sudo pacman -S festival-us
+    sudo pacman-key --init
+    sudo pacman-key --populate
+    sudo pacman -Sy  --noconfirm archlinux-keyring
+    sudo pacman -Syu --noconfirm zsh xorg xf86-input-synaptics curl cron base-devel #xorg needed by xsixel(docker)
+  }||{
+    sudo apt update
+    # sudo apt full-upgrade -y
+    # sudo apt install -y festvox-us-slt-hts
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh xorg xserver-xorg-input-synaptics curl cron build-essential #xorg needed by xsixel(docker)
+  }
+
+# alternitive install nix-daemon(multiuser)
+# yes | sh <(curl -L https://nixos.org/nix/install) --daemon
+# sudo nix-daemon &
+
+# install nix
+curl -L https://nixos.org/nix/install | sh
+
+# source nix
+. ~/.nix-profile/etc/profile.d/nix.sh
+
+# install packages
+nix-env -iA \
+  nixpkgs.bat \
+  nixpkgs.cht-sh \
+  nixpkgs.dmenu \
+  nixpkgs.devour \
+  nixpkgs.fzf \
+  nixpkgs.ffmpegthumbnailer \
+  nixpkgs.gcc \
+  nixpkgs.git \
+  nixpkgs.kitty \
+  nixpkgs.less \
+  nixpkgs.libsixel \
+  nixpkgs.light \
+  nixpkgs.lf \
+  nixpkgs.lua \
+  nixpkgs.moreutils \
+  nixpkgs.mpc_cli \
+  nixpkgs.mpd \
+  nixpkgs.mupdf \
+  nixpkgs.mpvScripts.mpris \
+  nixpkgs.ncmpcpp \
+  nixpkgs.neovim \
+  nixpkgs.nodejs \
+  nixpkgs.perl534Packages.FileMimeInfo \
+  nixpkgs.pipewire \
+  nixpkgs.playerctl \
+  nixpkgs.pulseaudio \
+  nixpkgs.python310 \
+  nixpkgs.python310Packages.pip \
+  nixpkgs.redshift \
+  nixpkgs.ripgrep \
+  nixpkgs.spaceship-prompt \
+  nixpkgs.stow \
+  nixpkgs.sxhkd \
+  nixpkgs.sxiv \
+  nixpkgs.trash-cli \
+  nixpkgs.unzip \
+  nixpkgs.wezterm \
+  nixpkgs.xcape \
+  nixpkgs.xdo \
+  nixpkgs.xdotool \
+  nixpkgs.xdragon \
+  nixpkgs.xorg.libXfont \
+  nixpkgs.xorg.xmodmap \
+  nixpkgs.xorg.xorgserver \
+  nixpkgs.xorg.xset \
+  nixpkgs.xorg.xf86inputsynaptics \
+  nixpkgs.zathura \
+  nixpkgs.zsh-autosuggestions \
+  nixpkgs.zsh-fast-syntax-highlighting \
+  #nixpkgs.mlterm \
+
+# launch nixGL wezterm and unset LD_LIBRARY_PATH if GLIBC error (/bin/mpv)
+nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
+nix-channel --update
+nix-env -iA nixgl.auto.nixGLDefault
+
+# dotfiles
+# git clone https://gitlab.com/yucrayeff36/dotfiles $HOME/.config/dotfiles
+# cd $HOME/.config/dotfiles
+cd ../..
+[ ! -e $HOME/.config ]&& mkdir $HOME/.config
+[ ! -e $HOME/.local ]&& mkdir $HOME/.local
+stow --restow --verbose --target=$HOME/.config .config
+stow --restow --verbose --target=$HOME/.local .local
+ln -sf $HOME/.config/shell/.zprofile $HOME/.zprofile
+mkdir -p ~/.local/share/mpd
+
+# nerd fonts
+mkdir -p ~/.local/share/fonts
+git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
+cd nerd-fonts
+git sparse-checkout add patched-fonts/CascadiaCode
+cp -r patched-fonts/CascadiaCode ~/.local/share/fonts/
+cd ..
+
+# touchcursor
+git clone https://github.com/donniebreve/touchcursor-linux
+cd touchcursor-linux
+sed -i "s/systemctl/#systemctl/" Makefile
+make && sudo make install
+cd ..
+
+# xsixel
+git clone --depth 1 https://github.com/saitoha/xserver-sixel
+cd xserver-sixel
+sed -i '/sixel/a\    --disable-xwayland \\' build-xsixel.sh
+sed -i 's|/usr/local|$HOME/.local|' build-xsixel.sh
+sed -i 's/env/#env/' build-xsixel.sh
+sed -i 's/gl >= *.*.0/gl >= 1.2.0/g' configure.ac
+
+# [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
+# 	zsh xorg build-essential dh-autoreconf gawk xutils-dev xtrans-dev pkg-config libfontenc-dev \
+# 	libpixman-1-dev libghc-cryptohash-sha1-dev libxkbfile-dev libxau-dev x11proto-dev libsixel-dev \
+# 	&& $(curl -LO https://xorg.freedesktop.org/archive/individual/lib/libXfont-1.5.4.tar.bz2 \
+# 		&& tar xjvf libXfont-1.5.4.tar.bz2 \
+# 		&& cd libXfont-1.5.4 \
+# 		&& ./configure \
+# 		&& sudo make install \
+# 		&& sudo ln -s /usr/local/lib/libXfont.so.1 /usr/lib/libXfont.so.1) \
+# 	&& ./build-sixel.sh \
+# 	&& sudo make install
+
+nix-shell --pure \
+          --packages autoconf automake clang libdrm libGL libmd libsixel nettle pkg-config \
+            xorg.fontutil xorg.libX11 xorg.libxkbfile xorg.libXfont xorg.utilmacros xorg.xorgserver xorg.xtrans \
+          --command "CC=clang ./build-xsixel.sh && make install"
+cd ..
+
+# mpv-sixel
+git clone --depth 1 https://github.com/mpv-player/mpv
+cd mpv
+
+# [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
+# 	ffmpeg liblua5.2-dev libsixel-dev libpipewire-0.3-dev libass-dev libavutil-dev \
+# 	libavcodec-dev libavformat-dev libgl-dev libswscale-dev libavfilter-dev libswresample-dev \
+# 	&& ./bootstrap.py \
+# 	&& ./waf configure --libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
+# 	&& ./waf build \
+# 	&& sudo ./waf install
+
+nix-shell --pure \
+          --packages ffmpeg libass lua libsixel libGL mesa mujs pipewire pkg-config pulseaudio python310 \
+	  	      xorg.libX11 xorg.libXv xorg.libXScrnSaver xorg.libXext xorg.libXinerama xorg.libXrandr zlib \
+          --command "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt ./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
+cd ..
+
+# pipewire:
+# echo "export DISPLAY=localhost:0.0" >>$HOME/.zprofile #WSL
+# echo "export PULSE_SERVER=tcp:localhost" >>$HOME/.zprofile #WSL
+echo "export XDG_RUNTIME_DIR=/run/user/1000" >>$HOME/.zprofile
+
+# user config
+# systemctl --user enable --now touchcursor
+[ ! -e /etc/X11/xorg.conf.d ]&& sudo mkdir /etc/X11/xorg.conf.d
+sudo cp $HOME/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
+sudo crontab $HOME/.local/bin/cron/lowbatnotificationcron
+rm -rf {nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
+[ ! -e $HOME/.cache/zsh ]&& mkdir $HOME/.cache/zsh
+nix-collect-garbage
+
+# add zsh as a login shell
+command -v zsh | sudo tee -a /etc/shells
+
+# use zsh as default shell
+sudo chsh -s $(which zsh) $USER
+
+# # blacklisting beep sound (there is no beep in docker)
+# sudo rmmod pcspkr
+# echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
+
+# install neovim plugins
+git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+
+printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xprofile   #if DM \e[0m\n"
+printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"
+printf "\e[1;32m Done! \e[0m\n"

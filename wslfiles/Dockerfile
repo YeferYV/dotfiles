@@ -1,0 +1,119 @@
+# docker build -t archrice .
+# docker run -it \
+#            --name archrice \
+#            --volume=$(pwd):/home/drksl/.config/dotfiles \
+#            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#            archrice
+
+FROM archlinux/archlinux:base-devel
+
+RUN  sed -i '33s/#//' /etc/pacman.conf \
+     && sed -i '34s/N/#N/' /etc/pacman.conf \
+     && sed -i '37s/V/#V/' /etc/pacman.conf \
+     && pacman-key --init \
+     && pacman-key --populate \
+     && pacman -Sy  --noconfirm archlinux-keyring \
+     && pacman -Syu --noconfirm \
+     bat \
+     clang \
+     ffmpegthumbnailer \
+     fzf \
+     git \
+     moreutils \
+     mupdf-tools \
+     neovim \
+     nodejs \
+     npm \
+     openssh \
+     perl-file-mimeinfo \
+     pipewire \
+     python-pip \
+     ripgrep \
+     sxiv \
+     trash-cli \
+     unzip \
+     wezterm \
+     zathura \
+     zathura-pdf-mupdf \
+     zsh \
+     zsh-autosuggestions\
+     # xsixel dependencies \
+     && pacman -S --noconfirm libxkbfile xorg-font-util xorg-xkbcomp \
+     # user settings \
+     && useradd -mG wheel drksl \
+     && chsh --shell /usr/bin/zsh drksl \
+     && echo root:toor | chpasswd \
+     && echo drksl:toor | chpasswd \
+     && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
+     # AUR: \
+     # && echo "drksl ALL=(ALL) NOPASSWD: /usr/bin/pacman" > /etc/sudoers.d/allow_drksl_to_pacman \
+     # && echo "root ALL=(ALL) CWD=* ALL" > /etc/sudoers.d/permissive_root_Chdir_Spec \
+     # && sudo -u "drksl" bash -c "git clone https://aur.archlinux.org/paru-bin.git /home/drksl/paru-bin" \
+     # && sudo -u "drksl" bash -c "cd /home/drksl/paru-bin && makepkg -s" \
+     # && pacman -U --noconfirm /home/drksl/paru-bin/paru-bin* \
+     # && sudo -u "drksl" -D~ bash -c "paru -S --noconfirm cht.sh-git lf-bin spaceship-prompt-git zsh-fast-syntax-highlighting libsixel"
+
+# Expose ports
+EXPOSE 22/tcp
+EXPOSE 8080/tcp
+EXPOSE 5900/tcp
+
+# Set environments
+ENV DISPLAY=:0
+USER drksl
+WORKDIR /home/drksl
+
+# Dotfiles
+COPY --chown=drksl .config /home/drksl/.config
+COPY --chown=drksl .local /home/drksl/.local
+COPY --chown=drksl .config/shell/.zprofile /home/drksl/.zprofile
+
+# AUR:
+RUN  git clone https://aur.archlinux.org/yay-bin.git /home/drksl/yay-bin \
+     && cd  /home/drksl/yay-bin && makepkg --noconfirm -si \
+     && yay -S --noconfirm cht.sh-git lf-bin spaceship-prompt-git zsh-fast-syntax-highlighting libsixel
+
+# libxfont:
+RUN  yay -G libxfont \
+     && cd libxfont \
+     && sed -i "s/'xproto' 'fontsproto'/'xorgproto'/" PKGBUILD \
+     && makepkg -si --noconfirm \
+     && cd ..
+
+# xsixel:
+RUN  git clone --depth 1 https://github.com/saitoha/xserver-sixel \
+     && cd xserver-sixel \
+     && sed -i '/sixel/a\    --disable-xwayland \\' build-xsixel.sh \
+     && CC=clang ./build-xsixel.sh && sudo make install \
+     && cd ..
+
+# mpv-sixel:
+RUN  git clone --depth 1 https://github.com/mpv-player/mpv \
+     && cd mpv \
+     && ./bootstrap.py \
+     && ./waf configure --enable-sixel && ./waf build && sudo ./waf install \
+     && cd ..
+
+# pipewire:
+RUN  echo "export XDG_RUNTIME_DIR=/run/user/1000" >>/home/drksl/.zprofile \
+     && sudo mkdir /run/user/1000 \
+     && sudo chown -R drksl:drksl /run/user/1000
+
+# openssh
+RUN  sudo /usr/bin/ssh-keygen -A \
+     && echo "sudo /sbin/sshd" >>/home/drksl/.zprofile
+
+# nvim:
+RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
+     && nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+
+# clean
+RUN yes | yay -Scc \
+     && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,xserver-sixel,yay-bin} \
+     && mkdir /home/drksl/.cache/zsh \
+     && printf "\e[1;32m Done! \e[0m\n"
+
+# CMD [ "sudo","/usr/sbin/sshd"]
+# SHELL ["/bin/zsh","-l"]
+ENTRYPOINT ["/bin/zsh","-l"]
+
