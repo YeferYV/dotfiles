@@ -83,6 +83,7 @@ nix-env -iA \
   nixpkgs.unzip \
   nixpkgs.wezterm \
   nixpkgs.xcape \
+  nixpkgs.xclip \
   nixpkgs.xdo \
   nixpkgs.xdotool \
   nixpkgs.xdragon \
