@@ -16,7 +16,7 @@ toggleterm.setup({
 	direction = "float",
 	close_on_exit = true,
 	-- shell = vim.o.shell,
-	shell = "zsh",
+	shell = "pwsh -nologo",
 	float_opts = {
 		border = "curved",
 		winblend = 0,

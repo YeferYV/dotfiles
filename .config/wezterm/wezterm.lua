@@ -28,10 +28,11 @@ return {
   -- tab_bar_at_bottom = true,
   adjust_window_size_when_changing_font_size = false,
   front_end = "OpenGL",
-  -- font_size = 10.0,
+  -- animation_fps = 60,
+  font_size = 10,
   -- line_height = 1.00,
   bold_brightens_ansi_colors = true,
-  window_close_confirmation = "NeverPrompt",
+  -- window_close_confirmation = "NeverPrompt",
   -- window_padding = {left = 8, right = 8, top = 18, bottom = 8},
   -- window_padding = {left = 8, right = 8, top = 14, bottom = 10},
   -- window_padding = {left = 8, right = 8, top = 12, bottom = 12},
@@ -46,12 +47,12 @@ return {
   scrollback_lines = 10000,
 
   -- foreground_text_hsb = {
-  --   hue = 1.0,
-  --   saturation = 1.05,
-  --   brightness = 1.25,
+  --   hue = 1.00,
+  --   saturation = 1.10, --yellow to more yellowish
+  --   brightness = 1.90, --yellow to less yellowish
   -- },
 
-  -- font = wezterm.font("CaskaydiaCove Nerd Font", {weight="Bold", stretch="Normal", style=Normal}), -- /usr/share/fonts/TTF/Caskaydia Cove Nerd Font Complete.ttf, FontConfig
+  font = wezterm.font("CaskaydiaCove Nerd Font", {weight="Bold", stretch="Normal", style=Normal}), -- /usr/share/fonts/TTF/Caskaydia Cove Nerd Font Complete.ttf, FontConfig
   -- font = wezterm.font("CaskaydiaCove Nerd Font Mono", {weight="Bold", stretch="Normal", style=Normal}), -- /usr/share/fonts/TTF/Caskaydia Cove Nerd Font Complete Mono.ttf, FontConfig
   -- font = wezterm.font("Cascadia Code", {weight="Bold", stretch="Normal", style=Normal}), -- /usr/share/fonts/TTF/CascadiaCode.ttf index=0 variation=6, FontConfig
   -- font = wezterm.font("Cascadia Code", {weight="Bold", stretch="Normal", style=Italic}), -- /usr/share/fonts/TTF/CascadiaCodeItalic.ttf index=0 variation=6, FontConfig

@@ -113,14 +113,14 @@ keymap("c","w!!","w !sudo tee %",opts)
 -- vertical split
 -- keymap("n","<leader>v",":vsplit | resize 20 | term <CR>",opts)
 -- keymap("t","<leader>v",":vs +te <CR>",opts)
-keymap("n","<leader>t",":vsplit<bar>vertical resize 80<bar>term zsh<cr>",opts)
-keymap("t","<leader>t","<C-\\><C-n>:vsplit<bar>vertical resize 80<bar>term zsh<cr>",opts)
+keymap("n","<leader>t",":vsplit<bar>vertical resize 80<bar>term pwsh -nologo<cr>",opts)
+keymap("t","<leader>t","<C-\\><C-n>:vsplit<bar>vertical resize 80<bar>term pwsh -nologo<cr>",opts)
 
 -- horizontal split
 -- keymap("n","<leader>V",":split | resize 20 | term <CR>",opts)
 -- keymap("t","<leader>V",":split +te <CR>",opts)
-keymap("n","<leader>T",":split<bar>resize 20<bar>term zsh<cr> ",opts)
-keymap("t","<leader>T","<C-\\><C-n>:split<bar>resize 20<bar>term zsh<cr>",opts)
+keymap("n","<leader>T",":split<bar>resize 20<bar>term pwsh -nologo<cr> ",opts)
+keymap("t","<leader>T","<C-\\><C-n>:split<bar>resize 20<bar>term pwsh -nologo<cr>",opts)
 
 -- Zoom split
 -- noremap Zz <c-w>_ \| <c-w>\|
