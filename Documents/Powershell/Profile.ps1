@@ -64,13 +64,11 @@ Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $function:OnVi
 ## Enviroment variables
 # $env:ASD="asd"
 # echo $env:ASD
-$env:SHELL="pwsh -logo"
 $env:EDITOR="nvim"
 $env:OPENER="start"
 $env:XDG_CONFIG_HOME="$HOME\.config"
 # $env:MPV_HOME="$HOME\.config\mpv"
 $env:PATH+=";$HOME\.cargo\bin"
-$SHELL="pwsh -logo"
 $EDITOR="nvim"
 $OPENER="start"
 $XDG_CONFIG_HOME="$HOME\.config"

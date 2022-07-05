@@ -128,8 +128,8 @@ return require('packer').startup(function(use)
   -- }
 
   -- Intellisense
-  -- use {'tzachar/cmp-tabnine', commit = "e23d32a76304496aade4e4b285751a6a8b505491", run = 'powershell ./install.ps1'}
-  use { 'tzachar/cmp-tabnine', commit = "e23d32a76304496aade4e4b285751a6a8b505491", run = './install.sh' }
+  use {'tzachar/cmp-tabnine', commit = "e23d32a76304496aade4e4b285751a6a8b505491", run = 'powershell ./install.ps1'}
+  -- use { 'tzachar/cmp-tabnine', commit = "e23d32a76304496aade4e4b285751a6a8b505491", run = './install.sh' }
   use { 'github/copilot.vim', commit = "c2e75a3a7519c126c6fdb35984976df9ae13f564" }
 
   -- LSP

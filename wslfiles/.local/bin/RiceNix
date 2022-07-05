@@ -55,6 +55,7 @@ nix-env -iA \
   nixpkgs.git \
   nixpkgs.kitty \
   nixpkgs.less \
+  nixpkgs.lazygit \
   nixpkgs.libsixel \
   nixpkgs.light \
   nixpkgs.lf \

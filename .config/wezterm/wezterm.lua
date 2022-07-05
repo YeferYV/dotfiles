@@ -97,7 +97,7 @@ return {
     {key="e", mods="ALT", action=wezterm.action{ScrollByLine=-1}},
     {key="d", mods="ALT", action=wezterm.action{ScrollByLine=1}},
     {key="r", mods="ALT", action=wezterm.action{ScrollByPage=-1}},
-    {key="r", mods="ALT|SHIFT", action=wezterm.action{ScrollByPage=1}},
+    {key="f", mods="ALT|SHIFT", action=wezterm.action{ScrollByPage=1}},
     {key="t", mods="ALT", action="ScrollToTop"},
     {key="g", mods="ALT", action="ScrollToBottom"},
     {key="LeftArrow", mods="CTRL|ALT", action=wezterm.action{AdjustPaneSize={"Left", 1}}},
