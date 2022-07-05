@@ -46,6 +46,9 @@ customprompt()
 export PROMPT_COMMAND='echo -ne "\033]0; $(TMP=${PWD/#$HOME/\~}; echo ${TMP##*/}) \007"'
 precmd() { customprompt; eval "$PROMPT_COMMAND" }
 
+# export LC_ALL=en_US.UTF-8
+export LS_COLORS="tw=30:di=90:ow=94:ln=34"
+
 setopt autocd		# Automatically cd into typed directory.
 stty stop undef		# Disable ctrl-s to freeze terminal.
 setopt interactive_comments

@@ -134,16 +134,18 @@ mkdir -p ~/.local/share/mpd
 mkdir -p ~/.local/share/fonts
 git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
 cd nerd-fonts
+git sparse-checkout add patched-fonts/3270
 git sparse-checkout add patched-fonts/CascadiaCode
-git sparse-checkout add patched-fonts/3070
+git sparse-checkout add patched-fonts/Terminus
+cp -r patched-fonts/3270 ~/.local/share/fonts/
 cp -r patched-fonts/CascadiaCode ~/.local/share/fonts/
-cp -r patched-fonts/3070 ~/.local/share/fonts/
+cp -r patched-fonts/Terminus ~/.local/share/fonts/
 cd ..
 
 # bedstead font
 wget https://bjh21.me.uk/bedstead/bedstead-002.004.zip
 unzip bedstead-002.004.zip
-mv bedstead-002.004 ~/.local/share/fonts/otf
+mv bedstead-002.004 ~/.local/share/fonts/
 
 # touchcursor
 git clone https://github.com/donniebreve/touchcursor-linux
