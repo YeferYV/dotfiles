@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/env zsh
 
 ## env
 . $HOME/.config/shell/.zprofile
@@ -30,7 +30,7 @@ touchcursor &
 
 ## Load a resource file, and merge with the current settings (for urxvt)
 # xrdb -merge ~/.config/x11/xresources &
-xrdb <<<"*background: #000000" # sxiv background
+bash -c 'sleep7 && xrdb <<<"*background: #000000"' # sxiv background
 
 ## To Load pointer
 # xsetroot -cursor_name left_ptr &
