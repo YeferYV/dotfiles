@@ -37,7 +37,7 @@ set -eu
 # yes | sh <(curl -L https://nixos.org/nix/install) --daemon
 # sudo nix-daemon &
 
-# install nix
+# install nix (tested version = 22.05)
 curl -L https://nixos.org/nix/install | sh
 
 # source nix
@@ -51,7 +51,7 @@ nix-env -iA \
   nixpkgs.devour \
   nixpkgs.fzf \
   nixpkgs.ffmpegthumbnailer \
-  nixpkgs.gcc \
+  nixpkgs.gcc11 \
   nixpkgs.git \
   nixpkgs.kitty \
   nixpkgs.less \
@@ -65,8 +65,7 @@ nix-env -iA \
   nixpkgs.mupdf \
   nixpkgs.mpvScripts.mpris \
   nixpkgs.ncmpcpp \
-  nixpkgs.neovim \
-  nixpkgs.nodejs \
+  nixpkgs.nodejs-16_x \
   nixpkgs.perl534Packages.FileMimeInfo \
   nixpkgs.pipewire \
   nixpkgs.playerctl \
@@ -95,7 +94,24 @@ nix-env -iA \
   nixpkgs.zathura \
   nixpkgs.zsh-autosuggestions \
   nixpkgs.zsh-fast-syntax-highlighting \
-  #nixpkgs.mlterm \
+  # nixpkgs.mlterm \
+  # nixpkgs.timg \
+  # nixpkgs._3270font \
+
+# neovim version 7
+# git clone https://github.com/neovim/neovim.git
+# cd neovim
+# git checkout release-0.7
+# make CMAKE_BUILD_TYPE=Release
+# sudo make install
+# cd ..
+nix-env -iA neovim -f https://github.com/NixOS/nixpkgs/archive/bf972dc380f36a3bf83db052380e55f0eaa7dcb6.tar.gz
+
+# wezterm version 20220408
+# nix-env -iA wezterm -f https://github.com/NixOS/nixpkgs/archive/bf972dc380f36a3bf83db052380e55f0eaa7dcb6.tar.gz
+
+# lf version r27
+# nix-env -iA lf -f https://github.com/NixOS/nixpkgs/archive/bf972dc380f36a3bf83db052380e55f0eaa7dcb6.tar.gz
 
 # launch nixGL wezterm and unset LD_LIBRARY_PATH if GLIBC error (/bin/mpv)
 nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
@@ -118,8 +134,15 @@ mkdir -p ~/.local/share/fonts
 git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
 cd nerd-fonts
 git sparse-checkout add patched-fonts/CascadiaCode
+git sparse-checkout add patched-fonts/3070
 cp -r patched-fonts/CascadiaCode ~/.local/share/fonts/
+cp -r patched-fonts/3070 ~/.local/share/fonts/
 cd ..
+
+# bedstead font
+wget https://bjh21.me.uk/bedstead/bedstead-002.004.zip
+unzip bedstead-002.004.zip
+mv bedstead-002.004 ~/.local/share/fonts/otf
 
 # touchcursor
 git clone https://github.com/donniebreve/touchcursor-linux
@@ -149,7 +172,7 @@ sed -i 's/gl >= *.*.0/gl >= 1.2.0/g' configure.ac
 # 	&& sudo make install
 
 nix-shell --pure \
-          --packages autoconf automake clang libdrm libGL libmd libsixel nettle pkg-config \
+          --packages autoconf automake clang_11 libdrm libGL libmd libsixel nettle pkg-config \
             xorg.fontutil xorg.libX11 xorg.libxkbfile xorg.libXfont xorg.utilmacros xorg.xorgserver xorg.xtrans \
           --command "CC=clang ./build-xsixel.sh && make install"
 cd ..

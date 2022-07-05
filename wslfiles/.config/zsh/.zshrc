@@ -65,9 +65,6 @@ HISTFILE=~/.cache/zsh/history
 # tty >> /tmp/sixel-$WINDOWID
 # trap "rm /tmp/sixel-$WINDOWID" EXIT
 
-# export LS_COLORS="ln=94:tw=90:ow=90:st=90:di=90"
-export LS_COLORS="ln=94:di=90"
-
 ## Basic auto/tab complete:
 autoload -U compinit
 zstyle ':completion:*' menu select
@@ -95,7 +92,7 @@ bindkey -v '^?' backward-delete-char
 #  6 -> solid vertical bar
 function zle-keymap-select () {
     case $KEYMAP in
-        vicmd) echo -ne '\e[1 q';;      # block
+        vicmd) echo -ne '\e[2 q';;      # block
         viins|main) echo -ne '\e[6 q';; # beam
     esac
 }
@@ -187,7 +184,7 @@ lfcd () {
     # zle kill-whole-line
     tmp="$(mktemp)"
     # ~/.config/lf/lf-wiki-previewer/lf_ueberzug_previewer -last-dir-path="$tmp" "$@" < $TTY      #tty needed by fzf
-    ~/.config/lf/lf-wiki-previewer/lf_scrolling_previewer -last-dir-path="$tmp" "$@" < /dev/tty   #tty needed by fzf 
+    ~/.config/lf/lf-wiki-previewer/lf_scrolling_previewer -last-dir-path="$tmp" "$@" < /dev/tty   #tty needed by fzf
     if [ -f "$tmp" ]; then
         dir="$(cat "$tmp")"
         rm -f "$tmp" >/dev/null
