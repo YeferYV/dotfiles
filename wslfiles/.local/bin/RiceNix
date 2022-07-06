@@ -18,19 +18,22 @@ set -eu
 # cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin
 # ./RiceNix
 
-# Arch/Debian dependencies
-[ -e /etc/arch-release ]&&{
+# Arch dependencies
+[ -e /etc/pacman.d ]&&{
     # sudo pacman -R fakeroot-tcp #WSL
     # sudo pacman -S festival-us
     sudo pacman-key --init
     sudo pacman-key --populate
     sudo pacman -Sy  --noconfirm archlinux-keyring
-    sudo pacman -Syu --noconfirm zsh xorg xf86-input-synaptics curl cron base-devel #xorg needed by xsixel(docker)
-  }||{
+    sudo pacman -Syu --noconfirm zsh xf86-input-synaptics curl cron base-devel
+  }
+
+# Debian dependencies
+[ -e /etc/apt ]&&{
     sudo apt update
     # sudo apt full-upgrade -y
     # sudo apt install -y festvox-us-slt-hts
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh xorg xserver-xorg-input-synaptics curl cron build-essential #xorg needed by xsixel(docker)
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh xserver-xorg-input-synaptics curl cron build-essential
   }
 
 # alternitive install nix-daemon(multiuser)
@@ -38,7 +41,11 @@ set -eu
 # sudo nix-daemon &
 
 # install nix (tested version = 22.05)
-curl -L https://nixos.org/nix/install | sh
+[ -e /etc/nix/nix.conf ]&& {
+  nix-env -iA nixpkgs.zsh nixpkgs.gnused
+  }||{
+  curl -L https://nixos.org/nix/install | sh
+  }
 
 # source nix
 . ~/.nix-profile/etc/profile.d/nix.sh
@@ -88,15 +95,18 @@ nix-env -iA \
   nixpkgs.xdotool \
   nixpkgs.xdragon \
   nixpkgs.xorg.libXfont \
+  nixpkgs.xorg.setxkbmap \
+  nixpkgs.xorg.xkbcomp \
   nixpkgs.xorg.xmodmap \
   nixpkgs.xorg.xorgserver \
   nixpkgs.xorg.xset \
-  nixpkgs.xorg.xf86inputsynaptics \
   nixpkgs.zathura \
   nixpkgs.zsh-autosuggestions \
   nixpkgs.zsh-fast-syntax-highlighting \
+  # nixpkgs.cron \
   # nixpkgs.mlterm \
   # nixpkgs.timg \
+  # nixpkgs.xorg.xf86inputsynaptics \
   # nixpkgs._3270font \
 
 # neovim version 7
@@ -159,7 +169,7 @@ git clone --depth 1 https://github.com/saitoha/xserver-sixel
 cd xserver-sixel
 sed -i '/sixel/a\    --disable-xwayland \\' build-xsixel.sh
 sed -i 's|/usr/local|$HOME/.local|' build-xsixel.sh
-sed -i 's/env/#env/' build-xsixel.sh
+sed -i 's|/usr|$HOME/.nix-profile|' build-xsixel.sh
 sed -i 's/gl >= *.*.0/gl >= 1.2.0/g' configure.ac
 
 # [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
@@ -222,9 +232,9 @@ sudo chsh -s $(which zsh) $USER
 # sudo rmmod pcspkr
 # echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
 
-# install neovim plugins
-git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+# # install neovim plugins
+# git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+# nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xprofile   #if DM \e[0m\n"
 printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"

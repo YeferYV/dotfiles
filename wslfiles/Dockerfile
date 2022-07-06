@@ -103,12 +103,13 @@ RUN  echo "export XDG_RUNTIME_DIR=/run/user/1000" >>/home/drksl/.zprofile \
 RUN  sudo /usr/bin/ssh-keygen -A \
      && echo "sudo /sbin/sshd" >>/home/drksl/.zprofile
 
-# nvim:
-RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
-     && nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+# # nvim:
+# RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
+#      && nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # clean
-RUN yes | yay -Scc \
+RUN  pacman -R --noconfirm clang \
+     && yes | yay -Scc \
      && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,xserver-sixel,yay-bin} \
      && mkdir /home/drksl/.cache/zsh \
      && printf "\e[1;32m Done! \e[0m\n"
