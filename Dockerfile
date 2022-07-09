@@ -30,6 +30,7 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      python-pip \
      ripgrep \
      sxiv \
+     stow \
      trash-cli \
      unzip \
      wezterm \
@@ -64,9 +65,19 @@ USER drksl
 WORKDIR /home/drksl
 
 # Dotfiles
-COPY --chown=drksl .config /home/drksl/.config
-COPY --chown=drksl .local /home/drksl/.local
-COPY --chown=drksl .config/shell/.zprofile /home/drksl/.zprofile
+# COPY --chown=drksl wslfiles/.config /home/drksl/.config
+# COPY --chown=drksl wslfiles/.local /home/drksl/.local
+# COPY --chown=drksl wslfiles/.config/shell/.zprofile /home/drksl/.zprofile
+COPY --chown=drksl . /home/drksl/.config/dotfiles/winfiles
+
+# stow:
+RUN  mkdir /home/drksl/.local \
+     && cd /home/drksl/.config/dotfiles/winfiles/wslfiles \
+     && sudo chown -R drksl:drksl /home/drksl/.config \
+     && stow --restow --verbose --target=/home/drksl/.config .config \
+     && stow --restow --verbose --target=/home/drksl/.local .local \
+     && ln -sf /home/drksl/.config/shell/.zprofile /home/drksl/.zprofile \
+     && mkdir -p /home/drksl/.local/share/mpd
 
 # AUR:
 RUN  git clone https://aur.archlinux.org/yay-bin.git /home/drksl/yay-bin \

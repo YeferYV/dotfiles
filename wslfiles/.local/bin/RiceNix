@@ -130,8 +130,8 @@ nix-channel --update
 nix-env -iA nixgl.auto.nixGLDefault
 
 # dotfiles
-# git clone https://gitlab.com/yucrayeff36/dotfiles $HOME/.config/dotfiles
-# cd $HOME/.config/dotfiles
+# git clone https://gitlab.com/yucrayeff36/winfiles $HOME/.config/dotfiles/winfiles
+# cd $HOME/.config/dotfiles/winfiles/wslfiles/.local/bin/
 cd ../..
 [ ! -e $HOME/.config ]&& mkdir $HOME/.config
 [ ! -e $HOME/.local ]&& mkdir $HOME/.local
