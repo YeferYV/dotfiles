@@ -103,9 +103,9 @@ RUN  echo "export XDG_RUNTIME_DIR=/run/user/1000" >>/home/drksl/.zprofile \
 RUN  sudo /usr/bin/ssh-keygen -A \
      && echo "sudo /sbin/sshd" >>/home/drksl/.zprofile
 
-# # nvim:
-# RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
-#      && nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+# nvim:
+RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
+     && nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # clean
 RUN  pacman -R --noconfirm clang \
