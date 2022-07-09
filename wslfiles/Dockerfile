@@ -108,7 +108,7 @@ RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/shar
      && nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # clean
-RUN  pacman -R --noconfirm clang \
+RUN  sudo pacman -R --noconfirm clang \
      && yes | yay -Scc \
      && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,xserver-sixel,yay-bin} \
      && mkdir /home/drksl/.cache/zsh \
