@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # exit on error
 set -eu
 
@@ -7,7 +7,7 @@ set -eu
 #            --name nixrice \
 #            --volume=$(pwd):/root/.config/dotfiles/winfiles \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
-#            archlinux/archlinux:base-devel
+#            nixos/nix:2.9.2
 # useradd -mG sudo -s /bin/bash drksl && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl && sudo sed -i 's/Defaults/#Defaults/g' /etc/sudoers
 # useradd -mG wheel drksl             && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
 # su - drksl
@@ -41,8 +41,38 @@ set -eu
 # sudo nix-daemon &
 
 # install nix (tested version = 22.05)
-[ -e /etc/nix/nix.conf ]&& {
-  nix-env -iA nixpkgs.zsh nixpkgs.gnused
+[ -e /etc/nix ]&& {
+  nix-channel --update
+  # nix-env -iA nixpkgs.shadow nixpkgs.pam
+  # mv /etc/group /etc/group.old
+  # mv /etc/passwd /etc/passwd.old
+  # mv /etc/shadow /etc/shadow.old
+  # cat /etc/group.old > /etc/group
+  # cat /etc/passwd.old > /etc/passwd
+  # cat /etc/shadow.old > /etc/shadow
+  # groupadd wheel
+  # useradd -mG wheel drksl
+  nix-env -iA nixpkgs.zsh nixpkgs.util-linux nixpkgs.sudo nixpkgs.ncurses nixpkgs.gnused nixpkgs.gawk nixpkgs.file nixpkgs.cron nipkgs.bashInteractive
+  mkdir -p /etc/{pam.d,sudoers.d,X11}
+  cat  > /etc/sudoers    <  ~/.nix-profile/etc/sudoers
+  cat >> /etc/pam.d/sudo <<-===
+    #%PAM-1.0
+    auth            required        pam_unix.so
+    account         required        pam_unix.so
+    session         required        pam_unix.so
+    password        required        pam_unix.so
+===
+  mv /bin /bin.old
+  ln -s /root/.nix-profile/bin /bin
+  echo "/bin/zsh -l" > /root/.bashrc
+  # cp /etc/pam.d/sudo /etc/pam.d/su
+  # cp /etc/pam.d/sudo /etc/pam.d/passwd
+  # cp /etc/pam.d/sudo /etc/pam.d/chpasswd
+  # echo drksl:toor | chpasswd
+  # echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
+  # nix-env -e shadow
+  # nix-env -iA nixpkgs.su
+  # su - drksl
   }||{
   curl -L https://nixos.org/nix/install | sh
   }
@@ -203,9 +233,10 @@ cd mpv
 # 	&& sudo ./waf install
 
 nix-shell --pure \
+          --keep NIX_SSL_CERT_FILE \
           --packages ffmpeg libass lua libsixel libGL mesa mujs pipewire pkg-config pulseaudio python310 \
 	  	      xorg.libX11 xorg.libXv xorg.libXScrnSaver xorg.libXext xorg.libXinerama xorg.libXrandr zlib \
-          --command "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt ./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
+          --command "./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
 cd ..
 
 # pipewire:
