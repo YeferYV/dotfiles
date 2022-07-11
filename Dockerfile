@@ -15,13 +15,13 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      && pacman -Sy  --noconfirm archlinux-keyring \
      && pacman -Syu --noconfirm \
      bat \
+     cmake \
      clang \
      ffmpegthumbnailer \
      fzf \
      git \
      moreutils \
      mupdf-tools \
-     neovim \
      nodejs \
      npm \
      openssh \
@@ -114,14 +114,21 @@ RUN  echo "export XDG_RUNTIME_DIR=/run/user/1000" >>/home/drksl/.zprofile \
 RUN  sudo /usr/bin/ssh-keygen -A \
      && echo "sudo /sbin/sshd" >>/home/drksl/.zprofile
 
-# nvim:
+# neovim version 0.7
+RUN  git clone --depth=1 https://github.com/neovim/neovim.git \
+     && cd neovim \
+     && git checkout release-0.7 \
+     && make CMAKE_BUILD_TYPE=Release \
+     && sudo make install
+
+# neovim plugins:
 RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
      && nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # clean
-RUN  sudo pacman -R --noconfirm clang \
+RUN  sudo pacman -R --noconfirm clang cmake \
      && yes | yay -Scc \
-     && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,xserver-sixel,yay-bin} \
+     && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,neovim,xserver-sixel,yay-bin} \
      && mkdir /home/drksl/.cache/zsh \
      && printf "\e[1;32m Done! \e[0m\n"
 

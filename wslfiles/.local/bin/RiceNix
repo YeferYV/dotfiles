@@ -140,12 +140,6 @@ nix-env -iA \
   # nixpkgs._3270font \
 
 # neovim version 7
-# git clone https://github.com/neovim/neovim.git
-# cd neovim
-# git checkout release-0.7
-# make CMAKE_BUILD_TYPE=Release
-# sudo make install
-# cd ..
 nix-env -iA neovim -f https://github.com/NixOS/nixpkgs/archive/bf972dc380f36a3bf83db052380e55f0eaa7dcb6.tar.gz
 
 # wezterm version 20220408
