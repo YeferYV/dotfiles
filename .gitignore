@@ -1,6 +1,15 @@
+.config/nvim/plugin
 AppData/Roaming/mpv/gallery-thumbs-dir
+
 wslfiles/.config/ncmpcpp/lyrics/
 wslfiles/.config/ncmpcpp/error.log
 wslfiles/.config/nvim/plugin
 wslfiles/.config/zsh/.zcompdump
-.config/nvim/plugin
+
+wslfiles/.local/bin/*
+!wslfiles/.local/bin/cron/
+!wslfiles/.local/bin/dmenupass
+!wslfiles/.local/bin/maimpick
+!wslfiles/.local/bin/remaps
+!wslfiles/.local/bin/RiceNix
+!wslfiles/.local/bin/spdf
