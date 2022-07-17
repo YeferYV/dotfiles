@@ -69,6 +69,8 @@ set -eu
   # cp /etc/pam.d/sudo /etc/pam.d/passwd
   # cp /etc/pam.d/sudo /etc/pam.d/chpasswd
   # echo drksl:toor | chpasswd
+  # echo root:toor | chpasswd
+  # chomod 4755 $(readlink $(which sudo))
   # echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
   # nix-env -e shadow
   # nix-env -iA nixpkgs.su
@@ -83,58 +85,58 @@ set -eu
 
 # install packages
 nix-env -iA \
-  nixpkgs.bat \
-  nixpkgs.cht-sh \
-  nixpkgs.dmenu \
-  nixpkgs.devour \
-  nixpkgs.fzf \
-  nixpkgs.ffmpegthumbnailer \
-  nixpkgs.gcc11 \
-  nixpkgs.git \
-  nixpkgs.kitty \
-  nixpkgs.less \
-  nixpkgs.lazygit \
-  nixpkgs.libsixel \
-  nixpkgs.light \
-  nixpkgs.lf \
-  nixpkgs.lua \
-  nixpkgs.moreutils \
-  nixpkgs.mpc_cli \
-  nixpkgs.mpd \
-  nixpkgs.mupdf \
-  nixpkgs.mpvScripts.mpris \
-  nixpkgs.ncmpcpp \
-  nixpkgs.neovim \
-  nixpkgs.nodejs-16_x \
-  nixpkgs.perl534Packages.FileMimeInfo \
-  nixpkgs.pipewire \
-  nixpkgs.playerctl \
-  nixpkgs.pulseaudio \
-  nixpkgs.python310 \
-  nixpkgs.python310Packages.pip \
-  nixpkgs.redshift \
-  nixpkgs.ripgrep \
-  nixpkgs.spaceship-prompt \
-  nixpkgs.stow \
-  nixpkgs.sxhkd \
-  nixpkgs.sxiv \
-  nixpkgs.trash-cli \
-  nixpkgs.unzip \
-  nixpkgs.wezterm \
-  nixpkgs.xcape \
-  nixpkgs.xclip \
-  nixpkgs.xdo \
-  nixpkgs.xdotool \
-  nixpkgs.xdragon \
-  nixpkgs.xorg.libXfont \
-  nixpkgs.xorg.setxkbmap \
-  nixpkgs.xorg.xkbcomp \
-  nixpkgs.xorg.xmodmap \
-  nixpkgs.xorg.xorgserver \
-  nixpkgs.xorg.xset \
-  nixpkgs.zathura \
-  nixpkgs.zsh-autosuggestions \
-  nixpkgs.zsh-fast-syntax-highlighting \
+  bat \
+  cht-sh \
+  dmenu \
+  devour \
+  fzf \
+  ffmpegthumbnailer \
+  gcc11 \
+  git \
+  kitty \
+  less \
+  lazygit \
+  libsixel \
+  light \
+  lf \
+  lua \
+  moreutils \
+  mpc_cli \
+  mpd \
+  mupdf \
+  mpvScripts.mpris \
+  ncmpcpp \
+  neovim \
+  nodejs-16_x \
+  perl534Packages.FileMimeInfo \
+  pipewire \
+  playerctl \
+  pulseaudio \
+  python310 \
+  python310Packages.pip \
+  redshift \
+  ripgrep \
+  spaceship-prompt \
+  stow \
+  sxhkd \
+  sxiv \
+  trash-cli \
+  unzip \
+  wezterm \
+  xcape \
+  xclip \
+  xdo \
+  xdotool \
+  xdragon \
+  xorg.libXfont \
+  xorg.setxkbmap \
+  xorg.xkbcomp \
+  xorg.xmodmap \
+  xorg.xorgserver \
+  xorg.xset \
+  zathura \
+  zsh-autosuggestions \
+  zsh-fast-syntax-highlighting \
   -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
   # nixpkgs.bspwm \
   # nixpkgs.cron \
@@ -194,7 +196,7 @@ sed -i "s/sudo //" Makefile
 nix-shell --pure \
           -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
           --packages gnumake \
-          --command "INSTALLPATH=$HOME/.loca/bin make && INSTALLPATH=$HOME/.loca/bin  make install"
+          --command "make && INSTALLPATH=$HOME/.local/bin  make install"
 cd ..
 
 # xsixel
@@ -260,7 +262,7 @@ sudo cp $HOME/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
 sudo crontab $HOME/.local/bin/cron/lowbatnotificationcron
 rm -rf {nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
 [ ! -e $HOME/.cache/zsh ]&& mkdir $HOME/.cache/zsh
-nix-collect-garbage
+nix-collect-garbage -d
 
 # add zsh as a login shell
 command -v zsh | sudo tee -a /etc/shells
