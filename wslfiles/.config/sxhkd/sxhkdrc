@@ -60,13 +60,13 @@ super + alt + shift + {h,j,k,l}
 	H=$(xdotool getwindowfocus getwindowgeometry | awk '/Geometry/ \{print $2\}' | awk -F'x' '\{print $2\}'); \
   xdotool getactivewindow windowmove --sync --relative -- -2 -52  windowmove \
 	{ \
-		0% y							  ; \ 
+		0% y							  ; \
 	, x $((768 - H - 26)) ; \
 	, x 0%							  ; \
 	, $((1366 - W - 2)) y ; \
 	}
 
-# increase/expand/grow window edges 
+# increase/expand/grow window edges
 super + alt + {m,comma,period,slash}
 	{ xdotool getactivewindow windowmove --relative -- -11 -26; xdo resize -w +10; \
   ,	                                                       		xdo resize -h +10; \
@@ -137,6 +137,10 @@ super + {F11,F12}
 # chromium play-pause
 shift + space
   playerctl --player=chromium play-pause
+
+# chromium next-toggle-prev
+alt + KP_{Right,Begin,Left}
+  playerctl --player=chromium {next,play-pause,previous}
 
 # chromium rewind-forward
 alt + {a,s}

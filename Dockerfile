@@ -15,7 +15,6 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      && pacman -Sy  --noconfirm archlinux-keyring \
      && pacman -Syu --noconfirm \
      bat \
-     cmake \
      clang \
      ffmpegthumbnailer \
      fzf \
@@ -115,18 +114,15 @@ RUN  sudo /usr/bin/ssh-keygen -A \
      && echo "sudo /sbin/sshd" >>/home/drksl/.zprofile
 
 # neovim version 0.7
-RUN  git clone --depth=1 https://github.com/neovim/neovim.git \
-     && cd neovim \
-     && git checkout release-0.7 \
-     && make CMAKE_BUILD_TYPE=Release \
-     && sudo make install
+RUN  curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage \
+     && chmod +x $HOME/.local/bin/nvim
 
 # neovim plugins:
 RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
      && nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # clean
-RUN  sudo pacman -R --noconfirm clang cmake \
+RUN  sudo pacman -R --noconfirm clang \
      && yes | yay -Scc \
      && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,neovim,xserver-sixel,yay-bin} \
      && mkdir /home/drksl/.cache/zsh \

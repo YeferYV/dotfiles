@@ -75,10 +75,11 @@ set -eu
   # su - drksl
   }||{
   curl -L https://nixos.org/nix/install | sh
+  . ~/.nix-profile/etc/profile.d/nix.sh
+  nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
+  nix-channel --update
+  nix-env -iA nixgl.auto.nixGLDefault
   }
-
-# source nix
-. ~/.nix-profile/etc/profile.d/nix.sh
 
 # install packages
 nix-env -iA \
@@ -103,6 +104,7 @@ nix-env -iA \
   nixpkgs.mupdf \
   nixpkgs.mpvScripts.mpris \
   nixpkgs.ncmpcpp \
+  nixpkgs.neovim \
   nixpkgs.nodejs-16_x \
   nixpkgs.perl534Packages.FileMimeInfo \
   nixpkgs.pipewire \
@@ -133,25 +135,14 @@ nix-env -iA \
   nixpkgs.zathura \
   nixpkgs.zsh-autosuggestions \
   nixpkgs.zsh-fast-syntax-highlighting \
+  -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
+  # nixpkgs.bspwm \
   # nixpkgs.cron \
   # nixpkgs.mlterm \
   # nixpkgs.timg \
   # nixpkgs.xorg.xf86inputsynaptics \
+  # nixpkgs.xorg.xinit \
   # nixpkgs._3270font \
-
-# neovim version 7
-nix-env -iA neovim -f https://github.com/NixOS/nixpkgs/archive/bf972dc380f36a3bf83db052380e55f0eaa7dcb6.tar.gz
-
-# wezterm version 20220408
-# nix-env -iA wezterm -f https://github.com/NixOS/nixpkgs/archive/bf972dc380f36a3bf83db052380e55f0eaa7dcb6.tar.gz
-
-# lf version r27
-# nix-env -iA lf -f https://github.com/NixOS/nixpkgs/archive/bf972dc380f36a3bf83db052380e55f0eaa7dcb6.tar.gz
-
-# launch nixGL wezterm and unset LD_LIBRARY_PATH if GLIBC error (/bin/mpv)
-nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
-nix-channel --update
-nix-env -iA nixgl.auto.nixGLDefault
 
 # dotfiles
 # git clone https://gitlab.com/yucrayeff36/winfiles $HOME/.config/dotfiles/winfiles
@@ -181,16 +172,38 @@ wget https://bjh21.me.uk/bedstead/bedstead-002.004.zip
 unzip bedstead-002.004.zip
 mv bedstead-002.004 ~/.local/share/fonts/
 
+# neovim version 7
+curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x $HOME/.local/bin/nvim
+# git clone --depth=1 --branch v0.7.2 --single-branch https://github.com/neovim/neovim
+# cd neovim
+# nix-shell --pure \
+#           -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
+#           --packages autoconf automake cmake curl gettext libtermkey libtool lua perl pkg-config unibilium unzip \
+#           --command "make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=$HOME/.local && make install"
+# cd ..
+
 # touchcursor
-git clone https://github.com/donniebreve/touchcursor-linux
+mkdir touchcursor-linux
 cd touchcursor-linux
+git init
+git remote add origin https://github.com/donniebreve/touchcursor-linux
+git fetch --depth=1 origin 775d5db97ff7a9d65965f5d05c338fd5276a7ce7
+git checkout 775d5db
 sed -i "s/systemctl/#systemctl/" Makefile
-make && sudo make install
+sed -i "s/sudo //" Makefile
+nix-shell --pure \
+          -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
+          --packages gnumake \
+          --command "INSTALLPATH=$HOME/.loca/bin make && INSTALLPATH=$HOME/.loca/bin  make install"
 cd ..
 
 # xsixel
-git clone --depth 1 https://github.com/saitoha/xserver-sixel
+mkdir xserver-sixel
 cd xserver-sixel
+git init
+git remote add origin https://github.com/saitoha/xserver-sixel
+git fetch --depth=1 origin 7f4af3440cd736942f87ae96d15f7eaa2c1d58a9
+git checkout 7f4af34
 sed -i '/sixel/a\    --disable-xwayland \\' build-xsixel.sh
 sed -i 's|/usr/local|$HOME/.local|' build-xsixel.sh
 sed -i 's|/usr|$HOME/.nix-profile|' build-xsixel.sh
@@ -209,13 +222,14 @@ sed -i 's/gl >= *.*.0/gl >= 1.2.0/g' configure.ac
 # 	&& sudo make install
 
 nix-shell --pure \
+          -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
           --packages autoconf automake clang_11 libdrm libGL libmd libsixel nettle pkg-config \
             xorg.fontutil xorg.libX11 xorg.libxkbfile xorg.libXfont xorg.utilmacros xorg.xorgserver xorg.xtrans \
           --command "CC=clang ./build-xsixel.sh && make install"
 cd ..
 
-# mpv-sixel
-git clone --depth 1 https://github.com/mpv-player/mpv
+# mpv-sixel (unset LD_LIBRARY_PATH if GLIBC error (/bin/mpv))
+git clone --depth=1 --branch v0.34.1 --single-branch https://github.com/mpv-player/mpv
 cd mpv
 
 # [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
@@ -228,6 +242,7 @@ cd mpv
 
 nix-shell --pure \
           --keep NIX_SSL_CERT_FILE \
+          -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
           --packages ffmpeg libass lua libsixel libGL mesa mujs pipewire pkg-config pulseaudio python310 \
 	  	      xorg.libX11 xorg.libXv xorg.libXScrnSaver xorg.libXext xorg.libXinerama xorg.libXrandr zlib \
           --command "./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
