@@ -59,9 +59,11 @@ EXPOSE 8080/tcp
 EXPOSE 5900/tcp
 
 # Set environments
-ENV DISPLAY=:0
 USER drksl
 WORKDIR /home/drksl
+ENV DISPLAY=:0
+ENV XDG_RUNTIME_DIR=/run/user/1000
+ENV APPIMAGE_EXTRACT_AND_RUN=1
 
 # Dotfiles
 # COPY --chown=drksl wslfiles/.config /home/drksl/.config
@@ -105,8 +107,7 @@ RUN  git clone --depth 1 https://github.com/mpv-player/mpv \
      && cd ..
 
 # pipewire:
-RUN  echo "export XDG_RUNTIME_DIR=/run/user/1000" >>/home/drksl/.zprofile \
-     && sudo mkdir /run/user/1000 \
+RUN  sudo mkdir /run/user/1000 \
      && sudo chown -R drksl:drksl /run/user/1000
 
 # openssh
@@ -119,7 +120,7 @@ RUN  curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/do
 
 # neovim plugins:
 RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
-     && nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+     && $HOME/.local/bin/nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 # clean
 RUN  sudo pacman -R --noconfirm clang \

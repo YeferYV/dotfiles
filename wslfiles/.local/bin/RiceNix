@@ -112,7 +112,6 @@ nix-env -iA \
   pipewire \
   playerctl \
   pulseaudio \
-  python310 \
   python310Packages.pip \
   redshift \
   ripgrep \
@@ -141,6 +140,7 @@ nix-env -iA \
   # nixpkgs.bspwm \
   # nixpkgs.cron \
   # nixpkgs.mlterm \
+  # nixpkgs.python310 \
   # nixpkgs.timg \
   # nixpkgs.xorg.xf86inputsynaptics \
   # nixpkgs.xorg.xinit \
@@ -174,8 +174,8 @@ wget https://bjh21.me.uk/bedstead/bedstead-002.004.zip
 unzip bedstead-002.004.zip
 mv bedstead-002.004 ~/.local/share/fonts/
 
-# neovim version 7
-curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x $HOME/.local/bin/nvim
+# neovim version 7 (appimage-run nvim.appimage on NIXOS)
+# curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x $HOME/.local/bin/nvim
 # git clone --depth=1 --branch v0.7.2 --single-branch https://github.com/neovim/neovim
 # cd neovim
 # nix-shell --pure \
@@ -253,14 +253,14 @@ cd ..
 # pipewire:
 # echo "export DISPLAY=localhost:0.0" >>$HOME/.zprofile #WSL
 # echo "export PULSE_SERVER=tcp:localhost" >>$HOME/.zprofile #WSL
-echo "export XDG_RUNTIME_DIR=/run/user/1000" >>$HOME/.zprofile
+# echo "export XDG_RUNTIME_DIR=/run/user/1000" >>$HOME/.zprofile #Docker Audio
 
 # user config
 # systemctl --user enable --now touchcursor
 [ ! -e /etc/X11/xorg.conf.d ]&& sudo mkdir /etc/X11/xorg.conf.d
 sudo cp $HOME/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
 sudo crontab $HOME/.local/bin/cron/lowbatnotificationcron
-rm -rf {nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
+rm -rf {bedstead-002.004.zip,nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
 [ ! -e $HOME/.cache/zsh ]&& mkdir $HOME/.cache/zsh
 nix-collect-garbage -d
 
