@@ -61,6 +61,7 @@ EXPOSE 5900/tcp
 # Set environments
 USER drksl
 WORKDIR /home/drksl
+ENV USER="drksl"
 ENV DISPLAY=:0
 ENV XDG_RUNTIME_DIR=/run/user/1000
 ENV APPIMAGE_EXTRACT_AND_RUN=1

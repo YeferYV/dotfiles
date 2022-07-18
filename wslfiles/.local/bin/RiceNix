@@ -174,7 +174,7 @@ wget https://bjh21.me.uk/bedstead/bedstead-002.004.zip
 unzip bedstead-002.004.zip
 mv bedstead-002.004 ~/.local/share/fonts/
 
-# neovim version 7 (appimage-run nvim.appimage on NIXOS)
+# # neovim version 7 (appimage-run nvim.appimage on NIXOS)
 # curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x $HOME/.local/bin/nvim
 # git clone --depth=1 --branch v0.7.2 --single-branch https://github.com/neovim/neovim
 # cd neovim
@@ -231,8 +231,12 @@ nix-shell --pure \
 cd ..
 
 # mpv-sixel (unset LD_LIBRARY_PATH if GLIBC error (/bin/mpv))
-git clone --depth=1 --branch v0.34.1 --single-branch https://github.com/mpv-player/mpv
+mkdir mpv
 cd mpv
+git init
+git remote add origin https://github.com/mpv-player/mpv
+git fetch --depth=1 origin 0044c19f0de29ff752eb708365322b0ec16b53e7
+git checkout 0044c19
 
 # [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
 # 	ffmpeg liblua5.2-dev libsixel-dev libpipewire-0.3-dev libass-dev libavutil-dev \
