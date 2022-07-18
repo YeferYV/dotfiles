@@ -52,7 +52,7 @@ set -eu
   # cat /etc/shadow.old > /etc/shadow
   # groupadd wheel
   # useradd -mG wheel drksl
-  nix-env -iA nixpkgs.zsh nixpkgs.util-linux nixpkgs.sudo nixpkgs.ncurses nixpkgs.gnused nixpkgs.gawk nixpkgs.file nixpkgs.cron nixpkgs.bashInteractive
+  nix-env -iA nixpkgs.zsh nixpkgs.util-linux nixpkgs.sudo nixpkgs.ncurses nixpkgs.gnused nixpkgs.gawk nixpkgs.file nixpkgs.cron nixpkgs.curl nixpkgs.bashInteractive
   mkdir -p /etc/{pam.d,sudoers.d,X11}
   cat  > /etc/sudoers    <  ~/.nix-profile/etc/sudoers
   cat >> /etc/pam.d/sudo <<-===
