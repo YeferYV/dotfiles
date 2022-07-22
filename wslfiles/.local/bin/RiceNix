@@ -5,6 +5,7 @@ set -eu
 # docker install:
 # docker run -it
 #            --name nixrice \
+#            --privileged \
 #            --volume=$(pwd):/root/.config/dotfiles/winfiles \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            nixos/nix:2.9.2
