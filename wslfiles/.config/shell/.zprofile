@@ -11,13 +11,13 @@ export PROMPT_COMMAND='echo -ne "\033]0;$(TMP=${PWD/#$HOME/\~};echo ${TMP##*/})\
 export PS1="[\w]\$ "
 
 #-- Default programs:
-# export SHELL="$(which zsh)"
+export SHELL="$(which zsh)"
 # export TERM="xterm-256color"
 export EDITOR="nvim"
 export VISUAL="nvim"
 export OPENER="xdg-open"
 export PAGER="less"
-export TERMINAL="wezterm"
+export TERMINAL="nixGL wezterm"
 export BROWSER="google-chrome-stable"
 export SURFRAW_text_browser='w3m -sixel'
 export SURFRAW_graphical=no
