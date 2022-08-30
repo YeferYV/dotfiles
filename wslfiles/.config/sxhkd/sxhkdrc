@@ -3,10 +3,10 @@
 #
 
 # terminal emulator
-super + {_,shift + ctrl,alt + }Return
+super + {_,shift +,ctrl + }Return
 	{ \
-	  nixGL wezterm --config initial_rows=30 --config initial_cols=90; \
-	, nixGL wezterm --config initial_rows=47 --config initial_cols=169; \
+	  nixGL wezterm --config initial_rows=47 --config initial_cols=169; \
+	, nixGL wezterm --config initial_rows=30 --config initial_cols=90; \
 	, nixGL wezterm; \
 	}
 
