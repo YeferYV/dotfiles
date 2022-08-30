@@ -64,15 +64,11 @@ HISTFILE=~/.cache/zsh/history
 # [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/bm-files" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/bm-files"
 # [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/inputrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/inputrc"
 
-# Tmux get parent tty
-# tty >> /tmp/sixel-$WINDOWID
-# trap "rm /tmp/sixel-$WINDOWID" EXIT
-
 ## Basic auto/tab complete:
 autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
-compinit
+compinit -d ~/.cache/zsh/.zcompdump
 _comp_options+=(globdots)		# Include hidden files.
 
 ## vi mode
@@ -111,46 +107,44 @@ preexec() { echo -ne '\e[6 q' ;} # Use beam shape cursor for each new prompt.
 
 # v() { xdotool set_window --name $(TMP=$1;echo ${TMP##*/}) $WINDOWID; vim $1; }
 # n() { xdotool set_window --name $(TMP=$1;echo ${TMP##*/}) $WINDOWID; nvim $1; }
-x2xalarm() { ssh -YC drksl@4l4rm x2x -north -to :0.0; }
-
-nvim-terminal() nvim -c "terminal zsh"
-zle -N nvim-terminal
-bindkey '^e' nvim-terminal
+# x2xalarm() { ssh -YC drksl@4l4rm x2x -north -to :0.0; }
 
 ## Tmux not-printed(archwiki)
-tmux-attach() {( exec </dev/tty; exec <&1; TMUX= tmux attach || tmux new )}
-tmux-choose-tree() {( exec </dev/tty; exec <&1; TMUX= tmux attach\; choose-tree -s -w )}
-tmux-new-session() {
-    # Launching tmux inside a zle widget is not easy
-    # Hence, We delegate the work to the parent zsh
-    BUFFER=" { tmux list-sessions >& /dev/null && tmux new-session } || tmux"
-    # eval $BUFFER > /dev/null
-    zle accept-line
+tmux-attach() {
+    (exec </dev/tty; exec <&1; tty >> /tmp/sixel-$WEZTERM_PANE; tmux attach || tmux new-session)
+    trap "rm /tmp/sixel-$WEZTERM_PANE" EXIT
 }
-
+tmux-choose-tree() {
+    (exec </dev/tty; exec <&1; tty >> /tmp/sixel-$WEZTERM_PANE; tmux attach\; choose-tree -s -w)
+    trap "rm /tmp/sixel-$WEZTERM_PANE" EXIT
+}
+tmux-new-session() {
+    (exec </dev/tty; exec <&1; tty >> /tmp/sixel-$WEZTERM_PANE; tmux new-session)
+    trap "rm /tmp/sixel-$WEZTERM_PANE" EXIT
+}
 zle -N tmux-attach
 zle -N tmux-choose-tree
 zle -N tmux-new-session
-bindkey '^a' tmux-attach
-bindkey '^z' tmux-choose-tree
+bindkey '^a' tmux-attach      #wezterm-leaderkey
+bindkey '^e' tmux-choose-tree #tree-explorer
 bindkey '^s' tmux-new-session
 
-## Show ncpmcpp printed(archwiki)
-ncmpcppShow() {
-  BUFFER="ncmpcpp"
-  zle accept-line
-}
-
 ## Show ncpmcpp(archwiki)
-ncmpcppShow() {
+ncmpcppBrowserMedia() {
   ncmpcpp <$TTY
   zle redisplay
 }
 
-zle -N ncmpcppShow
-zle -N ncmpcppShow
-bindkey '^p' ncmpcppShow
-bindkey '^y' ncmpcppShow
+## Show ncpmcpp printed(archwiki)
+ncmpcppPlayerMedia() {
+  BUFFER="ncmpcpp"
+  zle accept-line
+}
+
+zle -N ncmpcppPlayerMedia
+zle -N ncmpcppBrowserMedia
+bindkey '^p' ncmpcppPlayerMedia
+bindkey '^n' ncmpcppBrowserMedia
 
 cdUndoKey() {
   popd > /dev/null
@@ -200,13 +194,14 @@ lfcd () {
 my-script_lfcd() lfcd -command "set nopreview; set ratios 1"
 zle -N lfcd
 zle -N my-script_lfcd
-bindkey '^[o' my-script_lfcd
+bindkey '^o' my-script_lfcd
 bindkey '\eo' 'lfcd'
 [ -n "$LF_CD" ] && unset LF_CD && lfcd $PWD
 
 ## fzf scripts
 fmzcd () {
     tmp=$(mktemp)
+    FZF_DEFAULT_OPTS="--layout=reverse --height=60% --border" \
     command ~/.config/lf/fmz/fmz --cd "$tmp" "$@" <$TTY
     res=$(tail -n 1 "$tmp")
     if [ -d "$res" ] && [ "$res" != "$PWD" ]; then
@@ -219,23 +214,60 @@ fmzcd () {
 
 ## stpv-git(AUR)
 fzfprev() {
-  cd $(dirname "$(fzfp <$TTY )")
+  cd $(dirname "$(fzfp --layout=reverse --height 70% --border --color hl+:#ff0000\
+    --bind='?:toggle-preview' <$TTY )")
   customprompt
   zle reset-prompt
 }
 
 fzf_cd () {
-  cd $(dirname "$(fzf <$TTY )")
+  cd $(dirname "$(fzf --layout=reverse --height 40% --border --color hl+:#ff0000 <$TTY )")
   customprompt
   zle reset-prompt
+}
+
+fzf_completion() {
+  [[ $#BUFFER == 0 ]] && BUFFER="cd " && CURSOR=5;
+  FZF_DEFAULT_OPTS="--layout=reverse --height=60% --border --color hl+:#ff0000 \
+    --preview='(bat --style=plain  --color=always {})2>/dev/null || ls --color {} ' \
+    --preview-window 'right,40%,border-left,hidden' \
+    --bind='?:toggle-preview'" \
+  zle fzf-completion
 }
 
 zle -N fmzcd
 zle -N fzfprev
 zle -N fzf_cd
-bindkey '^f' fmzcd
-bindkey '^g' fzfprev
-bindkey '^k' fzf_cd
+zle -N fzf_completion && \
+bindkey '^z' fmzcd
+bindkey '^f' fzfprev
+bindkey '^g' fzf_cd
+bindkey '^K' fzf_completion
+
+my-script1() printf '\x1b[D' >/dev/tty #tput cub1
+my-script2() printf '\x1b[B' >/dev/tty #tput cud1
+my-script3() printf '\x1b[A' >/dev/tty #tput cuu1
+my-script4() printf '\x1b[C' >/dev/tty #tput cuf1
+my-script5() printf '\x1b[5S' >/dev/tty
+my-script6() printf '\x1b[2 q' >/dev/tty
+my-script7() nvim -c "terminal zsh"
+my-script8() lazygit
+zle -N my-script1
+zle -N my-script2
+zle -N my-script3
+zle -N my-script4
+zle -N my-script5
+zle -N my-script6
+zle -N my-script7
+zle -N my-script8
+bindkey '^[n' my-script1
+bindkey '^[m' my-script2
+bindkey '^[,' my-script3
+bindkey '^[.' my-script4
+bindkey '^[[' my-script5
+bindkey '^[]' my-script6
+bindkey '^[z' my-script7
+bindkey '^[i' my-script8
 
 #fix supress key in st
 bindkey '^[[P' delete-char
@@ -270,5 +302,43 @@ bindkey '^v' edit-command-line
 ## Spaceship Prompt
 [ -e $HOME/.nix-profile/lib/spaceship-prompt/spaceship.zsh ]&&\
   source ~/.nix-profile/lib/spaceship-prompt/spaceship.zsh ||{
-  autoload -U promptinit; promptinit
-  prompt spaceship }
+  autoload -U promptinit; promptinit; prompt spaceship }
+
+bindkey '^I' expand-or-complete
+
+
+[[ -n "$TMUX" ]] && {
+  [ -e /usr/share/zsh/plugins/fzf-tab-bin-git/fzf-tab.plugin.zsh ]&& \
+  source /usr/share/zsh/plugins/fzf-tab-bin-git/fzf-tab.plugin.zsh && {
+    fzf_tab_complete() {
+      [[ $#BUFFER == 0 ]] && {
+        BUFFER="tmux " && CURSOR=5
+        export FZF_DEFAULT_OPTS='--layout=reverse --border --color hl+:#ff0000'
+        zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+        # zstyle ':fzf-tab:*' fzf-bindings 'space:accept,enter:accept+execute(xdotool key KP_Enter && cat /tmp/tmuxpopup | sh )'
+        zstyle ':fzf-tab:*' fzf-bindings 'space:accept,enter:accept+execute(echo "xdotool key KP_Enter && cat /tmp/tmuxpopup | sh" >/tmp/fzftabcomplete)'
+      }||{
+        export FZF_DEFAULT_OPTS='--layout=reverse --border --color hl+:#ff0000'
+        zstyle ':fzf-tab:*' fzf-bindings 'space:accept'
+        zstyle ':fzf-tab:*' accept-line enter
+        zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+      }
+      zle fzf-tab-complete
+      [ -e /tmp/fzftabcomplete ]&& (cat /tmp/fzftabcomplete | sh && rm /tmp/fzftabcomplete ) >/dev/null 2>&1
+      # BUFFER_TMP="$BUFFER" && BUFFER="" && zle reset-prompt # && sh -c "echo $BUFFER_TMP"
+    }
+    zle -N fzf_tab_complete
+    zstyle ':fzf-tab:*' continuous-trigger
+    bindkey '^i' fzf_tab_complete
+    # zstyle ':fzf-tab:complete:*:*' fzf-preview '(bat --style=plain  --color=always ${(Q)realpath})2>/dev/null || ls --color ${(Q)realpath}'
+    zstyle ':fzf-tab:complete:(cd|ls):*' fzf-preview '(bat --style=plain  --color=always ${(Q)realpath})2>/dev/null || ls --color ${(Q)realpath}'
+    zstyle ':fzf-tab:complete:*:options' fzf-preview
+    zstyle ':fzf-tab:complete:*:argument-1' fzf-preview
+    zstyle ':fzf-tab:complete:-command-:*' fzf-preview \
+           '(out=$(cht.sh "$word") 2>/dev/null && awk "/Unknown topic/ {exit 1}" <<<"$out" && echo $out) || \
+            (out=$(MANWIDTH=$FZF_PREVIEW_COLUMNS man "$word") 2>/dev/null && echo $out) || \
+            (out=$(which "$word") && echo $out) || \
+            (echo "${(P)word}")'
+  }
+} || true
+

@@ -3,6 +3,7 @@
 #            --name archrice \
 #            --volume=$(pwd):/home/drksl/.config/dotfiles \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            archrice
 
 FROM archlinux/archlinux:base-devel

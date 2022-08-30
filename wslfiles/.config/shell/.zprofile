@@ -17,7 +17,7 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 export OPENER="xdg-open"
 export PAGER="less"
-export TERMINAL="nixGL wezterm"
+export TERMINAL="wezterm"
 export BROWSER="google-chrome-stable"
 export SURFRAW_text_browser='w3m -sixel'
 export SURFRAW_graphical=no
@@ -36,7 +36,7 @@ export LESSHISTFILE="-"
 # export WGETRC="${XDG_CONFIG_HOME:-$HOME/.config}/wget/wgetrc"
 export INPUTRC="${XDG_CONFIG_HOME:-$HOME/.config}/shell/inputrc"
 export ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
-export ZSH_COMPDUMP="${XDG_CONFIG_HOME:-$HOME/.cache}/zsh"
+# export ZSH_COMPDUMP="$HOME/.cache/zsh/.zcompdump"
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#555555"
 # export ALSA_CONFIG_PATH="$XDG_CONFIG_HOME/alsa/asoundrc"
 # export WINEPREFIX="${XDG_DATA_HOME:-$HOME/.local/share}/wineprefixes/default"
@@ -68,8 +68,9 @@ export MOZ_USE_XINPUT2="1"		# Mozilla smooth scrolling/touchpads.
 export AWT_TOOLKIT="MToolkit wmname LG3D"	#May have to install wmname
 export _JAVA_AWT_WM_NONREPARENTING=1	# Fix for Java applications in dwm
 export DEBIAN_FRONTEND=noninteractive
-# export FZF_DEFAULT_OPTS="--layout=reverse --height 40%"
 # export CACA_DRIVER=ncurses
+# export FZF_DEFAULT_OPTS="--layout=reverse --height 40% --border"
+export FZF_COMPLETION_TRIGGER=''
 
 # export LESS="-R --use-color --LINE-NUMBERS --color=Nk" #causes manpages badformatting
 export LESS='-RS'

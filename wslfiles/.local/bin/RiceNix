@@ -8,6 +8,7 @@ set -eu
 #            --privileged \
 #            --volume=$(pwd):/root/.config/dotfiles/winfiles \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            nixos/nix:2.9.2
 # useradd -mG sudo -s /bin/bash drksl && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl && sudo sed -i 's/Defaults/#Defaults/g' /etc/sudoers
 # useradd -mG wheel drksl             && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
