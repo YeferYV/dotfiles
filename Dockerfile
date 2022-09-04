@@ -45,7 +45,7 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      && chsh --shell /usr/bin/zsh drksl \
      && echo root:toor | chpasswd \
      && echo drksl:toor | chpasswd \
-     && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
+     && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
      # AUR: \
      # && echo "drksl ALL=(ALL) NOPASSWD: /usr/bin/pacman" > /etc/sudoers.d/allow_drksl_to_pacman \
      # && echo "root ALL=(ALL) CWD=* ALL" > /etc/sudoers.d/permissive_root_Chdir_Spec \

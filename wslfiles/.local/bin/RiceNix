@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# exit on error
-set -eu
 
 # docker install:
 # docker run -it
@@ -10,8 +8,8 @@ set -eu
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            nixos/nix:2.9.2
-# useradd -mG sudo -s /bin/bash drksl && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl && sudo sed -i 's/Defaults/#Defaults/g' /etc/sudoers
-# useradd -mG wheel drksl             && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
+# useradd -mG sudo -s /bin/bash drksl && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel && sudo sed -i 's/Defaults/#Defaults/g' /etc/sudoers
+# useradd -mG wheel drksl             && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 # su - drksl
 # mkdir {.config,.local}
 # sudo cp -r /root/.config/dotfiles ~/.config/dotfiles
@@ -19,6 +17,15 @@ set -eu
 # sudo chown -R drksl:drksl /run/user/1000
 # cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin
 # ./RiceNix
+
+# exit on error
+set -eu
+
+# check for non-root user
+[ "$(id -u)" == 0 ] && printf "\e[1;31mRun it as non-root user, nix-env doesn't suport root\e[0m\n" >&2 && exit 1
+
+# ask for sudo password at the beggining (last for 15 min)
+sudo true
 
 # Arch dependencies
 [ -e /etc/pacman.d ]&&{
@@ -43,47 +50,73 @@ set -eu
 # sudo nix-daemon &
 
 # install nix (tested version = 22.05)
-[ -e /etc/nix ]&& {
-  nix-channel --update
-  # nix-env -iA nixpkgs.shadow nixpkgs.pam
-  # mv /etc/group /etc/group.old
-  # mv /etc/passwd /etc/passwd.old
-  # mv /etc/shadow /etc/shadow.old
-  # cat /etc/group.old > /etc/group
-  # cat /etc/passwd.old > /etc/passwd
-  # cat /etc/shadow.old > /etc/shadow
-  # groupadd wheel
-  # useradd -mG wheel drksl
-  nix-env -iA nixpkgs.zsh nixpkgs.util-linux nixpkgs.sudo nixpkgs.ncurses nixpkgs.gnused nixpkgs.gawk nixpkgs.file nixpkgs.cron nixpkgs.curl nixpkgs.bashInteractive
-  mkdir -p /etc/{pam.d,sudoers.d,X11}
-  cat  > /etc/sudoers    <  ~/.nix-profile/etc/sudoers
-  cat >> /etc/pam.d/sudo <<-===
-    #%PAM-1.0
-    auth            required        pam_unix.so
-    account         required        pam_unix.so
-    session         required        pam_unix.so
-    password        required        pam_unix.so
+if [ -e /etc/nix ]; then
+  {
+    nix-channel --update
+    # nix-env -iA nixpkgs.shadow nixpkgs.pam
+    # mv /etc/group /etc/group.old
+    # mv /etc/passwd /etc/passwd.old
+    # mv /etc/shadow /etc/shadow.old
+    # cat /etc/group.old > /etc/group
+    # cat /etc/passwd.old > /etc/passwd
+    # cat /etc/shadow.old > /etc/shadow
+    # groupadd wheel
+    # useradd -mG wheel drksl
+    nix-env -iA zsh util-linux sudo psmisc ncurses gnused gawk file cron curl bashInteractive \
+            -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
+    sudo ln -sf /bin/sh /bin/bash
+    if [ ! -e /etc/nixos ]; then
+      {
+        mkdir -p /etc/{pam.d,sudoers.d,X11}
+        cat  > /etc/sudoers    <  "$HOME"/.nix-profile/etc/sudoers
+        cat >> /etc/pam.d/sudo <<-===
+          #%PAM-1.0
+          auth            required        pam_unix.so
+          account         required        pam_unix.so
+          session         required        pam_unix.so
+          password        required        pam_unix.so
 ===
-  mv /bin /bin.old
-  ln -s /root/.nix-profile/bin /bin
-  echo "/bin/zsh -l" > /root/.bashrc
-  # cp /etc/pam.d/sudo /etc/pam.d/su
-  # cp /etc/pam.d/sudo /etc/pam.d/passwd
-  # cp /etc/pam.d/sudo /etc/pam.d/chpasswd
-  # echo drksl:toor | chpasswd
-  # echo root:toor | chpasswd
-  # chomod 4755 $(readlink $(which sudo))
-  # echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/drksl
-  # nix-env -e shadow
-  # nix-env -iA nixpkgs.su
-  # su - drksl
-  }||{
-  curl -L https://nixos.org/nix/install | sh
-  . ~/.nix-profile/etc/profile.d/nix.sh
-  nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
-  nix-channel --update
-  nix-env -iA nixgl.auto.nixGLDefault
+        mv /bin /bin.old
+        ln -s /root/.nix-profile/bin /bin
+        echo "/bin/zsh -l" > /root/.bashrc
+      }
+    fi
+    # cp /etc/pam.d/sudo /etc/pam.d/su
+    # cp /etc/pam.d/sudo /etc/pam.d/passwd
+    # cp /etc/pam.d/sudo /etc/pam.d/chpasswd
+    # echo drksl:toor | chpasswd
+    # echo root:toor | chpasswd
+    # chomod 4755 $(readlink $(which sudo))
+    # echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
+    # nix-env -e shadow
+    # nix-env -iA nixpkgs.su
+    # su - drksl
   }
+  else
+  {
+    curl -L https://nixos.org/nix/install | sh
+    . "$HOME"/.nix-profile/etc/profile.d/nix.sh
+    nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
+    nix-channel --update
+    nix-env -iA nixgl.auto.nixGLDefault
+  }
+fi
+
+# zsh as a login/default shell
+if [ -e /etc/nixos ]; then
+  {
+    sudo sed -i '/users.users/a\  shell = pkgs.zsh;'                                /etc/nixos/configuration.nix
+    sudo sed -i '/programs.mtr.enable/a\  programs.zsh.enable = true;'              /etc/nixos/configuration.nix
+    sudo sed -i '/programs.zsh.enable/a\  security.sudo.wheelNeedsPassword = false;' /etc/nixos/configuration.nix
+    sudo sed -i 's/# services.openssh.enable/services.openssh.enable/'              /etc/nixos/configuration.nix
+    sudo nixos-rebuild switch
+  }
+  else
+  {
+    command -v zsh | sudo tee -a /etc/shells
+    sudo chsh -s "$(which zsh)" "$USER"
+  }
+fi
 
 # install packages
 nix-env -iA \
@@ -149,35 +182,35 @@ nix-env -iA \
   # nixpkgs._3270font \
 
 # dotfiles
-# git clone https://gitlab.com/yucrayeff36/winfiles $HOME/.config/dotfiles/winfiles
-# cd $HOME/.config/dotfiles/winfiles/wslfiles/.local/bin/
+# git clone https://gitlab.com/yucrayeff36/winfiles "$HOME"/.config/dotfiles/winfiles
+# cd "$HOME"/.config/dotfiles/winfiles/wslfiles/.local/bin/
 cd ../..
-[ ! -e $HOME/.config ]&& mkdir $HOME/.config
-[ ! -e $HOME/.local ]&& mkdir $HOME/.local
-stow --restow --verbose --target=$HOME/.config .config
-stow --restow --verbose --target=$HOME/.local .local
-ln -sf $HOME/.config/shell/.zprofile $HOME/.zprofile
-mkdir -p ~/.local/share/mpd
+[ ! -e "$HOME"/.config ]&& mkdir "$HOME"/.config
+[ ! -e "$HOME"/.local ]&& mkdir "$HOME"/.local
+stow --restow --verbose --target="$HOME"/.config .config
+stow --restow --verbose --target="$HOME"/.local .local
+ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
+ln -sf "$HOME"/.config/shell/.xprofile "$HOME"/.xprofile
+mkdir -p "$HOME"/.local/share/mpd
 
 # nerd fonts
-mkdir -p ~/.local/share/fonts
+mkdir -p "$HOME"/.local/share/fonts
 git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
 cd nerd-fonts
 git sparse-checkout add patched-fonts/3270
 git sparse-checkout add patched-fonts/CascadiaCode
 git sparse-checkout add patched-fonts/Terminus
-cp -r patched-fonts/3270 ~/.local/share/fonts/
-cp -r patched-fonts/CascadiaCode ~/.local/share/fonts/
-cp -r patched-fonts/Terminus ~/.local/share/fonts/
+cp -r patched-fonts/3270 "$HOME"/.local/share/fonts/
+cp -r patched-fonts/CascadiaCode "$HOME"/.local/share/fonts/
+cp -r patched-fonts/Terminus "$HOME"/.local/share/fonts/
 cd ..
 
 # bedstead font
-wget https://bjh21.me.uk/bedstead/bedstead-002.004.zip
-unzip bedstead-002.004.zip
-mv bedstead-002.004 ~/.local/share/fonts/
+curl -LO https://bjh21.me.uk/bedstead/bedstead-002.004.zip
+unzip bedstead-002.004.zip -d "$HOME"/.local/share/fonts/
 
 # # neovim version 7 (appimage-run nvim.appimage on NIXOS)
-# curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x $HOME/.local/bin/nvim
+# curl -LO "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
 # git clone --depth=1 --branch v0.7.2 --single-branch https://github.com/neovim/neovim
 # cd neovim
 # nix-shell --pure \
@@ -253,37 +286,30 @@ nix-shell --pure \
           -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
           --packages ffmpeg libass lua libsixel libGL mesa mujs pipewire pkg-config pulseaudio python310 \
 	  	      xorg.libX11 xorg.libXv xorg.libXScrnSaver xorg.libXext xorg.libXinerama xorg.libXrandr zlib \
-          --command "./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
+          --command "NIX_SSL_CERT_FILE=${NIX_SSL_CERT_FILE:-/etc/ssl/certs/ca-certificates.crt} ./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
 cd ..
 
 # pipewire:
-# echo "export DISPLAY=localhost:0.0" >>$HOME/.zprofile #WSL
-# echo "export PULSE_SERVER=tcp:localhost" >>$HOME/.zprofile #WSL
-# echo "export XDG_RUNTIME_DIR=/run/user/1000" >>$HOME/.zprofile #Docker Audio
+# echo "export DISPLAY=localhost:0.0" >>"$HOME"/.zprofile #WSL
+# echo "export PULSE_SERVER=tcp:localhost" >>"$HOME"/.zprofile #WSL
+# echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zprofile #Docker Audio
 
 # user config
 # systemctl --user enable --now touchcursor
 [ ! -e /etc/X11/xorg.conf.d ]&& sudo mkdir /etc/X11/xorg.conf.d
-sudo cp $HOME/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
-sudo crontab $HOME/.local/bin/cron/lowbatnotificationcron
+sudo cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
+sudo crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
 rm -rf {bedstead-002.004.zip,nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
-[ ! -e $HOME/.cache/zsh ]&& mkdir $HOME/.cache/zsh
+[ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
 nix-collect-garbage -d
-
-# add zsh as a login shell
-command -v zsh | sudo tee -a /etc/shells
-
-# use zsh as default shell
-sudo chsh -s $(which zsh) $USER
 
 # # blacklisting beep sound (there is no beep in docker)
 # sudo rmmod pcspkr
 # echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
 
-# install neovim plugins  $(ulimit -n 4096)  https://github.com/wbthomason/packer.nvim/issues/751
-git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+# install neovim plugins  $(ulimit -n 4096)
+git clone --depth 1 https://github.com/wbthomason/packer.nvim "$HOME"/.local/share/nvim/site/pack/packer/start/packer.nvim
+nvim -u "$HOME"/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
-printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xprofile   #if DM \e[0m\n"
 printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"
 printf "\e[1;32m Done! \e[0m\n"
