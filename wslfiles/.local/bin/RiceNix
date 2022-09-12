@@ -210,7 +210,7 @@ curl -LO https://bjh21.me.uk/bedstead/bedstead-002.004.zip
 unzip bedstead-002.004.zip -d "$HOME"/.local/share/fonts/
 
 # # neovim version 7 (appimage-run nvim.appimage on NIXOS)
-# curl -LO "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
+# curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
 # git clone --depth=1 --branch v0.7.2 --single-branch https://github.com/neovim/neovim
 # cd neovim
 # nix-shell --pure \
