@@ -1,31 +1,94 @@
 #!/usr/bin/env bash
 
-# docker install:
-# docker run -it
-#            --name nixrice \
+#=================== Docker Build Archrice ===================#
+
+# cd ../../..
+# docker run -it \
+#            --name archrice \
 #            --privileged \
-#            --volume=$(pwd):/root/.config/dotfiles/winfiles \
+#            --volume=$(pwd):/root/.config/dotfiles/winfiles-docker-volume \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
-#            nixos/nix:2.9.2
-# useradd -mG sudo -s /bin/bash drksl && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel && sudo sed -i 's/Defaults/#Defaults/g' /etc/sudoers
-# useradd -mG wheel drksl             && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
-# su - drksl
-# mkdir {.config,.local}
-# sudo cp -r /root/.config/dotfiles ~/.config/dotfiles
-# sudo chown -R drksl:drksl ~/.config/dotfiles
-# sudo chown -R drksl:drksl /run/user/1000
-# cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin
-# ./RiceNix
+#            archlinux:base-devel \
+#            bash -uelic '
+#              pacman-key --init
+#              pacman-key --populate
+#              pacman -Sy  --noconfirm archlinux-keyring
+#              pacman -Syu --noconfirm sudo
+#              useradd -mG wheel drksl
+#              echo root:toor | chpasswd
+#              echo drksl:toor | chpasswd
+#              echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
+#              mkdir -p /home/drksl/.config/dotfiles
+#              cp -r /root/.config/dotfiles/winfiles-docker-volume /home/drksl/.config/dotfiles/winfiles
+#              chown -R drksl:drksl /home/drksl/.config
+#              chown -R drksl:drksl /run/user/1000
+#              sudo -u "drksl" bash -c "cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin && ./RiceNix"
+#              chmod g+w /dev/pts/0
+#              su - drksl
+#            '
+
+#================== Docker Build Ubunturice ==================#
+
+# cd ../../..
+# docker run -it \
+#            --name ubunturice \
+#            --privileged \
+#            --volume=$(pwd):/root/.config/dotfiles/winfiles-docker-volume \
+#            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
+#            ubuntu:devel \
+#            bash -uelic '
+#              apt update
+#              DEBIAN_FRONTEND=noninteractive apt install -y sudo
+#              useradd -mG sudo,tty drksl
+#              echo root:toor | chpasswd
+#              echo drksl:toor | chpasswd
+#              echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
+#              sed -i "s/Defaults/#Defaults/g" /etc/sudoers
+#              mkdir -p /home/drksl/.config/dotfiles
+#              cp -r /root/.config/dotfiles/winfiles-docker-volume /home/drksl/.config/dotfiles/winfiles
+#              chown -R drksl:drksl /home/drksl/.config
+#              chown -R drksl:drksl /run/user/1000
+#              sudo -u "drksl" bash -c "cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin && ./RiceNix"
+#              chmod g+w /dev/pts/0
+#              su - drksl
+#            '
+
+#==================== Docker Build Nixrice ===================#
+
+# cd ../../..
+# docker run -it \
+#            --name nixrice \
+#            --privileged \
+#            --volume=$(pwd):/root/.config/dotfiles/winfiles-docker-volume \
+#            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
+#            nixos/nix:2.9.2 \
+#            bash -uelic '
+#              cp -r /root/.config/dotfiles/winfiles-docker-volume /root/.config/dotfiles/winfiles
+#              chown -R root:root /root/.config/dotfiles/winfiles
+#              chown -R root:root /run/user/1000
+#              cd /root/.config/dotfiles/winfiles/wslfiles/.local/bin
+#              SUDO=false ROOTCHECK=false ./RiceNix
+#              zsh -l
+#            '
+
+#================== Post-Install (dotfiles) ==================#
 
 # exit on error
 set -eu
 
 # check for non-root user
-[ "$(id -u)" == 0 ] && printf "\e[1;31mRun it as non-root user, nix-env doesn't suport root\e[0m\n" >&2 && exit 1
+if [ "${ROOTCHECK:-}" = false ]; then
+  printf "\e[1;33m skipping root check verification \e[0m\n"
+else
+  [ "$(id -u)" == 0 ] && printf "\e[1;31mRun it as non-root user, nix-env doesn't suport root\e[0m\n" >&2 && exit 1
+fi
 
 # ask for sudo password at the beggining (last for 15 min)
-sudo true
+[ ${SUDO:-} = false ] && export SUDO=" " || export SUDO="sudo"
+$SUDO true
 
 # Arch dependencies
 [ -e /etc/pacman.d ]&&{
@@ -42,7 +105,7 @@ sudo true
     sudo apt update
     # sudo apt full-upgrade -y
     # sudo apt install -y festvox-us-slt-hts
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh xserver-xorg-input-synaptics curl cron build-essential
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh xserver-xorg-input-synaptics file curl cron build-essential
   }
 
 # alternitive install nix-daemon(multiuser)
@@ -53,44 +116,9 @@ sudo true
 if [ -e /etc/nix ]; then
   {
     nix-channel --update
-    # nix-env -iA nixpkgs.shadow nixpkgs.pam
-    # mv /etc/group /etc/group.old
-    # mv /etc/passwd /etc/passwd.old
-    # mv /etc/shadow /etc/shadow.old
-    # cat /etc/group.old > /etc/group
-    # cat /etc/passwd.old > /etc/passwd
-    # cat /etc/shadow.old > /etc/shadow
-    # groupadd wheel
-    # useradd -mG wheel drksl
     nix-env -iA zsh util-linux sudo psmisc ncurses gnused gawk file cron curl bashInteractive \
             -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
-    sudo ln -sf /bin/sh /bin/bash
-    if [ ! -e /etc/nixos ]; then
-      {
-        mkdir -p /etc/{pam.d,sudoers.d,X11}
-        cat  > /etc/sudoers    <  "$HOME"/.nix-profile/etc/sudoers
-        cat >> /etc/pam.d/sudo <<-===
-          #%PAM-1.0
-          auth            required        pam_unix.so
-          account         required        pam_unix.so
-          session         required        pam_unix.so
-          password        required        pam_unix.so
-===
-        mv /bin /bin.old
-        ln -s /root/.nix-profile/bin /bin
-        echo "/bin/zsh -l" > /root/.bashrc
-      }
-    fi
-    # cp /etc/pam.d/sudo /etc/pam.d/su
-    # cp /etc/pam.d/sudo /etc/pam.d/passwd
-    # cp /etc/pam.d/sudo /etc/pam.d/chpasswd
-    # echo drksl:toor | chpasswd
-    # echo root:toor | chpasswd
-    # chomod 4755 $(readlink $(which sudo))
-    # echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
-    # nix-env -e shadow
-    # nix-env -iA nixpkgs.su
-    # su - drksl
+    $SUDO ln -sf /bin/sh /bin/bash
   }
   else
   {
@@ -102,7 +130,7 @@ if [ -e /etc/nix ]; then
   }
 fi
 
-# zsh as a login/default shell
+# nixos zsh as a login/default shell
 if [ -e /etc/nixos ]; then
   {
     sudo sed -i '/users.users/a\  shell = pkgs.zsh;'                                /etc/nixos/configuration.nix
@@ -113,8 +141,8 @@ if [ -e /etc/nixos ]; then
   }
   else
   {
-    command -v zsh | sudo tee -a /etc/shells
-    sudo chsh -s "$(which zsh)" "$USER"
+    command -v zsh | $SUDO tee -a /etc/shells
+    $SUDO chsh -s "$(which zsh)" "$USER"
   }
 fi
 
@@ -184,7 +212,7 @@ nix-env -iA \
 # dotfiles
 # git clone https://gitlab.com/yucrayeff36/winfiles "$HOME"/.config/dotfiles/winfiles
 # cd "$HOME"/.config/dotfiles/winfiles/wslfiles/.local/bin/
-cd ../..
+cd "$(git rev-parse --show-toplevel)"/wslfiles
 [ ! -e "$HOME"/.config ]&& mkdir "$HOME"/.config
 [ ! -e "$HOME"/.local ]&& mkdir "$HOME"/.local
 stow --restow --verbose --target="$HOME"/.config .config
@@ -254,7 +282,7 @@ sed -i 's/gl >= *.*.0/gl >= 1.2.0/g' configure.ac
 # 		&& cd libXfont-1.5.4 \
 # 		&& ./configure \
 # 		&& sudo make install \
-# 		&& sudo ln -s /usr/local/lib/libXfont.so.1 /usr/lib/libXfont.so.1) \
+# 		&& sudo ln -sf /usr/local/lib/libXfont.so.1 /usr/lib/libXfont.so.1) \
 # 	&& ./build-sixel.sh \
 # 	&& sudo make install
 
@@ -296,9 +324,9 @@ cd ..
 
 # user config
 # systemctl --user enable --now touchcursor
-[ ! -e /etc/X11/xorg.conf.d ]&& sudo mkdir /etc/X11/xorg.conf.d
-sudo cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
-sudo crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
+[ ! -e /etc/X11/xorg.conf.d ]&& $SUDO mkdir -p /etc/X11/xorg.conf.d
+$SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
+$SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
 rm -rf {bedstead-002.004.zip,nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
 [ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
 nix-collect-garbage -d
