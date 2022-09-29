@@ -1,7 +1,7 @@
 # docker build -t arch-no-nix-dockerfile .
 # docker run -it \
 #            --name arch-no-nix-dockerfile \
-#            --volume=$(pwd):/home/drksl/.config/dotfiles \
+#            --volume=${PWD%/*}:/home/drksl/.config/dotfiles/docker-shared-volume \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            arch-no-nix-dockerfile
@@ -52,7 +52,7 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      # && sudo -u "drksl" bash -c "git clone https://aur.archlinux.org/paru-bin.git /home/drksl/paru-bin" \
      # && sudo -u "drksl" bash -c "cd /home/drksl/paru-bin && makepkg -s" \
      # && pacman -U --noconfirm /home/drksl/paru-bin/paru-bin* \
-     # && sudo -u "drksl" -D~ bash -c "paru -S --noconfirm cht.sh-git lf-bin spaceship-prompt-git zsh-fast-syntax-highlighting libsixel"
+     # && sudo -u "drksl" -D~ bash -c "paru -S --noconfirm cht.sh-git lf-bin zsh-fast-syntax-highlighting libsixel"
 
 # Expose ports
 EXPOSE 22/tcp
@@ -85,7 +85,7 @@ RUN  mkdir /home/drksl/.local \
 # AUR:
 RUN  git clone https://aur.archlinux.org/yay-bin.git /home/drksl/yay-bin \
      && cd  /home/drksl/yay-bin && makepkg --noconfirm -si \
-     && yay -S --noconfirm cht.sh-git lf-bin spaceship-prompt-git zsh-fast-syntax-highlighting libsixel
+     && yay -S --noconfirm cht.sh-git lf-bin zsh-fast-syntax-highlighting libsixel
 
 # libxfont:
 RUN  yay -G libxfont \
@@ -123,6 +123,9 @@ RUN  curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/do
 # neovim plugins:
 RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
      && $HOME/.local/bin/nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+
+# Spaceship version 3.16.4
+RUN  git clone --branch "v3.16.4" --depth=1 https://github.com/spaceship-prompt/spaceship-prompt ~/.config/spaceship
 
 # clean
 RUN  sudo pacman -R --noconfirm clang \

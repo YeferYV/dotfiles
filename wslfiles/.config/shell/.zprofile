@@ -8,7 +8,7 @@ export PATH="$(du "$HOME/.local/bin" | cut -f2 | paste -sd ':'):$HOME/.local/sha
 # unsetopt PROMPT_SP
 # export PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/~}\007"'
 export PROMPT_COMMAND='echo -ne "\033]0;$(TMP=${PWD/#$HOME/\~};echo ${TMP##*/})\007"'
-export PS1="[\w]\$ "
+# export PS1="[\w]\$ "
 
 #-- Default programs:
 export SHELL="$(which zsh)"

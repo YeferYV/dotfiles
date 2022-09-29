@@ -302,7 +302,7 @@ bindkey '^v' edit-command-line
 ## Spaceship Prompt
 [ -e $HOME/.nix-profile/lib/spaceship-prompt/spaceship.zsh ]&&\
   source ~/.nix-profile/lib/spaceship-prompt/spaceship.zsh ||{
-  autoload -U promptinit; promptinit; prompt spaceship }
+  source ~/.config/spaceship/spaceship.zsh }
 
 bindkey '^I' expand-or-complete
 
