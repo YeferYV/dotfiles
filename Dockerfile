@@ -1,10 +1,10 @@
-# docker build -t arch-nix-dockerfile .
+# docker build -t arch-no-nix-dockerfile .
 # docker run -it \
-#            --name arch-nix-dockerfile \
+#            --name arch-no-nix-dockerfile \
 #            --volume=$(pwd):/home/drksl/.config/dotfiles \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
-#            archrice
+#            arch-no-nix-dockerfile
 
 FROM archlinux/archlinux:base-devel
 
@@ -134,4 +134,3 @@ RUN  sudo pacman -R --noconfirm clang \
 # CMD [ "sudo","/usr/sbin/sshd"]
 # SHELL ["/bin/zsh","-l"]
 ENTRYPOINT ["/bin/zsh","-l"]
-
