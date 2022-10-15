@@ -1,3 +1,5 @@
+#======== Dockerfile build/run arch-no-nix-dockerfile ========#
+
 # docker build -t arch-no-nix-dockerfile .
 # docker run -it \
 #            --name arch-no-nix-dockerfile \
@@ -5,6 +7,8 @@
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            arch-no-nix-dockerfile
+
+#============= Dockerfile: arch-no-nix-dockerfile ============#
 
 FROM archlinux/archlinux:base-devel
 
@@ -38,9 +42,9 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      zathura-pdf-mupdf \
      zsh \
      zsh-autosuggestions\
-     # xsixel dependencies \
+     # XSIXEL_DEPENDENCIES: \
      && pacman -S --noconfirm libxkbfile xorg-font-util xorg-xkbcomp \
-     # user settings \
+     # USER_SETTINGS: \
      && useradd -mG wheel drksl \
      && chsh --shell /usr/bin/zsh drksl \
      && echo root:toor | chpasswd \
@@ -54,12 +58,12 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      # && pacman -U --noconfirm /home/drksl/paru-bin/paru-bin* \
      # && sudo -u "drksl" -D~ bash -c "paru -S --noconfirm cht.sh-git lf-bin zsh-fast-syntax-highlighting libsixel"
 
-# Expose ports
+# Expose ports:
 EXPOSE 22/tcp
 EXPOSE 8080/tcp
 EXPOSE 5900/tcp
 
-# Set environments
+# Set environments:
 USER drksl
 WORKDIR /home/drksl
 ENV USER="drksl"
@@ -67,7 +71,7 @@ ENV DISPLAY=:0
 ENV XDG_RUNTIME_DIR=/run/user/1000
 ENV APPIMAGE_EXTRACT_AND_RUN=1
 
-# Dotfiles
+# Dotfiles:
 # COPY --chown=drksl wslfiles/.config /home/drksl/.config
 # COPY --chown=drksl wslfiles/.local /home/drksl/.local
 # COPY --chown=drksl wslfiles/.config/shell/.zprofile /home/drksl/.zprofile
@@ -112,11 +116,11 @@ RUN  git clone --depth 1 https://github.com/mpv-player/mpv \
 RUN  sudo mkdir /run/user/1000 \
      && sudo chown -R drksl:drksl /run/user/1000
 
-# openssh
+# openssh:
 RUN  sudo /usr/bin/ssh-keygen -A \
      && echo "sudo /sbin/sshd" >>/home/drksl/.zprofile
 
-# neovim version 0.7
+# neovim version 0.7:
 RUN  curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage \
      && chmod +x $HOME/.local/bin/nvim
 
@@ -124,10 +128,10 @@ RUN  curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/do
 RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
      && $HOME/.local/bin/nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
-# Spaceship version 3.16.4
+# Spaceship version 3.16.4:
 RUN  git clone --branch "v3.16.4" --depth=1 https://github.com/spaceship-prompt/spaceship-prompt ~/.config/spaceship
 
-# clean
+# clean:
 RUN  sudo pacman -R --noconfirm clang \
      && yes | yay -Scc \
      && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,neovim,xserver-sixel,yay-bin} \
