@@ -2,7 +2,8 @@
 
 #========== Docker build/run arch-ricenix-dockerfile =========#
 
-# docker build -t arch-ricenix-dockerfile -f Dockerfile-arch-nix .
+# sudo pkill dockerd && sleep 1 && sudo dockerd --experimental & disown
+# docker build --squash -t arch-ricenix-dockerfile -f Dockerfile-arch-nix .
 # docker run -it \
 #            --name arch-ricenix-dockerfile \
 #            --volume=${PWD%/*}:/home/drksl/.config/dotfiles/docker-shared-volume \
@@ -33,11 +34,13 @@
 # ENV USER="drksl"
 # ENV DISPLAY=:0
 # ENV XDG_RUNTIME_DIR=/run/user/1000
+# RUN echo "/dev/pts/0" >> /tmp/sixel-$WEZTERM_PANE
 # CMD ["/bin/zsh","-l"]
 
 #============ Docker build/run arch-nix-dockerfile ===========#
 
-# DOCKER_BUILDKIT=1 docker build -t arch-nix-dockerfile -f Dockerfile-arch-nix .
+# sudo pkill dockerd && sleep 1 && sudo dockerd --experimental & disown
+# DOCKER_BUILDKIT=1 docker build --squash -t arch-nix-dockerfile -f Dockerfile-arch-nix .
 # docker run -it \
 #            --name arch-nix-dockerfile \
 #            --volume=${PWD%/*}:/home/drksl/.config/dotfiles/docker-shared-volume \
@@ -81,35 +84,27 @@ RUN curl -L https://nixos.org/nix/install | sh \
     && nix-env -iA \
        bat \
        cht-sh \
-       fzf \
        ffmpegthumbnailer \
+       fzf \
        gcc11 \
        git \
        less \
        lazygit \
-       libsixel \
-       light \
        lf \
+       libsixel \
        moreutils \
+       mupdf \
        neovim \
        perl534Packages.FileMimeInfo \
        pipewire \
-       playerctl \
        ripgrep \
        spaceship-prompt \
        stow \
-       sxhkd \
        sxiv \
        trash-cli \
        unzip \
        wezterm \
        xclip \
-       xorg.libXfont \
-       xorg.setxkbmap \
-       xorg.xkbcomp \
-       xorg.xmodmap \
-       xorg.xorgserver \
-       xorg.xset \
        zathura \
        zsh-autosuggestions \
        zsh-fast-syntax-highlighting \
@@ -120,11 +115,12 @@ COPY --chown=drksl . /home/drksl/.config/dotfiles/winfiles
 
 # stow:
 RUN . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
-    &&  mkdir "$HOME"/.local \
+    && mkdir "$HOME"/.local \
     && cd /home/drksl/.config/dotfiles/winfiles/wslfiles \
     && stow --restow --verbose --target="$HOME"/.config .config \
     && stow --restow --verbose --target="$HOME"/.local .local \
-    && ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
+    && ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile \
+    && echo "/dev/pts/0" >> /tmp/sixel-$WEZTERM_PANE
 
 # AUR:
 RUN . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
@@ -154,7 +150,7 @@ RUN <<EOT bash
             --packages autoconf automake gcc11 libdrm libGL libmd libsixel nettle pkg-config \
               xorg.fontutil xorg.libX11 xorg.libxkbfile xorg.libXfont xorg.utilmacros xorg.xorgserver xorg.xtrans \
             --command "./build-xsixel.sh && make install"
-    nix-env -iA nixpkgs.libmd nixpkgs.xorg.libXfont nixpkgs.xorg.libxshmfence nixpkgs.libsixel
+    nix-env -iA nixpkgs.libmd nixpkgs.xorg.libXfont nixpkgs.xorg.libxshmfence nixpkgs.libsixel nixpkgs.xorg.setxkbmap nixpkgs.xorg.xkbcomp
 EOT
 
 # mpv-sixel:

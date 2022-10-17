@@ -1,6 +1,7 @@
 #======== Dockerfile build/run arch-no-nix-dockerfile ========#
 
-# docker build -t arch-no-nix-dockerfile .
+# sudo pkill dockerd && sleep 1 && sudo dockerd --experimental & disown
+# docker build --squash -t arch-no-nix-dockerfile .
 # docker run -it \
 #            --name arch-no-nix-dockerfile \
 #            --volume=${PWD%/*}:/home/drksl/.config/dotfiles/docker-shared-volume \
@@ -23,24 +24,23 @@ RUN  sed -i '33s/#//' /etc/pacman.conf \
      clang \
      ffmpegthumbnailer \
      fzf \
-     git \
+     lazygit \
+     lf \
+     libsixel \
      moreutils \
      mupdf-tools \
-     nodejs \
-     npm \
      openssh \
      perl-file-mimeinfo \
      pipewire \
-     python-pip \
+     pipewire-pulse \
      ripgrep \
-     sxiv \
      stow \
+     sxiv \
      trash-cli \
      unzip \
      wezterm \
-     zathura \
+     xclip \
      zathura-pdf-mupdf \
-     zsh \
      zsh-autosuggestions\
      # XSIXEL_DEPENDENCIES: \
      && pacman -S --noconfirm libxkbfile xorg-font-util xorg-xkbcomp \
@@ -84,12 +84,13 @@ RUN  mkdir /home/drksl/.local \
      && stow --restow --verbose --target=/home/drksl/.config .config \
      && stow --restow --verbose --target=/home/drksl/.local .local \
      && ln -sf /home/drksl/.config/shell/.zprofile /home/drksl/.zprofile \
-     && mkdir -p /home/drksl/.local/share/mpd
+     && echo "/dev/pts/0" >> /tmp/sixel-$WEZTERM_PANE
+
 
 # AUR:
 RUN  git clone https://aur.archlinux.org/yay-bin.git /home/drksl/yay-bin \
      && cd  /home/drksl/yay-bin && makepkg --noconfirm -si \
-     && yay -S --noconfirm cht.sh-git lf-bin zsh-fast-syntax-highlighting libsixel
+     && yay -S --noconfirm cht.sh-git zsh-fast-syntax-highlighting
 
 # libxfont:
 RUN  yay -G libxfont \

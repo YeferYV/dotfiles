@@ -6,7 +6,7 @@
 # docker run -it \
 #            --name arch-ricenix \
 #            --privileged \
-#            --volume=$(pwd):/root/.config/dotfiles/winfiles-docker-volume \
+#            --volume=${PWD%/*}:/home/dtfls/winfiles-docker-volume \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            archlinux:base-devel \
@@ -17,12 +17,14 @@
 #                pacman -Sy  --noconfirm archlinux-keyring
 #                pacman -Syu --noconfirm sudo
 #                useradd -mG wheel,tty drksl
+#                tty >> /tmp/sixel-
 #                echo root:toor | chpasswd
 #                echo drksl:toor | chpasswd
 #                echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 #                mkdir -p /home/drksl/.config/dotfiles
-#                cp -r /root/.config/dotfiles/winfiles-docker-volume /home/drksl/.config/dotfiles/winfiles
+#                cp -r /home/dtfls/winfiles-docker-volume/winfiles /home/drksl/.config/dotfiles/winfiles
 #                chown -R drksl:drksl /home/drksl/.config
+#                chown -R drksl:drksl /home/dtfls
 #                chown -R drksl:drksl /run/user/1000
 #                sudo -u "drksl" bash -c "cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin && ./RiceNix"
 #              }
@@ -36,7 +38,7 @@
 # docker run -it \
 #            --name ubuntu-ricenix \
 #            --privileged \
-#            --volume=$(pwd):/root/.config/dotfiles/winfiles-docker-volume \
+#            --volume=${PWD%/*}:/home/dtfls/winfiles-docker-volume \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            ubuntu:devel \
@@ -45,13 +47,15 @@
 #                apt update
 #                DEBIAN_FRONTEND=noninteractive apt install -y sudo
 #                useradd -mG sudo,tty drksl
+#                tty >> /tmp/sixel-
 #                echo root:toor | chpasswd
 #                echo drksl:toor | chpasswd
 #                echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 #                sed -i "s/Defaults/#Defaults/g" /etc/sudoers
 #                mkdir -p /home/drksl/.config/dotfiles
-#                cp -r /root/.config/dotfiles/winfiles-docker-volume /home/drksl/.config/dotfiles/winfiles
+#                cp -r /home/dtfls/winfiles-docker-volume/winfiles /home/drksl/.config/dotfiles/winfiles
 #                chown -R drksl:drksl /home/drksl/.config
+#                chown -R drksl:drksl /home/dtfls
 #                chown -R drksl:drksl /run/user/1000
 #                sudo -u "drksl" bash -c "cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin && ./RiceNix"
 #              }
@@ -65,20 +69,20 @@
 # docker run -it \
 #            --name nixos-ricenix \
 #            --privileged \
-#            --volume=$(pwd):/root/.config/dotfiles/winfiles-docker-volume \
+#            --volume=${PWD%/*}:/root/.config/dotfiles/winfiles-docker-volume \
 #            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
-#            --env XDG_RUNTIME_DIR=/run/user/1000
+#            --env XDG_RUNTIME_DIR=/run/user/1000 \
 #            nixos/nix:2.9.2 \
 #            bash -uelic '
-#              [[ ! -e /root/.config/dotfiles ]] && {
-#                cp -r /root/.config/dotfiles/winfiles-docker-volume /root/.config/dotfiles/winfiles
-#                chown -R root:root /root/.config/dotfiles/winfiles
-#                chown -R root:root /run/user/1000
+#              [[ ! -e /root/.config/dotfiles/winfiles ]] && {
+#                tty >> /tmp/sixel-
+#                cp -r /root/.config/dotfiles/winfiles-docker-volume/winfiles /root/.config/dotfiles/winfiles
 #                cd /root/.config/dotfiles/winfiles/wslfiles/.local/bin
 #                SUDO=false ROOTCHECK=false ./RiceNix
 #              }
 #              chmod g+w /dev/pts/0
+#              cd ~
 #              zsh -l
 #            '
 
@@ -105,7 +109,9 @@ $SUDO true
     sudo pacman-key --init
     sudo pacman-key --populate
     sudo pacman -Sy  --noconfirm archlinux-keyring
-    sudo pacman -Syu --noconfirm zsh xf86-input-synaptics curl cron base-devel
+    [ ! -e /.dockerenv ] && sudo pacman -Syu --noconfirm xf86-input-synaptics cron
+    sudo pacman -Syu --noconfirm zsh curl base-devel
+    yes | sudo pacman -Scc
   }
 
 # Debian dependencies:
@@ -113,7 +119,8 @@ $SUDO true
     sudo apt update
     # sudo apt full-upgrade -y
     # sudo apt install -y festvox-us-slt-hts
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh xserver-xorg-input-synaptics file curl cron build-essential
+    [ ! -e /.dockerenv ] && sudo DEBIAN_FRONTEND=noninteractive apt install -y xserver-xorg-input-synaptics cron
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh file curl build-essential
   }
 
 # alternitive install nix-daemon(multiuser):
@@ -132,9 +139,11 @@ if [ -e /etc/nix ]; then
   {
     curl -L https://nixos.org/nix/install | sh
     . "$HOME"/.nix-profile/etc/profile.d/nix.sh
-    nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
-    nix-channel --update
-    nix-env -iA nixgl.auto.nixGLDefault
+    [ ! -e /.dockerenv ] && {
+      nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl
+      nix-channel --update
+      nix-env -iA nixgl.auto.nixGLDefault
+    }
   }
 fi
 
@@ -154,68 +163,65 @@ if [ -e /etc/nixos ]; then
   }
 fi
 
-# install packages:
-nix-env -iA \
-  bat \
-  cht-sh \
+#-- Packages excluded on docker
+[ ! -e /.dockerenv ] && nix-env -iA \
   dmenu \
   devour \
-  fzf \
-  ffmpegthumbnailer \
-  gcc11 \
-  git \
   kitty \
-  less \
-  lazygit \
-  libsixel \
   light \
-  lf \
-  lua \
-  moreutils \
   mpc_cli \
   mpd \
-  mupdf \
   mpvScripts.mpris \
   ncmpcpp \
-  neovim \
-  nodejs-16_x \
-  perl534Packages.FileMimeInfo \
-  pipewire \
   playerctl \
-  pulseaudio \
-  python310Packages.pip \
   redshift \
-  ripgrep \
-  spaceship-prompt \
-  stow \
   sxhkd \
-  sxiv \
-  trash-cli \
-  unzip \
-  wezterm \
   xcape \
-  xclip \
   xdo \
   xdotool \
   xdragon \
-  xorg.libXfont \
-  xorg.setxkbmap \
-  xorg.xkbcomp \
   xorg.xmodmap \
-  xorg.xorgserver \
   xorg.xset \
-  zathura \
-  zsh-autosuggestions \
-  zsh-fast-syntax-highlighting \
   -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
   # nixpkgs.bspwm \
   # nixpkgs.cron \
   # nixpkgs.mlterm \
+  # nixpkgs.polybar \
   # nixpkgs.python310 \
   # nixpkgs.timg \
   # nixpkgs.xorg.xf86inputsynaptics \
   # nixpkgs.xorg.xinit \
   # nixpkgs._3270font \
+
+# install packages:
+nix-env -iA \
+  bat \
+  cht-sh \
+  fzf \
+  ffmpegthumbnailer \
+  gcc11 \
+  git \
+  less \
+  lazygit \
+  lf \
+  libsixel \
+  moreutils \
+  mupdf \
+  neovim \
+  perl534Packages.FileMimeInfo \
+  pipewire \
+  ripgrep \
+  spaceship-prompt \
+  stow \
+  sxiv \
+  trash-cli \
+  unzip \
+  wezterm \
+  xclip \
+  zathura \
+  zsh-autosuggestions \
+  zsh-fast-syntax-highlighting \
+  -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
 
 # Dotfiles:
 # git clone https://gitlab.com/yucrayeff36/winfiles "$HOME"/.config/dotfiles/winfiles
@@ -301,9 +307,9 @@ nix-shell --pure \
           --command "CC=clang ./build-xsixel.sh && make install"
 
   if [ -e /etc/nixos ]; then
-    nix-env -iA nixos.libmd nixos.xorg.libXfont nixos.xorg.libxshmfence nixos.libsixel
+    nix-env -iA nixos.libmd nixos.xorg.libXfont nixos.xorg.libxshmfence nixos.libsixel nixos.xorg.setxkbmap nixos.xorg.xkbcomp
   else
-    nix-env -iA nixpkgs.libmd nixpkgs.xorg.libXfont nixpkgs.xorg.libxshmfence nixpkgs.libsixel
+    nix-env -iA nixpkgs.libmd nixpkgs.xorg.libXfont nixpkgs.xorg.libxshmfence nixpkgs.libsixel nixpkgs.xorg.setxkbmap nixpkgs.xorg.xkbcomp
   fi
 cd ..
 
@@ -346,7 +352,7 @@ cd ..
 # systemctl --user enable --now touchcursor
 [ ! -e /etc/X11/xorg.conf.d ]&& $SUDO mkdir -p /etc/X11/xorg.conf.d
 $SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
-$SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
+[ -x "$(command -v crontab)" ] && $SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
 rm -rf {bedstead-002.004.zip,nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
 [ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
 nix-collect-garbage -d
