@@ -11,7 +11,7 @@
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            archlinux:base-devel \
 #            bash -uelic '
-#              [[ ! -e /home/drksl ]] && {
+#              if [ ! -e /home/drksl ]; then
 #                pacman-key --init
 #                pacman-key --populate
 #                pacman -Sy  --noconfirm archlinux-keyring
@@ -27,8 +27,11 @@
 #                chown -R drksl:drksl /home/dtfls
 #                chown -R drksl:drksl /run/user/1000
 #                sudo -u "drksl" bash -c "cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin && ./RiceNix"
-#              }
+#              else
+#                reset
+#              fi
 #              chmod g+w /dev/pts/0
+#              stty rows $(tput lines) && stty cols $(tput cols) && stty sane
 #              su - "drksl" bash -c "export XDG_RUNTIME_DIR=/run/user/1000 && script -qI /dev/null"
 #            '
 
@@ -43,7 +46,7 @@
 #            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
 #            ubuntu:devel \
 #            bash -uelic '
-#              [[ ! -e /home/drksl ]] && {
+#              if [ ! -e /home/drksl ]; then
 #                apt update
 #                DEBIAN_FRONTEND=noninteractive apt install -y sudo
 #                useradd -mG sudo,tty drksl
@@ -58,8 +61,11 @@
 #                chown -R drksl:drksl /home/dtfls
 #                chown -R drksl:drksl /run/user/1000
 #                sudo -u "drksl" bash -c "cd ~/.config/dotfiles/winfiles/wslfiles/.local/bin && ./RiceNix"
-#              }
+#              else
+#                reset
+#              fi
 #              chmod g+w /dev/pts/0
+#              stty rows $(tput lines) && stty cols $(tput cols) && stty sane
 #              su - "drksl" bash -c "export XDG_RUNTIME_DIR=/run/user/1000 && script -qI /dev/null"
 #            '
 
@@ -224,146 +230,174 @@ nix-env -iA \
   -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
 
 # Dotfiles:
-# git clone https://gitlab.com/yucrayeff36/winfiles "$HOME"/.config/dotfiles/winfiles
-# cd "$HOME"/.config/dotfiles/winfiles/wslfiles/.local/bin/
-cd "$(git rev-parse --show-toplevel)"/wslfiles
-[ ! -e "$HOME"/.config ]&& mkdir "$HOME"/.config
-[ ! -e "$HOME"/.local ]&& mkdir "$HOME"/.local
-stow --restow --verbose --target="$HOME"/.config .config
-stow --restow --verbose --target="$HOME"/.local .local
-ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
-ln -sf "$HOME"/.config/shell/.xprofile "$HOME"/.xprofile
-mkdir -p "$HOME"/.local/share/mpd
+install_dotfiles() {
+  # git clone https://gitlab.com/yucrayeff36/winfiles "$HOME"/.config/dotfiles/winfiles
+  # cd "$HOME"/.config/dotfiles/winfiles/wslfiles/.local/bin/
+  cd "$(git rev-parse --show-toplevel)"/wslfiles
+  [ ! -e "$HOME"/.config ]&& mkdir "$HOME"/.config
+  [ ! -e "$HOME"/.local ]&& mkdir "$HOME"/.local
+  stow --restow --verbose --target="$HOME"/.config .config
+  stow --restow --verbose --target="$HOME"/.local .local
+  ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
+  ln -sf "$HOME"/.config/shell/.xprofile "$HOME"/.xprofile
+  mkdir -p "$HOME"/.local/share/mpd
+}
 
 # nerd fonts:
-mkdir -p "$HOME"/.local/share/fonts
-git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
-cd nerd-fonts
-git sparse-checkout add patched-fonts/3270
-git sparse-checkout add patched-fonts/CascadiaCode
-git sparse-checkout add patched-fonts/Terminus
-cp -r patched-fonts/3270 "$HOME"/.local/share/fonts/
-cp -r patched-fonts/CascadiaCode "$HOME"/.local/share/fonts/
-cp -r patched-fonts/Terminus "$HOME"/.local/share/fonts/
-cd ..
+install_nerdfonts() {
+  mkdir -p "$HOME"/.local/share/fonts
+  git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
+  cd nerd-fonts
+  git sparse-checkout add patched-fonts/3270
+  git sparse-checkout add patched-fonts/CascadiaCode
+  git sparse-checkout add patched-fonts/Terminus
+  cp -r patched-fonts/3270 "$HOME"/.local/share/fonts/
+  cp -r patched-fonts/CascadiaCode "$HOME"/.local/share/fonts/
+  cp -r patched-fonts/Terminus "$HOME"/.local/share/fonts/
+  cd ..
 
-# bedstead font:
-curl -LO https://bjh21.me.uk/bedstead/bedstead-002.004.zip
-unzip bedstead-002.004.zip -d "$HOME"/.local/share/fonts/
+  # bedstead font:
+  curl -LO https://bjh21.me.uk/bedstead/bedstead-002.004.zip
+  unzip bedstead-002.004.zip -d "$HOME"/.local/share/fonts/
+}
 
-# # neovim version 7 (appimage-run nvim.appimage on NIXOS):
-# curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
-# git clone --depth=1 --branch v0.7.2 --single-branch https://github.com/neovim/neovim
-# cd neovim
-# nix-shell --pure \
-#           -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
-#           --packages autoconf automake cmake curl gettext libtermkey libtool lua perl pkg-config unibilium unzip \
-#           --command "make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=$HOME/.local && make install"
-# cd ..
 
 # touchcursor:
-mkdir touchcursor-linux
-cd touchcursor-linux
-git init
-git remote add origin https://github.com/donniebreve/touchcursor-linux
-git fetch --depth=1 origin 775d5db97ff7a9d65965f5d05c338fd5276a7ce7
-git checkout 775d5db
-sed -i "s/systemctl/#systemctl/" Makefile
-sed -i "s/sudo //" Makefile
-nix-shell --pure \
-          -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
-          --packages gnumake \
-          --command "make && INSTALLPATH=$HOME/.local/bin  make install"
-cd ..
+install_touchcursor() {
+  mkdir touchcursor-linux
+  cd touchcursor-linux
+  git init
+  git remote add origin https://github.com/donniebreve/touchcursor-linux
+  git fetch --depth=1 origin 775d5db97ff7a9d65965f5d05c338fd5276a7ce7
+  git checkout 775d5db
+  sed -i "s/systemctl/#systemctl/" Makefile
+  sed -i "s/sudo //" Makefile
+  nix-shell --pure \
+            -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
+            --packages gnumake \
+            --command "make && INSTALLPATH=$HOME/.local/bin  make install"
+  cd ..
+}
 
 # xsixel:
-mkdir xserver-sixel
-cd xserver-sixel
-git init
-git remote add origin https://github.com/saitoha/xserver-sixel
-git fetch --depth=1 origin 7f4af3440cd736942f87ae96d15f7eaa2c1d58a9
-git checkout 7f4af34
-sed -i '/sixel/a\    --disable-xwayland \\' build-xsixel.sh
-sed -i 's|/usr/local|$HOME/.local|' build-xsixel.sh
-sed -i 's|/usr|$HOME/.nix-profile|' build-xsixel.sh
-sed -i 's/gl >= *.*.0/gl >= 1.2.0/g' configure.ac
+install_xsixel() {
+  mkdir xserver-sixel
+  cd xserver-sixel
+  git init
+  git remote add origin https://github.com/saitoha/xserver-sixel
+  git fetch --depth=1 origin 7f4af3440cd736942f87ae96d15f7eaa2c1d58a9
+  git checkout 7f4af34
+  sed -i '/sixel/a\    --disable-xwayland \\' build-xsixel.sh
+  sed -i 's|/usr/local|$HOME/.local|' build-xsixel.sh
+  sed -i 's|/usr|$HOME/.nix-profile|' build-xsixel.sh
+  sed -i 's/gl >= *.*.0/gl >= 1.2.0/g' configure.ac
 
-# [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
-# 	zsh xorg build-essential dh-autoreconf gawk xutils-dev xtrans-dev pkg-config libfontenc-dev \
-# 	libpixman-1-dev libghc-cryptohash-sha1-dev libxkbfile-dev libxau-dev x11proto-dev libsixel-dev \
-# 	&& $(curl -LO https://xorg.freedesktop.org/archive/individual/lib/libXfont-1.5.4.tar.bz2 \
-# 		&& tar xjvf libXfont-1.5.4.tar.bz2 \
-# 		&& cd libXfont-1.5.4 \
-# 		&& ./configure \
-# 		&& sudo make install \
-# 		&& sudo ln -sf /usr/local/lib/libXfont.so.1 /usr/lib/libXfont.so.1) \
-# 	&& ./build-sixel.sh \
-# 	&& sudo make install
+  # [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
+  # 	zsh xorg build-essential dh-autoreconf gawk xutils-dev xtrans-dev pkg-config libfontenc-dev \
+  # 	libpixman-1-dev libghc-cryptohash-sha1-dev libxkbfile-dev libxau-dev x11proto-dev libsixel-dev \
+  # 	&& $(curl -LO https://xorg.freedesktop.org/archive/individual/lib/libXfont-1.5.4.tar.bz2 \
+  # 		&& tar xjvf libXfont-1.5.4.tar.bz2 \
+  # 		&& cd libXfont-1.5.4 \
+  # 		&& ./configure \
+  # 		&& sudo make install \
+  # 		&& sudo ln -sf /usr/local/lib/libXfont.so.1 /usr/lib/libXfont.so.1) \
+  # 	&& ./build-sixel.sh \
+  # 	&& sudo make install
 
-nix-shell --pure \
-          -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
-          --packages autoconf automake clang_11 libdrm libGL libmd libsixel nettle pkg-config \
-            xorg.fontutil xorg.libX11 xorg.libxkbfile xorg.libXfont xorg.utilmacros xorg.xorgserver xorg.xtrans \
-          --command "CC=clang ./build-xsixel.sh && make install"
+  nix-shell --pure \
+            -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
+            --packages autoconf automake clang_11 libdrm libGL libmd libsixel nettle pkg-config \
+              xorg.fontutil xorg.libX11 xorg.libxkbfile xorg.libXfont xorg.utilmacros xorg.xorgserver xorg.xtrans \
+            --command "CC=clang ./build-xsixel.sh && make install"
 
-  if [ -e /etc/nixos ]; then
-    nix-env -iA nixos.libmd nixos.xorg.libXfont nixos.xorg.libxshmfence nixos.libsixel nixos.xorg.setxkbmap nixos.xorg.xkbcomp
-  else
-    nix-env -iA nixpkgs.libmd nixpkgs.xorg.libXfont nixpkgs.xorg.libxshmfence nixpkgs.libsixel nixpkgs.xorg.setxkbmap nixpkgs.xorg.xkbcomp
-  fi
-cd ..
+    if [ -e /etc/nixos ]; then
+      nix-env -iA nixos.libmd nixos.xorg.libXfont nixos.xorg.libxshmfence nixos.libsixel nixos.xorg.setxkbmap nixos.xorg.xkbcomp
+    else
+      nix-env -iA nixpkgs.libmd nixpkgs.xorg.libXfont nixpkgs.xorg.libxshmfence nixpkgs.libsixel nixpkgs.xorg.setxkbmap nixpkgs.xorg.xkbcomp
+    fi
+  cd ..
+}
 
 # mpv-sixel (`unset LD_LIBRARY_PATH` if GLIBC error /bin/mpv):
-mkdir mpv
-cd mpv
-git init
-git remote add origin https://github.com/mpv-player/mpv
-git fetch --depth=1 origin 0044c19f0de29ff752eb708365322b0ec16b53e7
-git checkout 0044c19
+install_mpv() {
+  mkdir mpv
+  cd mpv
+  git init
+  git remote add origin https://github.com/mpv-player/mpv
+  git fetch --depth=1 origin 0044c19f0de29ff752eb708365322b0ec16b53e7
+  git checkout 0044c19
 
-# [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
-# 	ffmpeg liblua5.2-dev libsixel-dev libpipewire-0.3-dev libass-dev libavutil-dev \
-# 	libavcodec-dev libavformat-dev libgl-dev libswscale-dev libavfilter-dev libswresample-dev \
-# 	&& ./bootstrap.py \
-# 	&& ./waf configure --libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
-# 	&& ./waf build \
-# 	&& sudo ./waf install
+  # [ ! -e /etc/arch-release ]&& sudo DEBIAN_FRONTEND=noninteractive apt install -y \
+  # 	ffmpeg liblua5.2-dev libsixel-dev libpipewire-0.3-dev libass-dev libavutil-dev \
+  # 	libavcodec-dev libavformat-dev libgl-dev libswscale-dev libavfilter-dev libswresample-dev \
+  # 	&& ./bootstrap.py \
+  # 	&& ./waf configure --libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
+  # 	&& ./waf build \
+  # 	&& sudo ./waf install
 
-nix-shell --pure \
-          --keep NIX_SSL_CERT_FILE \
-          -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
-          --packages ffmpeg libass lua libsixel libGL mesa mujs pipewire pkg-config pulseaudio python310 \
-	  	      xorg.libX11 xorg.libXpresent xorg.libXv xorg.libXScrnSaver xorg.libXext xorg.libXinerama xorg.libXrandr zlib \
-          --command "NIX_SSL_CERT_FILE=${NIX_SSL_CERT_FILE:-/etc/ssl/certs/ca-certificates.crt} ./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
+  nix-shell --pure \
+            --keep NIX_SSL_CERT_FILE \
+            -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
+            --packages ffmpeg libass lua libsixel libGL mesa mujs pipewire pkg-config pulseaudio python310 \
+              xorg.libX11 xorg.libXpresent xorg.libXv xorg.libXScrnSaver xorg.libXext xorg.libXinerama xorg.libXrandr zlib \
+            --command "NIX_SSL_CERT_FILE=${NIX_SSL_CERT_FILE:-/etc/ssl/certs/ca-certificates.crt} ./bootstrap.py && ./waf configure --prefix=$HOME/.local && ./waf build && ./waf install"
 
-  if [ -e /etc/nixos ]; then
-    nix-env -iA nixos.ffmpeg nixos.xorg.libXpresent nixos.libsixel nixos.lua nixos.pulseaudio
-  else
-    nix-env -iA nixpkgs.ffmpeg nixpkgs.xorg.libXpresent nixpkgs.libsixel nixpkgs.lua nixpkgs.pulseaudio
-  fi
-cd ..
-
-# pipewire:
-# echo "export DISPLAY=localhost:0.0" >>"$HOME"/.zprofile #WSL
-# echo "export PULSE_SERVER=tcp:localhost" >>"$HOME"/.zprofile #WSL
-# echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zprofile #Docker Audio
+    if [ -e /etc/nixos ]; then
+      nix-env -iA nixos.ffmpeg nixos.xorg.libXpresent nixos.libsixel nixos.lua nixos.pulseaudio
+    else
+      nix-env -iA nixpkgs.ffmpeg nixpkgs.xorg.libXpresent nixpkgs.libsixel nixpkgs.lua nixpkgs.pulseaudio
+    fi
+  cd ..
+}
 
 # user config:
-# systemctl --user enable --now touchcursor
-[ ! -e /etc/X11/xorg.conf.d ]&& $SUDO mkdir -p /etc/X11/xorg.conf.d
-$SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
-[ -x "$(command -v crontab)" ] && $SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
-rm -rf {bedstead-002.004.zip,nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
-[ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
-nix-collect-garbage -d
+install_configs ()
+{
+  # systemctl --user enable --now touchcursor
+  [ ! -e /etc/X11/xorg.conf.d ]&& $SUDO mkdir -p /etc/X11/xorg.conf.d
+  $SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
+  [ -x "$(command -v crontab)" ] && $SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
+  rm -rf {bedstead-002.004.zip,nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
+  [ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
+  nix-collect-garbage -d
 
-# # blacklisting beep sound (there is no beep in docker):
-# sudo rmmod pcspkr
-# echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
+  # pipewire:
+  # echo "export DISPLAY=localhost:0.0" >>"$HOME"/.zprofile #WSL
+  # echo "export PULSE_SERVER=tcp:localhost" >>"$HOME"/.zprofile #WSL
+  # echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zprofile #Docker Audio
+
+  # # blacklisting beep sound (there is no beep in docker):
+  # sudo rmmod pcspkr
+  # echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
+
+}
+
+# neovim version 7 (appimage-run nvim.appimage on NIXOS):
+install_neovim() {
+  # curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
+  git clone --depth=1 --branch v0.7.2 --single-branch https://github.com/neovim/neovim
+  cd neovim
+  nix-shell --pure \
+            -I https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz \
+            --packages autoconf automake cmake curl gettext libtermkey libtool lua perl pkg-config unibilium unzip \
+            --command "make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=$HOME/.local && make install"
+  cd ..
+}
 
 # install neovim plugins  $(ulimit -n 4096):
-git clone --depth 1 https://github.com/wbthomason/packer.nvim "$HOME"/.local/share/nvim/site/pack/packer/start/packer.nvim
-nvim -u "$HOME"/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+install_neovim_plugins() {
+  git clone --depth 1 https://github.com/wbthomason/packer.nvim "$HOME"/.local/share/nvim/site/pack/packer/start/packer.nvim
+  nvim -u "$HOME"/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+}
+
+install_dotfiles                             #|| echo $(tput -T ansi setaf 1) install_dotfiles failed
+[ ! -e /.dockerenv ] && install_nerdfonts    #|| echo $(tput -T ansi setaf 1) install_nerdfonts failed
+[ ! -e /.dockerenv ] && install_touchcursor  #|| echo $(tput -T ansi setaf 1) install_touchcursor failed
+install_xsixel                               #|| echo $(tput -T ansi setaf 1) install_xsixel failed
+install_mpv                                  #|| echo $(tput -T ansi setaf 1) install_mpv failed
+install_configs                              #|| echo $(tput -T ansi setaf 1) install_configs failed
+# install_neovim                             #|| echo $(tput -T ansi setaf 1) install_neovim failed
+install_neovim_plugins                       #|| echo $(tput -T ansi setaf 1) install_neovim_plugins failed
 
 printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"
 printf "\e[1;32m Done! \e[0m\n"
