@@ -361,10 +361,15 @@ install_configs ()
   [ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
   nix-collect-garbage -d
 
+  # GWSL:
+  # echo "export LIBGL_ALWAYS_INDIRECT=1" >>"$HOME"/.zshenv #GWSL
+  # echo "export DISPLAY=\$(cat /etc/resolv.conf | grep nameserver | awk '{print \$2; exit;}'):0.0" >>"$HOME"/.zshenv #GWSL
+  # echo "export PULSE_SERVER=tcp:\$(cat /etc/resolv.conf | grep nameserver | awk '{print \$2; exit;}')" >>"$HOME"/.zshenv #GWSL
+
   # pipewire:
-  # echo "export DISPLAY=localhost:0.0" >>"$HOME"/.zprofile #WSL
-  # echo "export PULSE_SERVER=tcp:localhost" >>"$HOME"/.zprofile #WSL
-  # echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zprofile #Docker Audio
+  # echo "export DISPLAY=localhost:0.0" >>"$HOME"/.zshenv #WSL
+  # echo "export PULSE_SERVER=tcp:localhost" >>"$HOME"/.zshenv #WSL
+  # echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zshenv #Docker Audio
 
   # # blacklisting beep sound (there is no beep in docker):
   # sudo rmmod pcspkr

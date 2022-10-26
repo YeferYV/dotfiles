@@ -52,8 +52,7 @@ winrar-np `
 
 # winget packages
 winget install --force `
-IObit.DriverBooster9 ` 
+IObit.DriverBooster9 `
 GWSL `
 OpenInWSL `
 Microsoft.Powershell `
-
