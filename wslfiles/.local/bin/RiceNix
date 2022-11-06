@@ -190,7 +190,7 @@ fi
   xdragon \
   xorg.xmodmap \
   xorg.xset \
-  -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
+  -f https://github.com/NixOS/nixpkgs/archive/7db5c033211382f9b656531a3408fadd06ffb201.tar.gz
   # nixpkgs.bspwm \
   # nixpkgs.cron \
   # nixpkgs.mlterm \
@@ -229,7 +229,7 @@ nix-env -iA \
   zathura \
   zsh-autosuggestions \
   zsh-fast-syntax-highlighting \
-  -f https://github.com/NixOS/nixpkgs/archive/09066922296d9ef06bfadb937b2560524dd10785.tar.gz
+  -f https://github.com/NixOS/nixpkgs/archive/7db5c033211382f9b656531a3408fadd06ffb201.tar.gz
 
 # Dotfiles:
 install_dotfiles() {
