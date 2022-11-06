@@ -8,6 +8,7 @@ wslfiles/.config/zsh/.zcompdump
 
 wslfiles/.local/bin/*
 !wslfiles/.local/bin/cron/
+!wslfiles/.local/bin/borderless
 !wslfiles/.local/bin/dmenupass
 !wslfiles/.local/bin/maimpick
 !wslfiles/.local/bin/remaps

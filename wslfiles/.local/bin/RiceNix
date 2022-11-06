@@ -175,10 +175,12 @@ fi
   devour \
   kitty \
   light \
+  maim \
   mpc_cli \
   mpd \
   mpvScripts.mpris \
   ncmpcpp \
+  picom \
   playerctl \
   redshift \
   sxhkd \

@@ -1,0 +1,17 @@
+#! /usr/bin/python -Wi::DeprecationWarning
+# pip install pygi
+import gi
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk
+
+screen = Gdk.Screen.get_default()
+active_window = screen.get_active_window() # Deprecated, no alternative though
+d = active_window.get_decorations()
+
+new_value = Gdk.WMDecoration(0)
+if (d[0] and d[1] == Gdk.WMDecoration(0)):
+  new_value = Gdk.WMDecoration(1)
+
+active_window.set_decorations(new_value)
+Gdk.flush()
+

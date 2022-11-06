@@ -6,13 +6,17 @@
 super + {_,shift +,ctrl + }Return
 	{ \
 	  nixGL wezterm --config initial_rows=47 --config initial_cols=169; \
-	, nixGL wezterm --config initial_rows=30 --config initial_cols=90; \
-	, nixGL wezterm; \
+	, nixGL wezterm --config initial_rows=25 --config initial_cols=85; \
+	, nixGL wezterm --config "window_decorations='NONE'" ; \
 	}
 
 # terminal emulator
 mod1 + {_,shift +,ctrl + }Return
   {nixGL kitty, nixGL alacritty,cool-retro-term}
+
+# borderless window
+super + alt + b
+  borderless
 
 # dunst close/reopen notification
 ctrl + {_,shift + }Return
@@ -34,65 +38,104 @@ super + shift + Escape
 super + q
 	xdo close
 
+# toggle fullscreen
+super + f
+  xdotool windowstate --toggle=FULLSCREEN $(xdo id)
+
+# toggle maximized window
+super + m
+  xdotool windowstate --toggle=MAXIMIZED_HORZ $(xdo id); \
+  xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id);
+
 # focus or send to the given desktop
 super + {_,shift + }{1-9,0,minus,equal}
 	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11}'
 
 # increase/decrease window size (zoom in/out)
 super + alt + {i,o}
+  DECORATION_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $5 \}' | awk -F',' '\{ print $1\}'); \
+  BORDER_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $4 \}' | awk -F',' '\{ print $1\}'); \
 	{ \
-	  xdotool getactivewindow windowmove --relative -- -52 -51 ; xdo resize -w +100 -h +50; \
-	, xdotool getactivewindow windowmove --relative -- +50 -1 ; xdo resize -w -100 -h -50; \
+	  xdotool getactivewindow windowmove --relative -- -$((50 + BORDER_SIZE)) -$((25 + DECORATION_SIZE)) ; xdo resize -w +100 -h +50; \
+	, xdotool getactivewindow windowmove --relative -- +$((50 - BORDER_SIZE)) +$((25 - DECORATION_SIZE)) ; xdo resize -w -100 -h -50; \
 	}
 
 # hover window to left/down/up/right
 super + alt + shift + {u,i,o,p}
-  xdotool getactivewindow { \
-	  windowsize 50%  95% windowmove 0%  0% ; \
-	, windowsize 100% 46% windowmove 0%  51%; \
-	, windowsize 100% 45% windowmove 0%  0% ; \
-	, windowsize 50%  95% windowmove 50% 0% ; \
-	}
+  xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read B D;\
+  xprop -root _NET_WORKAREA  | awk -F ',' '\{print $2\}' | xargs -I var echo "(var + 1)/2" | bc | read S;\
+  xdotool getdisplaygeometry | awk '\{print $1" "$2\}' | read W H;\
+	{ \
+    w=$((W / 2 - 1)); h=$H; x=0; y=0;\
+  , w=$W; h=$((H / 2 - S - D)); x=0; y=$((H / 2 + S));\
+  , w=$W; h=$((H / 2 - S - D)); x=0; y=0;\
+  , w=$((W / 2    )); h=$H; x=$((W / 2)); y=0;\
+	} \
+  xdo resize -w $w -h $h; xdo move -x $x -y $y
 
 # move floating window by 10px
 super + alt + {h,j,k,l}
-  xdotool getactivewindow windowmove --relative -- {-10 -26, -1 -16, -1 -36, +10 -26}
+  DECORATION_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $5 \}' | awk -F',' '\{ print $1\}'); \
+  BORDER_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $4 \}' | awk -F',' '\{ print $1\}'); \
+  xdotool getactivewindow windowmove --relative -- \
+  { \
+     $((-10 - BORDER_SIZE)) -$DECORATION_SIZE ; \
+  , -$BORDER_SIZE $((-DECORATION_SIZE + 10)) ; \
+  , -$BORDER_SIZE $((-DECORATION_SIZE - 10)) ; \
+  ,  $((10 - BORDER_SIZE)) -$DECORATION_SIZE ; \
+  }
 
 # hover window to corner
 super + alt + shift + {h,j,k,l}
-	W=$(xdotool getwindowfocus getwindowgeometry | awk '/Geometry/ \{print $2\}' | awk -F'x' '\{print $1\}'); \
-	H=$(xdotool getwindowfocus getwindowgeometry | awk '/Geometry/ \{print $2\}' | awk -F'x' '\{print $2\}'); \
-  xdotool getactivewindow windowmove --sync --relative -- -2 -52  windowmove \
+  xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read BORDER DECORATION; \
+  xdotool getwindowfocus getwindowgeometry | awk -F'x' '/Geometry/ \{print $1" "$2\}' | read G W H; \
+  xdotool getdisplaygeometry | awk '\{print $1" "$2\}' | read W_SCREEN H_SCREEN; \
+  xdotool getactivewindow windowmove --relative -- -$((BORDER + BORDER)) -$((DECORATION + DECORATION)) &&\
+  xdotool getactivewindow windowmove \
 	{ \
-		0% y							  ; \
-	, x $((768 - H - 26)) ; \
-	, x 0%							  ; \
-	, $((1366 - W - 2)) y ; \
+		0% y; \
+	, x $((H_SCREEN - H - DECORATION)); \
+	, x 0%; \
+	, $((W_SCREEN - W - BORDER - BORDER)) y; \
 	}
 
-# increase/expand/grow window edges
+# increase/expand/grow window edges by 10px
 super + alt + {m,comma,period,slash}
-	{ xdotool getactivewindow windowmove --relative -- -11 -26; xdo resize -w +10; \
-  ,	                                                       		xdo resize -h +10; \
-  ,	xdotool getactivewindow windowmove --relative -- -1 -36;  xdo resize -h +10; \
-  ,	                                                          xdo resize -w +10; \
+  xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read BORDER DECORATION; \
+	{ \
+    xdotool getactivewindow windowmove --relative -- $((-10 - BORDER)) -$DECORATION; xdo resize -w +10; \
+  ,                                                                                  xdo resize -h +10; \
+  ,	xdotool getactivewindow windowmove --relative -- -$BORDER $((-DECORATION - 10)); xdo resize -h +10; \
+  ,                                                                                  xdo resize -w +10; \
 	}
 
-# decrease/contract/shrink window edges
+# decrease/contract/shrink window edges by 10px
 super + alt + shift + {m,comma,period,slash}
-	{ xdotool getactivewindow windowmove --relative -- +9 -26; xdo resize -w -10; \
-	,																													 xdo resize -h -10; \
-  , xdotool getactivewindow windowmove --relative -- -1 -16; xdo resize -h -10; \
-	,																													 xdo resize -w -10; \
+  xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read BORDER DECORATION; \
+	{ \
+    xdotool getactivewindow windowmove --relative --  $((10 - BORDER)) -$DECORATION; xdo resize -w -10; \
+	,                                                                                  xdo resize -h -10; \
+  , xdotool getactivewindow windowmove --relative -- -$BORDER $((-DECORATION + 10)); xdo resize -h -10; \
+	,	                                                                                 xdo resize -w -10; \
 	}
 
-# xdo fixedscreen 50%/75% (small/medium)
+# xdo fixedscreen 75%/50% (medium/small)
 super + alt + {_,shift + } n
-	xdotool getactivewindow windowsize { 75% 75%, 50% 50% }
+  xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read B D;\
+  xprop -root _NET_WORKAREA  | awk -F ',' '\{print $2\}' | xargs -I var echo "(var + 1)/2" | bc | read S;\
+  xdotool getdisplaygeometry | awk '\{print $1" "$2\}' | read W H;\
+  { \
+    xdotool getactivewindow windowsize 75% 75%; \
+  , xdo resize -w $((W / 2 - B)) -h $((H / 2 - S - D)); \
+  }
 
 # xdo fixedscreen 1366x768 (min-max window)
 super + {_,shift + }n
-	xdotool getactivewindow windowsize { 100% 94%, 80% 95% windowmove 20% x}
+  xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id); \
+  { \
+	  xdotool getactivewindow windowsize 100% y; \
+	, xdotool getactivewindow windowsize 80% y windowmove 20% x; \
+  }
 
 ########################################
 ###      alphabetic_hotkeys          ###
@@ -195,6 +238,7 @@ mod1 + ctrl + {1,2,3,4,5}
 # compositor start/end
 super + BackSpace
 	{\
+    nixGL \
 		picom --glx-no-rebind-pixmap \
         --use-damage \
         --xrender-sync-fence \
@@ -210,9 +254,9 @@ super + BackSpace
 
 # compositor keep background
 super + ctrl + BackSpace
-	{picom,killall picom}
+	{ nixGL picom --opacity-rule="90:class_g *= 'wezterm'" --frame-opacity=0.9, killall picom}
 
-# compositor decrease/increase trasnparency
+# compositor decrease/increase transparency
 super + ctrl + {minus,equal}
   xdo id -d -c | xargs -I id -n 1 picom-trans -w id {-2,+4}
   # xdo pid $ID  		# xdotool getactivewindow getwindowpid
@@ -237,7 +281,7 @@ super + {_,shift +,ctrl +}d
 
 # lf user/root
 super + {_,shift +} e
-	{LF_CD=true wezterm, sudo -i LF_CD=true LS_COLORS="" $TERMINAL}
+	{LF_CD=true nixGL wezterm, sudo -i LF_CD=true LS_COLORS="" nixGL wezterm}
 
 # browser
 super + {_,shift +} w
