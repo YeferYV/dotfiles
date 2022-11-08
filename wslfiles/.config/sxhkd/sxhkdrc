@@ -47,6 +47,31 @@ super + m
   xdotool windowstate --toggle=MAXIMIZED_HORZ $(xdo id); \
   xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id);
 
+# rofi focus last window
+XF86WWW
+  LOCALE_ARCHIVE=/lib/locale/locale-archive \
+  rofi \
+    -show window  -window-thumbnail -show-icons \
+    -kb-cancel "Escape" \
+    -kb-accept-entry "!space,Return" \
+    -selected-row 1; \
+  xdotool search --sync --class Rofi key --delay 0 --clearmodifiers space;
+
+# xdo focus last window
+shift + space
+	xdo activate -dr
+
+# rofi alt-tab like
+super + Tab
+  LOCALE_ARCHIVE=/lib/locale/locale-archive \
+  rofi -no-lazy-grab \
+    -show window  -window-thumbnail -show-icons \
+    -kb-accept-entry "!Super-Tab,!Super_L,!Super+Super_L,Return" \
+    -kb-row-down "Super+Tab" \
+    -kb-row-up "Super+ISO_Left_Tab" & \
+  xdotool keyup Tab; \
+  xdotool keydown Tab
+
 # focus or send to the given desktop
 super + {_,shift + }{1-9,0,minus,equal}
 	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11}'
@@ -193,9 +218,9 @@ XF86Launch{1,4}
 XF86Launch{2,3}
 	playerctl --player=chromium position {5-,5+}
 
-# chromium play-paus,rewind
-{XF86Shop, shift + space}
-  playerctl --player=chromium {play-pause, position 5-}
+# chromium play-pause
+XF86Shop
+  playerctl --player=chromium play-pause
 
 # mpv next-toggle-prev
 mod1 + KP_{Right,Begin,Left}

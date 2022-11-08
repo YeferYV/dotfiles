@@ -183,6 +183,7 @@ fi
   picom \
   playerctl \
   redshift \
+  rofi \
   sxhkd \
   xcape \
   xdo \
