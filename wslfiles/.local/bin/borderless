@@ -1,5 +1,5 @@
-#! /usr/bin/python -Wi::DeprecationWarning
-# pip install pygi
+#! /usr/bin/python3 -Wi::DeprecationWarning
+# sudo apt install python3-gi || sudo pacman -S python-gobject
 import gi
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk

@@ -31,6 +31,7 @@ touchcursor &
 ## Load a resource file, and merge with the current settings (for urxvt)
 # xrdb -merge ~/.config/x11/xresources &
 bash -c 'sleep 7 && xrdb -merge <<<"*foreground: #ff0000" && xrdb -merge <<<"*background: #000000"' & # sxiv fg/bg # locale-gen (if "no locale support")
+bash -c 'sleep 7 && xrdb -merge <<<"Xcursor.theme: Adwaita"' & # wezterm cursor
 
 ## To Load pointer
 # xsetroot -cursor_name left_ptr &

@@ -115,7 +115,7 @@ $SUDO true
     sudo pacman-key --init
     sudo pacman-key --populate
     sudo pacman -Sy  --noconfirm archlinux-keyring
-    [ ! -e /.dockerenv ] && sudo pacman -Syu --noconfirm xf86-input-synaptics cron
+    [ ! -e /.dockerenv ] && sudo pacman -Syu --noconfirm xf86-input-synaptics python-gobject cron
     sudo pacman -Syu --noconfirm zsh curl base-devel
     yes | sudo pacman -Scc
   }
@@ -125,7 +125,7 @@ $SUDO true
     sudo apt update
     # sudo apt full-upgrade -y
     # sudo apt install -y festvox-us-slt-hts
-    [ ! -e /.dockerenv ] && sudo DEBIAN_FRONTEND=noninteractive apt install -y xserver-xorg-input-synaptics cron
+    [ ! -e /.dockerenv ] && sudo DEBIAN_FRONTEND=noninteractive apt install -y xserver-xorg-input-synaptics python3-gi cron
     sudo DEBIAN_FRONTEND=noninteractive apt install -y zsh file curl build-essential
   }
 
@@ -183,7 +183,6 @@ fi
   picom \
   playerctl \
   redshift \
-  rofi \
   sxhkd \
   xcape \
   xdo \
@@ -259,11 +258,30 @@ install_nerdfonts() {
   cp -r patched-fonts/Terminus "$HOME"/.local/share/fonts/
   cd ..
 
+  # rofi emoji
+  # pip install --user --upgrade git+https://github.com/fdw/rofimoji@6.0.0
+  nix-shell -p python310Packages.pipx --command "pipx install https://github.com/fdw/rofimoji/archive/refs/tags/6.0.0.zip"
+  if [ -e /etc/nixos ]; then
+    nix-env -iA nixos.python310Packages.pipx nixos.rofi
+  else
+    nix-env -iA nixpkgs.python310Packages.pipx nixpkgs.rofi
+  fi
+
+  # Font-Awesome-6.2.0
+  git clone --depth=1 --branch 6.2.0 https://github.com/FortAwesome/Font-Awesome
+  mkdir "$HOME"/.local/share/fonts/Font-Awesome-6.2.0
+  cp -r Font-Awesome/otfs/ "$HOME"/.local/share/fonts/Font-Awesome-6.2.0/
+  cp -r Font-Awesome/webfonts/ "$HOME"/.local/share/fonts/Font-Awesome-6.2.0/
+
+  # Noto Color emoji
+  git clone --depth=1 https://github.com/googlefonts/noto-emoji
+  mkdir "$HOME"/.local/share/fonts/Noto-Emoji
+  cp noto-emoji/fonts/NotoColorEmoji.ttf "$HOME"/.local/share/fonts/Noto-Emoji/
+
   # bedstead font:
   curl -LO https://bjh21.me.uk/bedstead/bedstead-002.004.zip
   unzip bedstead-002.004.zip -d "$HOME"/.local/share/fonts/
 }
-
 
 # touchcursor:
 install_touchcursor() {
@@ -360,7 +378,7 @@ install_configs ()
   [ ! -e /etc/X11/xorg.conf.d ]&& $SUDO mkdir -p /etc/X11/xorg.conf.d
   $SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
   [ -x "$(command -v crontab)" ] && $SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
-  rm -rf {bedstead-002.004.zip,nerd-fonts,touchcursor-linux,xserver-sixel,mpv}
+  rm -rf {bedstead-002.004.zip,Font-Awesome,nerd-fonts,noto-emoji,touchcursor-linux,xserver-sixel,mpv}
   [ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
   nix-collect-garbage -d
 
