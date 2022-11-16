@@ -61,6 +61,7 @@ super + {alt,ctrl} + e
 
 # rofi focus last window
 XF86WWW
+  RHEIGHT=33% \
   LOCALE_ARCHIVE=/lib/locale/locale-archive \
   rofi \
     -show window  -window-thumbnail -show-icons \
@@ -69,18 +70,25 @@ XF86WWW
     -selected-row 1; \
   xdotool search --sync --class Rofi key --delay 0 --clearmodifiers space;
 
-# xdo focus next window
+# xdo focus last window
 shift + space
-	xdo activate -dr
+  A=$(xdo id | tr '[:upper:]' '[:lower:]' | sed -r 's/^0x0+/0x/g'); \
+  WINDOWS=($(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," " " | sed -r "s/$A.*//g")); \
+  xdo activate $\{WINDOWS[-1]\}
+  # xprop -root _NET_CLIENT_LIST_STACKING | ( read VAR; echo $VAR | cut --delimiter="," --fields=$(($(echo $VAR | wc -w) - 8)) | xargs xdo activate )
+  # read VAR < <(xprop -root _NET_CLIENT_LIST_STACKING); echo $VAR | cut --delimiter="," --fields=$(($(echo $VAR | wc -w) - 8)) | xargs xdo activate
 
 # rofi alt-tab like
 super + Tab
-  LOCALE_ARCHIVE=/lib/locale/locale-archive \
-  rofi -no-lazy-grab \
-    -show window  -window-thumbnail -show-icons \
+  A=$(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," "\n" | xargs -I var xdotool get_desktop_for_window var 2>/dev/null | sed 's/-1//g' | wc -w); \
+  [ $A -le 5 ]&& export RWIDTH="$((A * 20))%" RHEIGHT=33%; \
+  [[ 6 -le $A && $A -le 10 ]]&& export RHEIGHT=66%; \
+  rofi -show window \
     -kb-accept-entry "!Super-Tab,!Super_L,!Super+Super_L,Return" \
-    -kb-row-down "Super+Tab" \
-    -kb-row-up "Super+ISO_Left_Tab" & \
+    -kb-row-right "Super+Tab,Super+l" \
+    -kb-row-up "Super+k" \
+    -kb-row-down "Super+j" \
+    -kb-row-left "Super+ISO_Left_Tab,Super+h"& \
   xdotool keyup Tab; \
   xdotool key Tab
 
