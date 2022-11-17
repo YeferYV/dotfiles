@@ -47,6 +47,16 @@ super + m
   xdotool windowstate --toggle=MAXIMIZED_HORZ $(xdo id); \
   xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id);
 
+# rofi drun
+super + ctrl + d
+  A='rofimoji --action clipboard copy print --files fontawesome nerd_font gitmoji emojis latin-1'; \
+  COL=10 \
+  ICON=10% \
+  ENTRY=true \
+  SWITCHER=true \
+  XDG_DATA_DIRS=$HOME/.nix-profile/share:/usr/local/share:/usr/share:$HOME/.local/share:$XDG_DATA_DIRS \
+  rofi -modi "window,run,drun,emoji:$A,ssh" -show drun
+
 # rofi emoji
 super + {alt,ctrl} + e
   LOCALE_ARCHIVE=/lib/locale/locale-archive \
@@ -316,7 +326,7 @@ super + shift + b
   nixGL wezterm start ncmpcpp
 
 # dmenu launcher
-super + {_,shift +,ctrl +}d
+super + {_,shift +,alt +}d
 	{ \
 		dmenu_run; \
 	, wezterm start $(dmenu_path | dmenu); \
