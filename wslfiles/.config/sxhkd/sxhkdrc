@@ -82,17 +82,21 @@ XF86WWW
 
 # xdo focus last window
 shift + space
-  A=$(xdo id | tr '[:upper:]' '[:lower:]' | sed -r 's/^0x0+/0x/g'); \
-  WINDOWS=($(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," " " | sed -r "s/$A.*//g")); \
+  WINID=$(xdo id | tr '[:upper:]' '[:lower:]' | sed -r 's/^0x0+/0x/g'); \
+  WINDOWS=($(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," " " | sed -r "s/$WINID.*//g")); \
   xdo activate $\{WINDOWS[-1]\}
-  # xprop -root _NET_CLIENT_LIST_STACKING | ( read VAR; echo $VAR | cut --delimiter="," --fields=$(($(echo $VAR | wc -w) - 8)) | xargs xdo activate )
-  # read VAR < <(xprop -root _NET_CLIENT_LIST_STACKING); echo $VAR | cut --delimiter="," --fields=$(($(echo $VAR | wc -w) - 8)) | xargs xdo activate
+  # IDS=($((xdo id -D; xdo id -d) | tr "\n" " ")) && xdo activate $\{IDS[-2]\}
+
+# fzf alt-tab
+super + alt + z
+  nixGL wezterm --config "window_decorations='NONE'" start --always-new-process -- bash -c \
+  'test=$((xdo id -D & xdo id -d) | xargs -I var xprop -id var _NET_WM_NAME | cut -d"\"" -f2 | fzf); xdo activate $( xdo id -a "$test");'
 
 # rofi alt-tab like
 super + Tab
-  A=$(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," "\n" | xargs -I var xdotool get_desktop_for_window var 2>/dev/null | sed 's/-1//g' | wc -w); \
-  [ $A -le 5 ]&& export RWIDTH="$((A * 20))%" RHEIGHT=33%; \
-  [[ 6 -le $A && $A -le 10 ]]&& export RHEIGHT=66%; \
+  N=$((xdo id -D & xdo id -d) | wc -w); \
+  [ $N -le 5 ]&& export RWIDTH="$((N * 20))%" RHEIGHT=33%; \
+  [[ 6 -le $N && $N -le 10 ]]&& export RHEIGHT=66%; \
   rofi -show window \
     -kb-accept-entry "!Super-Tab,!Super_L,!Super+Super_L,Return" \
     -kb-row-right "Super+Tab,Super+l" \
