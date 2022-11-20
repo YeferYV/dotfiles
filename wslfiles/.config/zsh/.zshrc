@@ -304,5 +304,4 @@ bindkey '^v' edit-command-line
   source ~/.nix-profile/lib/spaceship-prompt/spaceship.zsh ||{
   source ~/.config/spaceship/spaceship.zsh }
 
-bindkey '^I' expand-or-complete
-
+# bindkey '^I' expand-or-complete

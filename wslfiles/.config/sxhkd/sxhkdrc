@@ -35,17 +35,30 @@ super + shift + Escape
 #
 
 # xdo close
-super + q
+super + x
 	xdo close
 
 # toggle fullscreen
-super + f
-  xdotool windowstate --toggle=FULLSCREEN $(xdo id)
+super + {e,d}
+  xdotool windowstate --{add,remove}=FULLSCREEN $(xdo id)
 
 # toggle maximized window
 super + m
   xdotool windowstate --toggle=MAXIMIZED_HORZ $(xdo id); \
   xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id);
+
+# focus/send to the given desktop
+super + {_,shift + }{1-9,0,minus,equal}
+	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11}'
+
+# focus relative desktop
+super + {s,f}
+	xdotool set_desktop --relative -- {-1,1}
+
+# swap relative desktop
+super + shift + {s,f}
+  { sign="-", sign="+" }; \
+  xdotool getactivewindow set_desktop_for_window $(($(xdotool get_desktop) $sign 1)) && xdotool set_desktop --relative -- "$sign"1
 
 # rofi drun
 super + ctrl + d
@@ -70,7 +83,7 @@ super + {alt,ctrl} + e
     }
 
 # rofi focus last window
-XF86WWW
+XF86DOS
   RHEIGHT=33% \
   LOCALE_ARCHIVE=/lib/locale/locale-archive \
   rofi \
@@ -81,7 +94,7 @@ XF86WWW
   xdotool search --sync --class Rofi key --delay 0 --clearmodifiers space;
 
 # xdo focus last window
-shift + space
+{shift + space, super + semicolon}
   WINID=$(xdo id | tr '[:upper:]' '[:lower:]' | sed -r 's/^0x0+/0x/g'); \
   WINDOWS=($(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," " " | sed -r "s/$WINID.*//g")); \
   xdo activate $\{WINDOWS[-1]\}
@@ -105,10 +118,6 @@ super + Tab
     -kb-row-left "Super+ISO_Left_Tab,Super+h"& \
   xdotool keyup Tab; \
   xdotool key Tab
-
-# focus or send to the given desktop
-super + {_,shift + }{1-9,0,minus,equal}
-	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11}'
 
 # increase/decrease window size (zoom in/out)
 super + alt + {i,o}
@@ -207,6 +216,10 @@ super + {_,shift + }n
 # super/alt click
 {XF86Finance,XF86Game}
   xdotool click {1,2}
+
+# mouse scroll
+XF86Launch{8,9}
+  xdotool click {4,5}
 
 # super volume
 super + XF86Audio{Raise,Lower}Volume
@@ -330,7 +343,7 @@ super + shift + b
   nixGL wezterm start ncmpcpp
 
 # dmenu launcher
-super + {_,shift +,alt +}d
+super + {_,shift +,alt +} p
 	{ \
 		dmenu_run; \
 	, wezterm start $(dmenu_path | dmenu); \
@@ -339,7 +352,7 @@ super + {_,shift +,alt +}d
 	}
 
 # lf user/root
-super + {_,shift +} e
+super + {_,shift +} r
 	{LF_CD=true nixGL wezterm, sudo -i LF_CD=true LS_COLORS="" nixGL wezterm}
 
 # browser
