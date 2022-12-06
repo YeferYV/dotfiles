@@ -16,10 +16,11 @@ export SHELL="$(which zsh)"
 export EDITOR="nvim"
 export VISUAL="nvim"
 export OPENER="xdg-open"
-export BAT_THEME="base16"
 export PAGER="less"
+export BAT_THEME="base16"
 export TERMINAL="nixGL wezterm"
 export BROWSER="google-chrome-stable"
+export SWALLOWER="devour"
 export SURFRAW_text_browser='w3m -sixel'
 export SURFRAW_graphical=no
 
@@ -71,8 +72,9 @@ export AWT_TOOLKIT="MToolkit wmname LG3D"	#May have to install wmname
 export _JAVA_AWT_WM_NONREPARENTING=1	# Fix for Java applications in dwm
 export DEBIAN_FRONTEND=noninteractive
 # export CACA_DRIVER=ncurses
-# export FZF_DEFAULT_OPTS="--layout=reverse --height 40% --border"
 # export FZF_COMPLETION_TRIGGER=''
+# export FZF_DEFAULT_OPTS="--layout=reverse --height 40% --border"
+export FZF_DEFAULT_OPTS="--multi --color='hl:#cccc00,hl+:#cccc00'"
 
 # export LESS="-R --use-color --LINE-NUMBERS --color=Nk" #causes manpages badformatting
 export LESS='-RS'
@@ -157,4 +159,3 @@ if [ -e /home/linuxbrew/.linuxbrew/bin/brew ]; then eval "$(/home/linuxbrew/.lin
 
 # Start graphical server on user's current tty if not already running.
 [ "$(tty)" = "/dev/tty1" ] && ! pidof -s Xorg >/dev/null 2>&1 && exec startx "$XINITRC"
-
