@@ -105,8 +105,8 @@ else
 fi
 
 # ask for sudo password at the beggining (last for 15 min):
-[ ${SUDO:-} = false ] && export SUDO=" " || export SUDO="sudo"
-$SUDO true
+[ "${SUDO:-}" = false ] && export SUDO=" " || export SUDO="sudo"
+"$SUDO" true
 
 # Arch dependencies:
 [ -e /etc/pacman.d ]&&{
@@ -139,7 +139,7 @@ if [ -e /etc/nix ]; then
     nix-channel --update
     nix-env -iA zsh util-linux sudo psmisc ncurses gnused gawk file cron curl bashInteractive \
             -f https://github.com/NixOS/nixpkgs/archive/2abf40d9b5bfaa49898af7b18b69a86247c29f2c.tar.gz
-    $SUDO ln -sf /bin/sh /bin/bash
+    "$SUDO" ln -sf /bin/sh /bin/bash
   }
   else
   {
@@ -164,8 +164,8 @@ if [ -e /etc/nixos ]; then
   }
   else
   {
-    command -v zsh | $SUDO tee -a /etc/shells
-    $SUDO chsh -s "$(which zsh)" "$USER"
+    command -v zsh | "$SUDO" tee -a /etc/shells
+    "$SUDO" chsh -s "$(which zsh)" "$USER"
   }
 fi
 
@@ -242,21 +242,60 @@ install_dotfiles() {
   stow --restow --verbose --target="$HOME"/.local .local
   ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
   ln -sf "$HOME"/.config/shell/.xprofile "$HOME"/.xprofile
-  mkdir -p "$HOME"/.local/share/mpd
 }
 
-# nerd fonts:
-install_nerdfonts() {
-  mkdir -p "$HOME"/.local/share/fonts
-  git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
+# Install Fonts:
+install_fonts() {
+  [ ! -e "$HOME"/.local/share/fonts ] && mkdir -p "$HOME"/.local/share/fonts
+
+  # Nerd-Fonts:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts
   cd nerd-fonts
   git sparse-checkout add patched-fonts/3270
   git sparse-checkout add patched-fonts/CascadiaCode
+  git sparse-checkout add patched-fonts/FiraCode
   git sparse-checkout add patched-fonts/Terminus
   cp -r patched-fonts/3270 "$HOME"/.local/share/fonts/
   cp -r patched-fonts/CascadiaCode "$HOME"/.local/share/fonts/
+  cp -r patched-fonts/FiraCode "$HOME"/.local/share/fonts/
   cp -r patched-fonts/Terminus "$HOME"/.local/share/fonts/
   cd ..
+
+  # Font-Awesome:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/FortAwesome/Font-Awesome
+  cd Font-Awesome
+  git sparse-checkout add otfs
+  git sparse-checkout add webfonts
+  mkdir "$HOME"/.local/share/fonts/Font-Awesome
+  cp -r otfs/ "$HOME"/.local/share/fonts/Font-Awesome/
+  cp -r webfonts/ "$HOME"/.local/share/fonts/Font-Awesome/
+  cd ..
+
+  # Noto Sans/Serif/Mono:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/notofonts/notofonts.github.io
+  cd notofonts.github.io
+  git sparse-checkout add fonts/NotoSans/googlefonts
+  git sparse-checkout add fonts/NotoSansMono/googlefonts
+  git sparse-checkout add fonts/NotoSerif/googlefonts
+  mkdir "$HOME"/.local/share/fonts/NotoSans
+  mkdir "$HOME"/.local/share/fonts/NotoSansMono
+  mkdir "$HOME"/.local/share/fonts/NotoSerif
+  cp -r fonts/NotoSans/googlefonts "$HOME"/.local/share/fonts/NotoSans/
+  cp -r fonts/NotoSansMono/googlefonts "$HOME"/.local/share/fonts/NotoSansMono/
+  cp -r fonts/NotoSerif/googlefonts "$HOME"/.local/share/fonts/NotoSerif/
+  cd ..
+
+  # Noto Color-Emoji:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/googlefonts/noto-emoji
+  cd noto-emoji
+  git sparse-checkout add fonts
+  mkdir "$HOME"/.local/share/fonts/Noto-Emoji
+  cp fonts/NotoColorEmoji.ttf "$HOME"/.local/share/fonts/Noto-Emoji/
+  cd ..
+
+  # Bedstead Font:
+  curl -LO https://bjh21.me.uk/bedstead/bedstead-002.004.zip
+  unzip bedstead-002.004.zip -d "$HOME"/.local/share/fonts/
 
   # rofi emoji
   # pip install --user --upgrade git+https://github.com/fdw/rofimoji@6.0.0
@@ -266,24 +305,9 @@ install_nerdfonts() {
   else
     nix-env -iA nixpkgs.python310Packages.pipx nixpkgs.rofi
   fi
-
-  # Font-Awesome-6.2.0
-  git clone --depth=1 --branch 6.2.0 https://github.com/FortAwesome/Font-Awesome
-  mkdir "$HOME"/.local/share/fonts/Font-Awesome-6.2.0
-  cp -r Font-Awesome/otfs/ "$HOME"/.local/share/fonts/Font-Awesome-6.2.0/
-  cp -r Font-Awesome/webfonts/ "$HOME"/.local/share/fonts/Font-Awesome-6.2.0/
-
-  # Noto Color emoji
-  git clone --depth=1 https://github.com/googlefonts/noto-emoji
-  mkdir "$HOME"/.local/share/fonts/Noto-Emoji
-  cp noto-emoji/fonts/NotoColorEmoji.ttf "$HOME"/.local/share/fonts/Noto-Emoji/
-
-  # bedstead font:
-  curl -LO https://bjh21.me.uk/bedstead/bedstead-002.004.zip
-  unzip bedstead-002.004.zip -d "$HOME"/.local/share/fonts/
 }
 
-# touchcursor:
+# Touchcursor:
 install_touchcursor() {
   mkdir touchcursor-linux
   cd touchcursor-linux
@@ -371,14 +395,16 @@ install_mpv() {
   cd ..
 }
 
-# user config:
-install_configs ()
-{
+# User Configs:
+install_configs () {
+  mkdir -p "$HOME"/.local/share/mpd
+  # systemctl --user enable --now mpd
   # systemctl --user enable --now touchcursor
-  [ ! -e /etc/X11/xorg.conf.d ]&& $SUDO mkdir -p /etc/X11/xorg.conf.d
-  $SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
-  [ -x "$(command -v crontab)" ] && $SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
-  rm -rf {bedstead-002.004.zip,Font-Awesome,nerd-fonts,noto-emoji,touchcursor-linux,xserver-sixel,mpv}
+  # mpc --port=6601 update
+  [ ! -e /etc/X11/xorg.conf.d ]&& "$SUDO" mkdir -p /etc/X11/xorg.conf.d
+  "$SUDO" cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
+  [ -x "$(command -v crontab)" ] && "$SUDO" crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
+  rm -rf {nerd-fonts,Font-Awesome,notofonts.github.io,noto-emoji,bedstead-002.004.zip,touchcursor-linux,xserver-sixel,mpv}
   [ ! -e "$HOME"/.cache/zsh ]&& mkdir "$HOME"/.cache/zsh
   nix-collect-garbage -d
 
@@ -398,19 +424,19 @@ install_configs ()
 
 }
 
-# neovim version v0.8.1 (appimage-run nvim.appimage on NIXOS):
+# neovim version v0.8.3 (appimage-run nvim.appimage on NIXOS):
 install_neovim() {
-  curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.8.1/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
+  curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.8.3/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
 }
 
 # install neovim plugins  $(ulimit -n 4096):
 install_neovim_plugins() {
   git clone --depth 1 https://github.com/wbthomason/packer.nvim "$HOME"/.local/share/nvim/site/pack/packer/start/packer.nvim
-  nvim -u "$HOME"/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
+  ( APPIMAGE_EXTRACT_AND_RUN=1 nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync" )
 }
 
 install_dotfiles                             #|| echo $(tput -T ansi setaf 1) install_dotfiles failed
-[ ! -e /.dockerenv ] && install_nerdfonts    #|| echo $(tput -T ansi setaf 1) install_nerdfonts failed
+[ ! -e /.dockerenv ] && install_fonts        #|| echo $(tput -T ansi setaf 1) install_fonts failed
 [ ! -e /.dockerenv ] && install_touchcursor  #|| echo $(tput -T ansi setaf 1) install_touchcursor failed
 install_xsixel                               #|| echo $(tput -T ansi setaf 1) install_xsixel failed
 install_mpv                                  #|| echo $(tput -T ansi setaf 1) install_mpv failed
