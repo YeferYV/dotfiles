@@ -51,7 +51,7 @@ export LS_COLORS="tw=30:di=90:ow=94:ln=34"
 
 setopt autocd		# Automatically cd into typed directory.
 stty stop undef		# Disable ctrl-s to freeze terminal.
-setopt interactive_comments
+setopt interactive_comments  # Solves command not found: '#'
 
 ## History in cache directory:
 HISTSIZE=10000000
@@ -65,10 +65,9 @@ HISTFILE=~/.cache/zsh/history
 # [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/inputrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/inputrc"
 
 ## Basic auto/tab complete:
-autoload -U compinit
-zstyle ':completion:*' menu select
+autoload -U compinit && compinit -d ~/.cache/zsh/.zcompdump
 zmodload zsh/complist
-compinit -d ~/.cache/zsh/.zcompdump
+zstyle ':completion:*' menu select
 _comp_options+=(globdots)		# Include hidden files.
 
 ## vi mode
@@ -105,9 +104,9 @@ zle -N zle-line-init
 echo -ne '\e[6 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[6 q' ;} # Use beam shape cursor for each new prompt.
 
-# v() { xdotool set_window --name $(TMP=$1;echo ${TMP##*/}) $WINDOWID; vim $1; }
-# n() { xdotool set_window --name $(TMP=$1;echo ${TMP##*/}) $WINDOWID; nvim $1; }
 # x2xalarm() { ssh -YC drksl@4l4rm x2x -north -to :0.0; }
+l() {                                            tty > /tmp/sixel-$WEZTERM_PANE; lfcd $1; trap "rm /tmp/sixel-$WEZTERM_PANE >/dev/null" EXIT; }
+n() { printf "\033]0; ${1##*/} \007" > /dev/tty; tty > /tmp/sixel-$WEZTERM_PANE; nvim $1; trap "rm /tmp/sixel-$WEZTERM_PANE >/dev/null" EXIT; }
 
 ## Tmux not-printed(archwiki)
 tmux-attach() {
@@ -163,22 +162,19 @@ zle -N                 cdUndoKey
 bindkey '^[[1;3D'      cdParentKey
 bindkey '^[[1;3C'      cdUndoKey
 
-ranger_cd() {
-    temp_file="$(mktemp -t "ranger_cd.XXXXXXXXXX")"
-    ranger --choosedir="$temp_file" -- "${@:-$PWD}"
-    if chosen_dir="$(cat -- "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
-        cd -- "$chosen_dir"
-    fi
-    rm -f -- "$temp_file"
-}
+# ranger_cd() {
+#     temp_file="$(mktemp -t "ranger_cd.XXXXXXXXXX")"
+#     ranger --choosedir="$temp_file" -- "${@:-$PWD}"
+#     if chosen_dir="$(cat -- "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
+#         cd -- "$chosen_dir"
+#     fi
+#     rm -f -- "$temp_file"
+# }
 # bindkey -s '^r' 'ranger\n'
 # [ -n $RANGERCD ] && unset RANGERCD && ranger_cd
 # [ -z "$RANGERCD" ] && echo "Empty string"; [ -n "$RANGERCD" ] && echo "No-empty string"
 
 lfcd () {
-    # stty echo
-    # zle redisplay
-    # zle kill-whole-line
     tmp="$(mktemp)"
     # ~/.config/lf/lf-wiki-previewer/lf_ueberzug_previewer -last-dir-path="$tmp" "$@" < $TTY      #tty needed by fzf
     ~/.config/lf/lf-wiki-previewer/lf_scrolling_previewer -last-dir-path="$tmp" "$@" < /dev/tty   #tty needed by fzf
@@ -197,6 +193,19 @@ zle -N my-script_lfcd
 bindkey '^o' my-script_lfcd
 bindkey '\eo' 'lfcd'
 [ -n "$LF_CD" ] && unset LF_CD && lfcd $PWD
+
+lfub () {
+    cleanup() { exec 3>&-; rm "$LF_UEBERZUG" >/dev/null; }
+    [ ! -d "$HOME/.cache/lf" ] && mkdir -p "$HOME/.cache/lf";
+    export LF_UEBERZUG="$HOME/.cache/lf/ueberzug-$$";
+    mkfifo "$LF_UEBERZUG";
+    ueberzug layer -s <"$LF_UEBERZUG" &;
+    exec 3>"$LF_UEBERZUG";
+    trap cleanup HUP INT QUIT TERM PWR EXIT;
+    lfcd "$@" 3>&-;
+}
+zle -N lfub
+bindkey '\eu' 'lfub'
 
 ## fzf scripts
 fmzcd () {
