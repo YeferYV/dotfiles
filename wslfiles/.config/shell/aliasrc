@@ -1,7 +1,12 @@
 #!/bin/sh
 
 ## Use neovim for vim if present.
-#[ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+# [ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+
+# sudo not required for some system commands
+for command in mount umount sv pacman updatedb su shutdown poweroff reboot ; do
+	alias $command="sudo $command"
+done; unset command
 
 ## Verbosity and settings that you pretty much just always are going to want.
 alias \
@@ -53,9 +58,9 @@ alias \
 	pacman="sudo pacman --noconfirm" \
 	ytfzf-term="alacritty -e ytfzf" \
 	ytfzf-thumb="ytfzf -t" \
-	e="$EDITOR" \
-	z="zathura" \
-	l="$HOME/.config/lf/lf-wiki-previewer/lf_previewer.sh" \
+	# e="$EDITOR" \
+	# z="zathura" \
+	# l="$HOME/.config/lf/lf-wiki-previewer/lf_previewer.sh" \
 	# YT="youtube-viewer" \
 	# f="$FILE" \
 

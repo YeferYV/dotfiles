@@ -11,8 +11,8 @@ super + {_,shift +,ctrl + }Return
 	}
 
 # terminal emulator
-mod1 + {_,shift +,ctrl + }Return
-  {nixGL kitty, nixGL alacritty,cool-retro-term}
+mod1 + {_,shift +,ctrl +,shift + ctrl +}Return
+  { nixGL neovide, nixGL kitty, nixGL alacritty, cool-retro-term }
 
 # borderless window
 super + alt + b
@@ -312,26 +312,36 @@ super + BackSpace
 	{\
     nixGL \
 		picom --glx-no-rebind-pixmap \
-        --use-damage \
-        --xrender-sync-fence \
-        --backend glx \
-        --transparent-clipping \
-        # --active-opacity=0.90 \
-        # --inactive-opacity=0.90 \
-        # --refresh-rate 30\
-				,\
+          --use-damage \
+          --xrender-sync-fence \
+          --backend glx \
+          --transparent-clipping \
+          # --active-opacity=0.90 \
+          # --inactive-opacity=0.90 \
+          # --refresh-rate 30\
+				  ,\
     killall picom\
+	}
+
+# compositor blur background
+super + alt + BackSpace
+	{ \
+	  nixGL picom --backend="glx" \
+	        --blur-strength="1" \
+	        --blur-method="dual_kawase" \
+	        --opacity-rule="70:class_g *= 'neovide'" \
+	        --opacity-rule="70:class_g *= 'wezterm'" \
+				  ,\
+	  killall picom \
 	}
 
 # compositor keep background
 super + ctrl + BackSpace
-	{ nixGL picom --opacity-rule="90:class_g *= 'wezterm'" --frame-opacity=0.9, killall picom}
+	{ nixGL picom,killall picom }
 
 # compositor decrease/increase transparency
 super + ctrl + {minus,equal}
   xdo id -d -c | xargs -I id -n 1 picom-trans -w id {-2,+4}
-  # xdo pid $ID  		# xdotool getactivewindow getwindowpid
-  # xdo id -p $PID  # xdotool getactivewindow
 
 # TextToSpeech
 super + {_,shift,ctrl} + Next
@@ -356,7 +366,7 @@ super + {_,shift +} r
 
 # browser
 super + {_,shift +} w
-  { google-chrome-stable --process-per-site, killall chrome}
+  { google-chrome-stable --process-per-tab, killall chrome}
 
 # toggle background
 super + alt + ctrl + w

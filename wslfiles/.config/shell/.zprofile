@@ -13,6 +13,7 @@ export PROMPT_COMMAND='echo -ne "\033]0;$(TMP=${PWD/#$HOME/\~};echo ${TMP##*/})\
 #-- Default programs:
 # export NEOVIDE_MULTIGRID=true
 # export TERM="xterm-256color"
+# export VIM="/usr/share/nvim"
 export BAT_THEME="base16"
 export BROWSER="google-chrome-stable"
 export EDITOR="nvim"
@@ -23,7 +24,6 @@ export SURFRAW_graphical=no
 export SURFRAW_text_browser='w3m -sixel'
 export SWALLOWER="devour"
 export TERMINAL="nixGL wezterm"
-export VIM="/usr/share/nvim"
 export VISUAL="nvim"
 
 #-- ~/Clean-up:
