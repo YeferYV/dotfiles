@@ -1,4 +1,9 @@
--- vim:ft=vim:ts=2:sw=2:sts=2
+-- vim:ft=lua:ts=2:sw=2:sts=2
+
+local M = {}
+local cmd = vim.api.nvim_create_autocmd
+local augroup = vim.api.nvim_create_augroup
+local create_command = vim.api.nvim_create_user_command
 
 vim.cmd [[
   " augroup _alpha
@@ -17,9 +22,9 @@ vim.cmd [[
   "   autocmd VimResized * tabdo wincmd =
   " augroup end
 
-  " augroup _disable_nvimtree_status
+  " augroup _disable_neotree_status
   "   autocmd!
-  "   au BufEnter,BufWinEnter,WinEnter,CmdwinEnter * if bufname('%') == "NvimTree" | set laststatus=0 | else | set laststatus=2 | endif
+  "   au BufEnter,BufWinEnter,WinEnter,CmdwinEnter * if bufname('%') == "neo-tree" | set laststatus=0 | else | set laststatus=2 | endif
   " augroup end
 
   " augroup _enable_terminal_insert_and_hide_terminal_statusline
@@ -73,14 +78,24 @@ vim.cmd [[
 
   " augroup _lsp_autoformat
   "   autocmd!
-  "   autocmd BufWritePre * lua vim.lsp.buf.formatting()
+  "   autocmd BufWritePre * silent! lua vim.lsp.buf.format()
   " augroup end
+
+  augroup _lspsaga_highlights_overwrite
+    autocmd!
+    au BufReadPost * hi LspSagaWinbarSep guifg=#495466
+  augroup end
 
   augroup _markdown
     autocmd!
-    autocmd FileType markdown setlocal wrap
     autocmd FileType markdown setlocal spell
   augroup end
+
+  " augroup _save_folding
+  "   autocmd!
+  "   autocmd BufWinLeave *.* mkview
+  "   autocmd BufWinEnter *.* silent loadview
+  " augroup end
 
   augroup _stop_newlines_commented
     autocmd!
@@ -88,10 +103,10 @@ vim.cmd [[
     au BufEnter * set fo-=c fo-=r fo-=o
   augroup end
 
-  " augroup _toogle_nvimtree_cursor
+  " augroup _toogle_neotree_cursor
   "   autocmd!
-  "   autocmd BufEnter * if &filetype == 'NvimTree' | hi Cursor guifg=none guibg=red blend=100 | setlocal guicursor=n:Cursor/lCursor | endif
-  "   autocmd BufEnter * if &filetype != 'NvimTree' | setlocal guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20 | endif
+  "   autocmd BufEnter * if &filetype == 'neo-tree' | hi Cursor guifg=none guibg=red blend=100 | setlocal guicursor=n:Cursor/lCursor | endif
+  "   autocmd BufEnter * if &filetype != 'neo-tree' | setlocal guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20 | endif
   " augroup end
 
 ]]
@@ -137,29 +152,6 @@ vim.cmd [[
   " tnoremap <C-x> <C-\><C-n>:call WinBufSwap()<CR><Esc>
 ]]
 
--- toggle status line
-vim.cmd [[
-  let s:hidden_all = 0
-  function! ToggleStatusLIne()
-    if s:hidden_all  == 0
-      let s:hidden_all = 1
-      set noruler
-      set laststatus=0
-      set cmdheight=3
-      set noshowcmd
-      " set nonumber
-    else
-      let s:hidden_all = 0
-      set ruler
-      set laststatus=3
-      set cmdheight=2
-      set showcmd
-      " set number
-    endif
-  endfunction
-  " nnoremap <silent> <C-z> :call ToggleStatusLIne()<CR>
-]]
-
 -- Window Buffer Swap
 vim.cmd [[
   function! WinBufSwap()
@@ -202,51 +194,164 @@ vim.cmd [[
   " nmap <silent> <C-x> :call DoWindowSwap()<CR>
 ]]
 
--- _toogle_nvimtree_cursor
-local toogle_nvimtree_cursor = vim.api.nvim_create_augroup("_toogle_nvimtree_cursor", { clear = true })
-vim.api.nvim_create_autocmd({"BufEnter","Filetype"}, {
-  group = toogle_nvimtree_cursor,
+-- -- _toogle_neotree_cursor
+-- local toogle_neotree_cursor = augroup("_toogle_neotree_cursor", { clear = true })
+-- cmd({"BufEnter","Filetype"}, {
+--   group = toogle_neotree_cursor,
+--   callback = function()
+--     if vim.bo.filetype ~= "neo-tree" then
+--       vim.cmd[[setlocal guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20]]
+--     end
+--   end,
+-- })
+-- cmd({"BufEnter","Filetype"}, {
+--   group = toogle_neotree_cursor,
+--   callback = function()
+--     if vim.bo.filetype == "neo-tree" then
+--       vim.cmd[[hi Cursor guibg=red blend=100 | setlocal guicursor=n:Cursor/lCursor]]
+--     end
+--   end,
+-- })
+
+-- _enable_terminal_insert_and_hide_terminal_statusline
+local hide_terminal_statusline = augroup("_enable_terminal_insert_and_hide_terminal_statusline", { clear = true })
+
+-- cmd({ "BufEnter", "Filetype" }, {
+--   group = hide_terminal_statusline,
+--   pattern = "term://*",
+--   command = "startinsert"
+-- })
+
+cmd({ "TermEnter", "TermOpen" }, {
+  group = hide_terminal_statusline,
   callback = function()
-    if vim.bo.filetype ~= "NvimTree" then
-      vim.cmd[[setlocal guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20]]
-    end
+    -- require('lualine').hide()
+    -- vim.cmd[[set nocursorline nonumber statusline=%< | startinsert]]
+    vim.cmd [[set nocursorline nonumber | startinsert]]
+    vim.cmd [[hi ExtraWhitespace guibg=none]]
   end,
 })
-vim.api.nvim_create_autocmd({"BufEnter","Filetype"}, {
-  group = toogle_nvimtree_cursor,
+
+-- cmd({ "TermLeave" }, {
+--   group = hide_terminal_statusline,
+--   callback = function()
+--     require('lualine').hide({ unhide = true })
+--   end,
+-- })
+
+-- _autoclose_tab-terminal_if_last_window
+cmd({ "TermClose" }, {
+  group = hide_terminal_statusline,
   callback = function()
-    if vim.bo.filetype == "NvimTree" then
-      vim.cmd[[hi Cursor guibg=red blend=100 | setlocal guicursor=n:Cursor/lCursor]]
+
+    local type = vim.bo.filetype
+    if type == "sp-terminal" or type == "vs-terminal" or type == "buf-terminal" or type == "tab-terminal" then
+
+      -- if number of buffers of the current tab is equal to 1 (last window)
+      if #vim.fn.getbufinfo({ buflisted = 1 }) == 1 then
+        -- M.FeedKeysCorrectly("<esc><esc>:close<cr>")
+        vim.cmd [[ call feedkeys("\<Esc>\<Esc>:close\<CR>") ]]
+      end
+
+      -- confirm terminal-exit-code by pressing <esc>
+      vim.cmd [[ call feedkeys("") ]]
+
+      -- alternatively close the buffer instead of confirming
+      -- vim.cmd [[ execute 'bdelete! ' . expand('<abuf>') ]]
+
     end
   end,
 })
 
--- _enable_terminal_insert_and_hide_terminal_statusline
-local hide_terminal_statusline = vim.api.nvim_create_augroup("_enable_terminal_insert_and_hide_terminal_statusline", { clear = true })
-vim.api.nvim_create_autocmd({ "BufEnter","Filetype" }, {
-  group = hide_terminal_statusline,
-  pattern = "term://*",
-  command = "startinsert"
-})
-vim.api.nvim_create_autocmd( { "TermEnter","TermOpen" }, {
-  group = hide_terminal_statusline,
-  callback = function()
-    require('lualine').hide()
-    vim.cmd[[set nocursorline nonumber statusline=%< | startinsert]]
-  end,
-})
-vim.api.nvim_create_autocmd({ "TermLeave" }, {
-  group = hide_terminal_statusline,
-  callback = function()
-    require('lualine').hide({unhide=true})
-    vim.cmd[[set cursorline]]
-  end,
-})
-vim.api.nvim_create_autocmd({ "TermClose" }, {
-  group = hide_terminal_statusline,
-  callback = function()
-    if vim.bo.filetype ~= "toggleterm" then
-      vim.cmd[[ call feedkeys("i") ]]
+M.EnableAutoNoHighlightSearch = function()
+  vim.on_key(function(char)
+    if vim.fn.mode() == "n" then
+      local new_hlsearch = vim.tbl_contains({ "<CR>", "n", "N", "*", "#", "?", "/" }, vim.fn.keytrans(char))
+      if vim.opt.hlsearch:get() ~= new_hlsearch then vim.cmd [[ noh ]] end
     end
-  end,
-})
+  end, vim.api.nvim_create_namespace "auto_hlsearch")
+end
+
+M.DisableAutoNoHighlightSearch = function()
+  vim.on_key(nil, vim.api.nvim_get_namespaces()["auto_hlsearch"])
+  vim.cmd [[ set hlsearch ]]
+end
+
+M.EnableAutoNoHighlightSearch() -- autostart
+
+M.GoToParentIndent = function()
+  local ok, start = require("indent_blankline.utils").get_current_context(
+    vim.g.indent_blankline_context_patterns,
+    vim.g.indent_blankline_use_treesitter_scope
+  )
+  if ok then
+    vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { start, 0 })
+    vim.cmd [[normal! _]]
+  end
+end
+
+local My_count = 0
+
+M.GoToParentIndent_Repeat = function()
+  My_count = 0
+  vim.go.operatorfunc = "v:lua.GoToParentIndent_Callback"
+  return "g@l"
+end
+
+function GoToParentIndent_Callback()
+  My_count = My_count + 1
+  if My_count >= 2 then
+    vim.cmd [[ normal 0 ]]
+  end
+  M.GoToParentIndent()
+  -- print("Count: " .. My_count)
+end
+
+M.FeedKeysCorrectly = function(keys)
+  local feedableKeys = vim.api.nvim_replace_termcodes(keys, true, false, true)
+  vim.api.nvim_feedkeys(feedableKeys, "n", true)
+end
+
+function HorzIncrement()
+  vim.cmd [[ normal "zyan ]]
+  vim.cmd [[ execute "normal \<Plug>(textobj-numeral-N)" ]]
+  vim.cmd [[ normal van"zp ]]
+  M.FeedKeysCorrectly('<C-a>')
+end
+
+function HorzDecrement()
+  vim.cmd [[ normal "zyan ]]
+  vim.cmd [[ execute "normal \<Plug>(textobj-numeral-N)" ]]
+  vim.cmd [[ normal van"zp ]]
+  M.FeedKeysCorrectly('<C-x>')
+end
+
+function ShowBufferline()
+  require('bufferline').setup {
+    options = {
+      offsets = { { filetype = 'neo-tree', padding = 1 } },
+      show_close_icon = false
+    }
+  }
+end
+
+create_command("IncrementHorz", HorzIncrement, {})
+create_command("DecrementHorz", HorzDecrement, {})
+create_command("BufferlineShow", ShowBufferline, {})
+
+-- -- _json_to_jsonc
+-- cmd({ "BufEnter", "BufWinEnter", "WinEnter" }, {
+--   -- pattern = "*.json",
+--   -- command = "set ft=jsonc"
+--   callback = function()
+--     if vim.fn.expand('%:p:h:t') == "User" then
+--       if vim.fn.expand('%:t') == "settings.json" or
+--           vim.fn.expand('%:t') == "keybindings.json" or
+--           vim.fn.expand('%:t') == "tasks.json" then
+--         vim.bo.filetype = "jsonc"
+--       end
+--     end
+--   end,
+-- })
+
+return M

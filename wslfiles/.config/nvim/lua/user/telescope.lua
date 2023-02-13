@@ -3,8 +3,21 @@ if not status_ok then
   return
 end
 
-require('telescope').load_extension('fzf')
 local actions = require "telescope.actions"
+local action_set = require "telescope.actions.set"
+local fb_actions = require "telescope._extensions.file_browser.actions"
+
+-- FIXED: actions.edit_register
+local function edit_register(prompt_bufnr)
+  local selection = require("telescope.actions.state").get_selected_entry()
+  local updated_value = vim.fn.input("Edit [" .. selection.value .. "] ❯ ", selection.content)
+
+  vim.fn.setreg(selection.value:lower(), updated_value)
+  selection.content = updated_value
+
+  require("telescope.actions").close(prompt_bufnr)
+  require("telescope.builtin").resume()
+end
 
 telescope.setup {
   defaults = {
@@ -23,7 +36,7 @@ telescope.setup {
     selection_caret = " ",
     path_display = { "smart" },
     file_ignore_patterns = {
-      "node_modules", ".git",
+      "node_modules", "!.git/",
     },
     selection_strategy = "reset",
     sorting_strategy = "ascending",
@@ -43,70 +56,99 @@ telescope.setup {
     },
     mappings = {
       i = {
+        ["<A-R>"] = edit_register,
+
+        ["<Tab>"] = function(prompt_bufnr) actions.toggle_selection(prompt_bufnr) actions.move_selection_next(prompt_bufnr) end,
+        ["<S-Tab>"] = function(prompt_bufnr) actions.toggle_selection(prompt_bufnr) actions.move_selection_previous(prompt_bufnr) end,
+
+        ["<C-a>"] = function(prompt_bufnr) actions.add_selected_to_qflist(prompt_bufnr) actions.open_qflist(prompt_bufnr) end,
+        ["<A-A>"] = function(prompt_bufnr) actions.add_selected_to_loclist(prompt_bufnr) actions.open_loclist(prompt_bufnr) end,
+
+        ["<C-d>"] = actions.preview_scrolling_down,
+        ["<C-u>"] = actions.preview_scrolling_up,
+
+        ["<Down>"] = actions.move_selection_next,
+        ["<Up>"] = actions.move_selection_previous,
+        ["<CR>"] = actions.select_default,
+        ["<C-j>"] = actions.move_selection_next,
+        ["<C-k>"] = actions.move_selection_previous,
+        ["<C-l>"] = actions.select_default,
+        ["<A-J>"] = function(prompt_bufnr) action_set.shift_selection(prompt_bufnr, 10) end,
+        ["<A-K>"] = function(prompt_bufnr) action_set.shift_selection(prompt_bufnr, -10) end,
+
         ["<C-n>"] = actions.cycle_history_next,
         ["<C-p>"] = actions.cycle_history_prev,
 
-        ["<C-j>"] = actions.move_selection_next,
-        ["<C-k>"] = actions.move_selection_previous,
+        ["<C-g>"] = actions.move_to_top,
+        ["<A-G>"] = actions.move_to_bottom,
+        ["<C-;>"] = actions.move_to_middle,
 
         ["<C-c>"] = actions.close,
 
-        ["<Down>"] = actions.move_selection_next,
-        ["<Up>"] = actions.move_selection_previous,
+        ["<C-s>"] = function(prompt_bufnr) actions.send_selected_to_qflist(prompt_bufnr) actions.open_qflist(prompt_bufnr) end,
+        ["<A-S>"] = function(prompt_bufnr) actions.send_selected_to_loclist(prompt_bufnr) actions.open_loclist(prompt_bufnr) end,
 
-        ["<CR>"] = actions.select_default,
-        ["<C-x>"] = actions.select_horizontal,
         ["<C-v>"] = actions.select_vertical,
-        ["<C-t>"] = actions.select_tab,
+        ["<A-V>"] = actions.select_horizontal,
+        ["<A-T>"] = actions.select_tab,
 
-        ["<C-y>"] = require("telescope.actions.layout").cycle_layout_next,
-        ["<C-?>"] = require("telescope.actions.layout").toggle_preview,
-        ["<C-u>"] = actions.preview_scrolling_up,
-        ["<C-d>"] = actions.preview_scrolling_down,
+        ["<A-P>"] = require("telescope.actions.layout").toggle_preview,
+        ["<A-Z>"] = require("telescope.actions.layout").cycle_layout_next,
+        ["<C-z>"] = actions.toggle_all,
+
+        ["<C-_>"] = actions.complete_tag, -- keys from pressing <C-/>
+        ["<C-?>"] = actions.which_key,
 
         ["<PageUp>"] = actions.results_scrolling_up,
         ["<PageDown>"] = actions.results_scrolling_down,
-
-        ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
-        ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-        ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
-        ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
-        ["<C-l>"] = actions.complete_tag,
-        ["<C-_>"] = actions.which_key, -- keys from pressing <C-/>
       },
-
       n = {
-        ["<esc>"] = actions.close,
+        ["R"] = edit_register,
+
+        ["<Tab>"] = function(prompt_bufnr) actions.toggle_selection(prompt_bufnr) actions.move_selection_next(prompt_bufnr) end,
+        ["<S-Tab>"] = function(prompt_bufnr) actions.toggle_selection(prompt_bufnr) actions.move_selection_previous(prompt_bufnr) end,
+
+        ["a"] = function(prompt_bufnr) actions.add_selected_to_qflist(prompt_bufnr) actions.open_qflist(prompt_bufnr) end,
+        ["A"] = function(prompt_bufnr) actions.add_selected_to_loclist(prompt_bufnr) actions.open_loclist(prompt_bufnr) end,
+
+        ["d"] = actions.preview_scrolling_down,
+        ["u"] = actions.preview_scrolling_up,
+
+        ["<Down>"] = actions.move_selection_next,
+        ["<Up>"] = actions.move_selection_previous,
         ["<CR>"] = actions.select_default,
-        ["<C-x>"] = actions.select_horizontal,
-        ["<C-v>"] = actions.select_vertical,
-        ["<C-t>"] = actions.select_tab,
-
-        ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
-        ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
-        ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
-        ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
-
         ["j"] = actions.move_selection_next,
         ["k"] = actions.move_selection_previous,
-        ["H"] = actions.move_to_top,
-        ["M"] = actions.move_to_middle,
-        ["L"] = actions.move_to_bottom,
+        ["l"] = actions.select_default,
+        ["J"] = function(prompt_bufnr) action_set.shift_selection(prompt_bufnr, 10) end,
+        ["K"] = function(prompt_bufnr) action_set.shift_selection(prompt_bufnr, -10) end,
 
-        ["<Down>"] = actions.move_selection_next,
-        ["<Up>"] = actions.move_selection_previous,
-        ["gg"] = actions.move_to_top,
+        ["n"] = actions.cycle_history_next,
+        ["p"] = actions.cycle_history_prev,
+
+        ["g"] = actions.move_to_top,
         ["G"] = actions.move_to_bottom,
+        [";"] = actions.move_to_middle,
 
-        ["<C-y>"] = require("telescope.actions.layout").cycle_layout_next,
-        ["<C-?>"] = require("telescope.actions.layout").toggle_preview,
-        ["<C-u>"] = actions.preview_scrolling_up,
-        ["<C-d>"] = actions.preview_scrolling_down,
+        ["q"] = actions.close,
+        ["<esc>"] = actions.close,
+
+        ["s"] = function(prompt_bufnr) actions.send_selected_to_qflist(prompt_bufnr) actions.open_qflist(prompt_bufnr) end,
+        ["S"] = function(prompt_bufnr) actions.send_selected_to_loclist(prompt_bufnr) actions.open_loclist(prompt_bufnr) end,
+
+        ["t"] = actions.select_tab,
+        ["v"] = actions.select_vertical,
+        ["V"] = actions.select_horizontal,
+
+        ["P"] = require("telescope.actions.layout").toggle_preview,
+        ["Z"] = require("telescope.actions.layout").cycle_layout_next,
+        ["z"] = actions.toggle_all,
+
+        ["/"] = actions.complete_tag,
+        ["?"] = actions.which_key,
 
         ["<PageUp>"] = actions.results_scrolling_up,
         ["<PageDown>"] = actions.results_scrolling_down,
-
-        ["?"] = actions.which_key,
       },
     },
   },
@@ -121,11 +163,11 @@ telescope.setup {
             local current_picker = action_state.get_current_picker(prompt_bufnr)
 
             local opts = {
-              entry_maker = make_entry.gen_from_file(opts),
+              entry_maker = make_entry.gen_from_file(),
               default_text = current_picker:_get_prompt()
             }
 
-            local cmd = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" }
+            local cmd = { "rg", "--files", "--hidden", "--glob", "!.git/" }
             current_picker:refresh(finders.new_oneshot_job(cmd, opts), {})
           end,
           ["l"] = function(prompt_bufnr)
@@ -135,11 +177,11 @@ telescope.setup {
             local current_picker = action_state.get_current_picker(prompt_bufnr)
 
             local opts = {
-              entry_maker = make_entry.gen_from_file(opts),
+              entry_maker = make_entry.gen_from_file(),
               default_text = current_picker:_get_prompt()
             }
 
-            local cmd = { "rg", "--files"}
+            local cmd = { "rg", "--files" }
             current_picker:refresh(finders.new_oneshot_job(cmd, opts), {})
           end,
         },
@@ -154,7 +196,7 @@ telescope.setup {
             local opts = {
               default_text = current_picker:_get_prompt(),
               additional_args = function()
-                return {"--hidden"}
+                return { "--hidden" }
               end
             }
             require('telescope.builtin').live_grep(require('telescope.themes').get_ivy(opts))
@@ -177,7 +219,8 @@ telescope.setup {
             local current_picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
             local opts = {
               default_text = current_picker:_get_prompt(),
-              vimgrep_arguments = { 'rg', '--hidden', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case', "--glob", "!**/.git/*" },
+              vimgrep_arguments = { 'rg', '--hidden', '--no-heading', '--with-filename', '--line-number', '--column',
+                '--smart-case', "--glob", "!.git/" },
             }
             require('telescope.builtin').grep_string(require('telescope.themes').get_ivy(opts))
           end,
@@ -195,14 +238,63 @@ telescope.setup {
   },
   extensions = {
     fzf = {
-      fuzzy = true,                    -- false will only do exact matching
-      override_generic_sorter = true,  -- override the generic sorter
-      override_file_sorter = true,     -- override the file sorter
-      case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
-                                       -- the default case_mode is "smart_case"
+      fuzzy = true, -- false will only do exact matching
+      override_generic_sorter = true, -- override the generic sorter
+      override_file_sorter = true, -- override the file sorter
+      case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+      -- the default case_mode is "smart_case"
+    },
+    file_browser = {
+      -- theme = "ivy",
+      auto_depth = true, -- finder unlimited depth
+      depth = 1, -- telescope show depth
+      default_selection_index = 1,
+      display_stat = {}, -- { date = true, size = true },
+      grouped = true,
+      hidden = true,
+      hide_parent_dir = true,
+      path = "%:p:h",
+      respect_gitignore = false,
+      mappings = {
+        ["i"] = {
+          ["<A-B>"] = fb_actions.toggle_browser,
+          ["<A-C>"] = fb_actions.create,
+          ["<A-D>"] = fb_actions.remove,
+          ["<A-E>"] = fb_actions.goto_home_dir,
+          ["<c-h>"] = fb_actions.toggle_hidden,
+          ["<A-H>"] = fb_actions.goto_parent_dir,
+          ["<A-M>"] = fb_actions.move,
+          ["<A-O>"] = fb_actions.open,
+          ["<A-R>"] = fb_actions.rename,
+          ["<A-W>"] = fb_actions.goto_cwd,
+          ["<A-Y>"] = fb_actions.copy,
+          ["<A-Z>"] = fb_actions.toggle_all,
+          ["<A-.>"] = fb_actions.change_cwd,
+          ["<S-CR>"] = fb_actions.create_from_prompt,
+        },
+        ["n"] = {
+          ["B"] = fb_actions.toggle_browser,
+          ["c"] = fb_actions.create,
+          ["D"] = fb_actions.remove,
+          ["e"] = fb_actions.goto_home_dir,
+          ["h"] = fb_actions.goto_parent_dir,
+          ["H"] = fb_actions.toggle_hidden,
+          ["m"] = fb_actions.move,
+          ["o"] = fb_actions.open,
+          ["r"] = fb_actions.rename,
+          ["w"] = fb_actions.goto_cwd,
+          ["y"] = fb_actions.copy,
+          ["z"] = fb_actions.toggle_all,
+          ["."] = fb_actions.change_cwd,
+        },
+      },
     }
   },
 }
+
+require('telescope').load_extension('fzf')
+require("telescope").load_extension("file_browser")
+require("telescope").load_extension("neoclip")
 
 -- local M = {}
 -- function M.find_configs()

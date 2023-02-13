@@ -55,19 +55,21 @@ cmp.setup {
     end,
   },
   mapping = {
-    ["<Up>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i","c"}),
-    ["<Down>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i","c"}),
-    ["<C-k>"] = cmp.mapping.select_prev_item(),
-		["<C-j>"] = cmp.mapping.select_next_item(),
+    ["<Up>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
+    ["<Down>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
+    ["<M-k>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "c" }),
+    ["<M-j>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "c" }),
+    -- ["<C-k>"] = cmp.mapping.select_prev_item(),
+    -- ["<C-j>"] = cmp.mapping.select_next_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(-1),
     ['<C-f>'] = cmp.mapping.scroll_docs(1),
-    ['<C-Space>'] = cmp.mapping.complete(),
     -- ["<C-y>"] = cmp.config.disable,
     -- ["<C-e>"] = cmp.mapping {
     --   i = cmp.mapping.abort(),
     --   c = cmp.mapping.close(),
     -- },
-    ["<C-h>"] = cmp.mapping({
+    -- ['<C-Space>'] = cmp.mapping.complete(),
+    ["<C-Space>"] = cmp.mapping({
       i = function()
         if cmp.visible() then
           -- require("notify")("visible")
@@ -90,10 +92,11 @@ cmp.setup {
     -- Accept currently selected item. If none selected, `select` first item.
     -- Set `select` to `false` to only confirm explicitly selected items.
     ["<CR>"] = cmp.mapping.confirm { select = true },
+    ["<M-l>"] = cmp.mapping(cmp.mapping.confirm { select = true }, { "i", "c" }),
     -- ['<CR>'] = cmp.mapping.confirm({
-    --           behavior = cmp.ConfirmBehavior.Replace,
-    --           select = false,
-    --           }),
+    --   behavior = cmp.ConfirmBehavior.Replace,
+    --   select = false,
+    -- }),
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -165,27 +168,27 @@ cmp.setup {
     select = false,
   },
   completion = {
-    completeopt = 'menu,menuone,noinsert'
+    completeopt = 'menu,menuone,noinsert' -- autoselect to show the completion preview
   },
   -- documentation = {
   --   border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
   -- },
-   window = {
-        -- completion = cmp.config.window.bordered(),
-        -- documentation = cmp.config.window.bordered(),
-        completion = { -- rounded border; thin-style scrollbar
-          border = 'rounded',
-          scrollbar = "║",
-          thin_scrollbar = true,
-          -- completeopt = 'menu,menuone,noinsert',
-        },
-        documentation = { -- rounded border; native-style scrollbar
-          border = 'rounded',
-          scrollbar = "║",
-          thin_scrollbar = true,
-          -- winhighlight = "NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder",
-        },
+  window = {
+    -- completion = cmp.config.window.bordered(),
+    -- documentation = cmp.config.window.bordered(),
+    completion = { -- rounded border; thin-style scrollbar
+      border = 'rounded',
+      scrollbar = "║",
+      thin_scrollbar = true,
+      -- completeopt = 'menu,menuone,noinsert',
     },
+    documentation = { -- rounded border; native-style scrollbar
+      border = 'rounded',
+      scrollbar = "║",
+      thin_scrollbar = true,
+      winhighlight = "Normal:Normal,NormalFloat:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None"
+    },
+  },
   experimental = {
     ghost_text = false,
     native_menu = false,

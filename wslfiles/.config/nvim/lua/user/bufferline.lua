@@ -1,30 +1,30 @@
 local web_devicons_ok, web_devicons = pcall(require, "nvim-web-devicons")
 if not web_devicons_ok then
-	return
+  return
 end
 
 local material_icon_ok, material_icon = pcall(require, "nvim-material-icon")
 if not material_icon_ok then
-	return
+  return
 end
 
 web_devicons.setup({
-	override = material_icon.get_icons(),
+  override = material_icon.get_icons(),
 })
 
 require('bufferline').setup {
   options = {
     numbers = "none", -- | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string,
-    close_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
-    right_mouse_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
+    close_command = "bp | bd #", -- can be a string | function, see "Mouse actions"
+    right_mouse_command = "bp | bd #", -- can be a string | function, see "Mouse actions"
     left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
-    middle_mouse_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
+    middle_mouse_command = "bp | bd #", -- can be a string | function, see "Mouse actions"
     -- NOTE: this plugin is designed with this icon in mind,
     -- and so changing this is NOT recommended, this is intended
     -- as an escape hatch for people who cannot bear it for whatever reason
     indicator = {
-        icon = '▎', -- this should be omitted if indicator style is not 'icon'
-        style = 'icon'  , -- 'icon' | 'underline' | 'none',
+      icon = '▎', -- this should be omitted if indicator style is not 'icon'
+      style = 'icon', -- 'icon' | 'underline' | 'none',
     },
     buffer_close_icon = "",
     modified_icon = "●",
@@ -66,7 +66,7 @@ require('bufferline').setup {
     --     return true
     --   end
     -- end,
-    offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
+    offsets = { { filetype = "neo-tree", text = "", padding = 1 } },
     themable = true,
     color_icons = true, -- whether or not to add the filetype icon highlights
     show_buffer_icons = true,
