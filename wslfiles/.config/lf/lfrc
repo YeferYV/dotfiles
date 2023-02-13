@@ -122,13 +122,13 @@ cmd imgcat !{{
 }}
 
 cmd sixel ${{
-    [[ $( awk 'END {print NR}' <<<$fx ) -ne 1 ]] && { Xsixel :11 -screen 1024x1024 -exec 'basename -a $fx | sxiv -baio'
+    [[ $( awk 'END {print NR}' <<<$fx ) -ne 1 ]] && { Xsixel :11 -screen 1024x1024 -exec 'basename -a $fx | sxiv -baio' # files with spaces not showing
     }||{
     case $(file --dereference --brief --mime-type $fx) in
         text/*)   bat --paging always --wrap never $fx;;
-        image/*)  Xsixel :11 -screen 1024x1024 -exec 'sxiv $fx' 2>/dev/null;;
+        image/*)  Xsixel :11 -screen 1024x1024 -exec 'sxiv "$fx"' 2>/dev/null;;
         video/*)  mpv -vo=sixel --vo-sixel-width=$(($(tput cols)*8)) --vo-sixel-height=$(($(tput lines)*16)) $fx;;
-        application/pdf) Xsixel :11 -screen 1024x1024 -exec 'zathura $fx' 2>/dev/null;;
+        application/pdf) Xsixel :11 -screen 1024x1024 -exec 'zathura "$fx"' 2>/dev/null;;
     esac
     }
 }}
@@ -153,19 +153,23 @@ cmd cmd_scrollup &{{
 }}
 
 cmd cmd_redraw_up :{{
-	$(echo 0 >"$LF_SCROLLINGPREVIEW_TEMPDIR/offset")
+	$(echo 1 >"$LF_SCROLLINGPREVIEW_TEMPDIR/offset")
   up
   redraw
   $lf -remote "send $id reload"
   # $lf -remote "send $id up && send $id redraw"
+  %wc -l "$fx"
+  &({ declare -Ap add_command=([action]='add' [identifier]='PREVIEW' [x]="55" [y]="1" [width]="110" [height]="110" [path]="$fx"); sleep 3; } | ueberzug layer --parser bash)
 }}
 
 cmd cmd_redraw_down :{{
-	$(echo 0 >"$LF_SCROLLINGPREVIEW_TEMPDIR/offset")
+	$(echo 1 >"$LF_SCROLLINGPREVIEW_TEMPDIR/offset")
   down
   redraw
   $lf -remote "send $id reload"
   # $lf -remote "send $id down && send $id redraw"
+  %wc -l "$fx"
+  &({ declare -Ap add_command=([action]='add' [identifier]='PREVIEW' [x]="55" [y]="1" [width]="110" [height]="110" [path]="$fx"); sleep 3; } | ueberzug layer --parser bash)
 }}
 
 cmd setbg ${{
@@ -182,7 +186,7 @@ cmd tmuxtty ${{
 
 cmd fzf_preview ${{
     # fzf with lf images preview like keybinding
-    export FZF_DEFAULT_COMMAND='rg --files -g "!.git" --hidden'
+    export FZF_DEFAULT_COMMAND='rg --files -g "!.git/" --hidden'
     export FZF_PREVIEWER="$HOME/.config/lf/${1}"
     fzf --bind='alt-j:down+execute-silent((tput sc; tput cup 2 $(tput cols) ; wezterm imgcat --width $(tput cols) {}; tput rc; read) >/dev/tty)'\
         --bind='alt-k:up+execute-silent((tput sc; tput cup 2 $(tput cols) ; wezterm imgcat --width $(tput cols) {}; tput rc; read) >/dev/tty)'\
@@ -210,7 +214,7 @@ cmd fzf_preview ${{
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md#switching-between-ripgrep-mode-and-fzf-mode
 cmd fzf_rg ${{
     # Switch between Ripgrep launcher mode (CTRL-R) and fzf filtering mode (CTRL-F)
-    RG_PREFIX="rg --column --glob='!.git' --hidden --line-number --no-heading --color=always --smart-case"
+    RG_PREFIX="rg --column --glob='!.git/' --hidden --line-number --no-heading --color=always --smart-case"
     INITIAL_QUERY="${*:-}"
     IFS=: read -ra selected < <(
       FZF_DEFAULT_COMMAND="$RG_PREFIX $(printf %q "$INITIAL_QUERY")" \
@@ -299,6 +303,9 @@ map <a-i> imgcat
 map <a-o> sixel
 map <a-u> !tput cup 0 5 && img2sixel --width $(($(tput cols)*15/2)) $fx
 map <a-p> $wezterm cli split-pane --horizontal -- bash -c "img2sixel --width $(($(tput cols)*4)) $fx && read"
+map <a-l> $({ declare -Ap add_command=([action]="add" [identifier]="PREVIEW" [x]="1" [y]="1" [width]="$(tput cols)" [height]="$(tput lines)" [path]="$fx"); read; } | ueberzug layer --parser bash)
+map <a-h> &(printf 'chafa "%s" && read' $fx  | xargs -I var tmux popup -w 110 -h 37 -x 60 -y 1 -E "var")
+map <a-y> &(printf 'chafa "%s"' $fx  | xargs -I var tmux split-window -h \; send-keys "var" 'Enter')
 
 map <c-j> cmd_redraw_down
 map <c-k> cmd_redraw_up
@@ -348,6 +355,7 @@ map gtl   tmuxtty lf
 map gtz   tmuxtty zsh
 map J     push 10j
 map K     push 10k
+map L     $ $SWALLOWER neovide $fx
 
 map i     $LESSOPEN='| ~/.config/lf/lf-wiki-previewer/lf_sixel_preview %s' bat --pager "less -R" --paging always --wrap never $fx
 map I     $LESSOPEN='| ~/.config/lf/lf-wiki-previewer/lf_sixel_preview %s' less -R $f
