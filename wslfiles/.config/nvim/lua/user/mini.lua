@@ -39,43 +39,18 @@ mini_ai.setup({
     -- w = mapped to word by nvim
     -- W = mapped to Word by nvim
 
-    q = spec_treesitter({
-      a = '@call.outer',
-      i = '@call.inner',
-    }),
-    Q = spec_treesitter({
-      a = '@class.outer',
-      i = '@class.inner',
-    }),
-    g = spec_treesitter({
-      a = '@comment.outer',
-      i = '@comment.inner',
-    }),
-    G = spec_treesitter({
-      a = '@conditional.outer',
-      i = '@conditional.inner',
-    }),
-    B = spec_treesitter({
-      a = '@block.outer',
-      i = '@block.inner',
-    }),
-    F = spec_treesitter({
-      a = '@function.outer',
-      i = '@function.inner',
-    }),
-    L = spec_treesitter({
-      a = '@loop.outer',
-      i = '@loop.inner',
-    }),
-    P = spec_treesitter({
-      a = '@parameter.outer',
-      i = '@parameter.inner',
-    }),
-
-    -- @atribute unsupported
-    -- @frame unsupported
-    -- @statement unsupported
-    -- @scope unsupported
+    q = spec_treesitter({ a = '@call.outer', i = '@call.inner', }),
+    Q = spec_treesitter({ a = '@class.outer', i = '@class.inner', }),
+    g = spec_treesitter({ a = '@comment.outer', i = '@comment.inner', }),
+    G = spec_treesitter({ a = '@conditional.outer', i = '@conditional.inner', }),
+    B = spec_treesitter({ a = '@block.outer', i = '@block.inner', }),
+    F = spec_treesitter({ a = '@function.outer', i = '@function.inner', }),
+    L = spec_treesitter({ a = '@loop.outer', i = '@loop.inner', }),
+    P = spec_treesitter({ a = '@parameter.outer', i = '@parameter.inner', }),
+    R = spec_treesitter({ a = '@return.outer', i = '@return.inner', }),
+    ["="] = spec_treesitter({ a = '@assignment.rhs', i = '@assignment.lhs', }),
+    ["+"] = spec_treesitter({ a = '@assignment.outer', i = '@assignment.inner', }),
+    ["z"] = spec_treesitter({ a = '@number.outer', i = '@number.inner', }),
 
     -- Tweak argument textobject
     a = require('mini.ai').gen_spec.argument({ brackets = { '%b()' } }), -- brackets = { '%b()', '%b[]', '%b{}' },
@@ -84,8 +59,18 @@ mini_ai.setup({
     -- b = false,
     -- b = { { '%b()', '%b[]', '%b{}' }, '^.().*().$' },
 
-    -- Quotes/uotes
-    u = { { "%b''", '%b""', '%b``' }, '^.().*().$' },
+    -- _key_value_textobj :help mini.ai (line 300)
+    -- the pattern .- matches any sequence of characters (except newline characters) (including whitespaces)
+    k = { { '\n.-[=:]', '^.-[=:]' }, '^%s*()().-()%s-()=?[!=<>\\+-\\*]?[=:]' }, -- .- -> don't be greedy let %s- to exist
+    v = { { '[=:]()%s*().-%s*()[;,]()', '[=:]=?()%s*().*()().$' } }, -- Pattern in double curly bracket equals fallback
+
+    -- _quotes/uotes
+    u = { { "%b''", '%b""', '%b``' }, '^.().*().$' }, -- Pattern in single curly bracket equals filter the double-bracket/left-side
+
+    -- _number/hexadecimalcolor_textobj
+    -- the pattern %f[%d]%d+ ensures there is a %d before start matching (non %d before %d+)(useful to stop .*)
+    n = { '[-+]?()%f[%d]%d+()%.?%d*' }, -- %f[%d] to make jumping to next group of number instead of next digit
+    x = { '#()%x%x%x%x%x%x()' },
 
     -- Now `vax` should select `xxx` and `vix` - middle `x`
     -- x = { 'x()x()x' },
@@ -177,6 +162,33 @@ require('mini.align').setup({
     merge = nil,
   },
 
+})
+
+require('mini.bracketed').setup({
+  -- First-level elements are tables describing behavior of a target:
+  --
+  -- - <suffix> - single character suffix. Used after `[` / `]` in mappings.
+  --   For example, with `b` creates `[B`, `[b`, `]b`, `]B` mappings.
+  --   Supply empty string `''` to not create mappings.
+  --
+  -- - <options> - table overriding target options.
+  --
+  -- See `:h MiniBracketed.config` for more info.
+
+  buffer     = { suffix = 'b', options = {} },
+  comment    = { suffix = 'c', options = {} },
+  conflict   = { suffix = 'x', options = {} },
+  diagnostic = { suffix = 'd', options = {} },
+  file       = { suffix = 'f', options = {} },
+  indent     = { suffix = 'n', options = {} },
+  jump       = { suffix = 'j', options = {} },
+  location   = { suffix = 'l', options = {} },
+  oldfile    = { suffix = 'o', options = {} },
+  quickfix   = { suffix = 'q', options = {} },
+  treesitter = { suffix = 't', options = {} },
+  undo       = { suffix = 'u', options = {} },
+  window     = { suffix = 'w', options = {} },
+  yank       = { suffix = 'y', options = {} },
 })
 
 require('mini.comment').setup({

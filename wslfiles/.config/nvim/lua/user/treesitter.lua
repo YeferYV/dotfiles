@@ -30,8 +30,8 @@ configs.setup {
       -- node_decremental = "grm",       -- decrement to the previous node
       init_selection = '<c-space>',
       node_incremental = '<c-space>',
-      scope_incremental = '<c-i>',
-      node_decremental = '<c-h>', -- showkey -a <c-backspace> outputs ^H
+      scope_incremental = '<c-]>',
+      node_decremental = '<c-[>', -- showkey -a <c-backspace> outputs ^H
     }
   },
   textobjects = {
@@ -64,6 +64,10 @@ configs.setup {
     --     ['iP'] = '@parameter.inner',
     --     -- ["aS"] = "@statement.outer",  -- not supported in c/go/javascript/lua/python/rust
     --     -- ["iS"] = "@scopename.inner",  -- not supported in      javascript/lua
+    --     ['a='] = '@assignment.lhs',
+    --     ['i='] = '@assignment.rhs',
+    --     ['a+'] = '@assignment.outer',
+    --     ['i+'] = '@assignment.inner',
     --   },
     --   -- selection_modes = {
     --   --   ['@parameter.outer'] = 'v', -- charwise
@@ -83,6 +87,9 @@ configs.setup {
         ['[aF'] = '@function.outer',
         ['[aL'] = '@loop.outer',
         ['[aP'] = '@parameter.outer',
+        ['[aR'] = '@return.outer',
+        ['[a='] = '@assignment.outer',
+        ['[a+'] = '@assignment.lhs',
 
         ['[iq'] = '@call.inner',
         ['[iQ'] = '@class.inner',
@@ -92,7 +99,10 @@ configs.setup {
         ['[iF'] = '@function.inner',
         ['[iL'] = '@loop.inner',
         ['[iP'] = '@parameter.inner',
+        ['[iR'] = '@return.inner',
         ['[['] = '@parameter.inner',
+        ['[i='] = '@assignment.inner',
+        ['[i+'] = '@assignment.rhs',
       },
       goto_next_start = {
         [']aq'] = '@call.outer',
@@ -103,6 +113,9 @@ configs.setup {
         [']aF'] = '@function.outer',
         [']aL'] = '@loop.outer',
         [']aP'] = '@parameter.outer',
+        [']aR'] = '@return.outer',
+        [']a='] = '@assignment.outer',
+        [']a+'] = '@assignment.lhs',
 
         [']iq'] = '@call.inner',
         [']iQ'] = '@class.inner',
@@ -112,7 +125,10 @@ configs.setup {
         [']iF'] = '@function.inner',
         [']iL'] = '@loop.inner',
         [']iP'] = '@parameter.inner',
+        [']iR'] = '@return.inner',
         [']]'] = '@parameter.inner',
+        [']i='] = '@assignment.inner',
+        [']i+'] = '@assignment.rhs',
       },
       goto_previous_end = {
         ['[eaq'] = '@call.outer',
@@ -123,6 +139,9 @@ configs.setup {
         ['[eaF'] = '@function.outer',
         ['[eaL'] = '@loop.outer',
         ['[eaP'] = '@parameter.outer',
+        ['[eaR'] = '@return.outer',
+        ['[ea='] = '@assignment.outer',
+        ['[ea+'] = '@assignment.lhs',
 
         ['[eiq'] = '@call.inner',
         ['[eiQ'] = '@class.inner',
@@ -132,6 +151,9 @@ configs.setup {
         ['[eiF'] = '@function.inner',
         ['[eiL'] = '@loop.inner',
         ['[eiP'] = '@parameter.inner',
+        ['[eiR'] = '@return.inner',
+        ['[ei='] = '@assignment.inner',
+        ['[ei+'] = '@assignment.rhs',
       },
       goto_next_end = {
         [']eaq'] = '@call.outer',
@@ -142,6 +164,9 @@ configs.setup {
         [']eaF'] = '@function.outer',
         [']eaL'] = '@loop.outer',
         [']eaP'] = '@parameter.outer',
+        [']eaR'] = '@return.outer',
+        [']ea='] = '@assignment.outer',
+        [']ea+'] = '@assignment.lhs',
 
         [']eiq'] = '@call.inner',
         [']eiQ'] = '@class.inner',
@@ -151,6 +176,9 @@ configs.setup {
         [']eiF'] = '@function.inner',
         [']eiL'] = '@loop.inner',
         [']eiP'] = '@parameter.inner',
+        [']eiR'] = '@return.inner',
+        [']ei='] = '@assignment.inner',
+        [']ei+'] = '@assignment.rhs',
       },
     },
     -- selection_modes = {

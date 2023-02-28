@@ -39,10 +39,10 @@ map({ 'n', 't' }, '<M-Up>', require('smart-splits').resize_up)
 map({ 'n', 't' }, '<M-Right>', require('smart-splits').resize_right)
 
 -- Navigate buffers
-keymap("n", "]q", ":cnext<CR>", opts)
-keymap("n", "[q", ":cprevious<CR>", opts)
-keymap("n", "]l", ":lnext<CR>", opts)
-keymap("n", "[l", ":lprevious<CR>", opts)
+-- keymap("n", "]q", ":cnext<CR>", opts)
+-- keymap("n", "[q", ":cprevious<CR>", opts)
+-- keymap("n", "]l", ":lnext<CR>", opts)
+-- keymap("n", "[l", ":lprevious<CR>", opts)
 keymap("n", "<right>", ":bnext<CR>", opts)
 keymap("n", "<left>", ":bprevious<CR>", opts)
 keymap("n", "<Home>", ":tabprevious<CR>", opts)
@@ -105,7 +105,7 @@ keymap("n", 'Y', 'yg_', { noremap = true, silent = true, desc = "Forward yank" }
 keymap("v", 'P', 'g_P', { noremap = true, silent = true, desc = "Forward Paste" }) -- "P" seems unaltered the clipboard
 
 -- Unaltered clipboard
-keymap("v", 'p', '"_dP', { noremap = true, silent = true, desc = "Paste Unaltered" })
+keymap("v", 'p', '"_c<c-r>+<esc>', { noremap = true, silent = true, desc = "Paste Unaltered" })
 
 -- Save file as sudo
 -- keymap("c","w!!","execute 'silent! write !sudo tee % >/dev/null' <bar> edit!",opts)
@@ -125,12 +125,12 @@ keymap("n", "<leader>6", "<Cmd>BufferLineGoToBuffer 6<CR>", opts)
 keymap("n", "<leader>7", "<Cmd>BufferLineGoToBuffer 7<CR>", opts)
 keymap("n", "<leader>8", "<Cmd>BufferLineGoToBuffer 8<CR>", opts)
 keymap("n", "<leader>9", "<Cmd>BufferLineGoToBuffer 9<CR>", opts)
-keymap("n", "gy;", ":call CycleLastBuffer()<CR>", opts)
-keymap("n", "gyl", "<C-6>", { noremap = true, silent = true, desc = "go to last buffer" })
-keymap("n", "gys", "<Cmd>BufferLineCyclePrev <CR>", opts)
-keymap("n", "gyf", "<Cmd>BufferLineCycleNext <CR>", opts)
-keymap("n", "gyS", "<Cmd>BufferLineMovePrev <CR>", opts)
-keymap("n", "gyF", "<Cmd>BufferLineMoveNext <CR>", opts)
+keymap("n", "gb;", ":call CycleLastBuffer()<CR>", opts)
+keymap("n", "gbl", "<C-6>", { noremap = true, silent = true, desc = "go to last buffer" })
+keymap("n", "gbs", "<Cmd>BufferLineCyclePrev <CR>", opts)
+keymap("n", "gbf", "<Cmd>BufferLineCycleNext <CR>", opts)
+keymap("n", "gbS", "<Cmd>BufferLineMovePrev <CR>", opts)
+keymap("n", "gbF", "<Cmd>BufferLineMoveNext <CR>", opts)
 
 -- Terminal
 keymap("n", "<leader>v", "<Cmd>ToggleTerm direction=vertical   size=70<CR>",
@@ -173,12 +173,12 @@ map("n", "gsf", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
 map("n", "gsh", "<cmd>Lspsaga hover_doc<CR>", { silent = true })
 map("n", "gsn", "<cmd>Lspsaga diagnostic_jump_next<CR>", { silent = true })
 map("n", "gsN", function() require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR }) end,
-  { silent = true })
+  { silent = true, desc = "Lspsaga Next Error" })
 map("n", "gso", "<cmd>Lspsaga show_line_diagnostics<CR>", { silent = true })
 map("n", "gsO", "<cmd>Lspsaga show_cursor_diagnostics<CR>", { silent = true })
 map("n", "gsp", "<cmd>Lspsaga diagnostic_jump_prev<CR>", { silent = true })
 map("n", "gsP", function() require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR }) end,
-  { silent = true })
+  { silent = true, desc = "Lspsaga Prev Error" })
 map("n", "gsr", "<cmd>Lspsaga term_toggle ranger<CR>", { silent = true })
 map("n", "gsR", "<cmd>Lspsaga rename<CR>", { silent = true })
 map("n", "gsz", "<cmd>LSpsaga outline<CR>", { silent = true })
@@ -196,6 +196,10 @@ map({ "n", "t" }, "<M-x>", "<cmd>Lspsaga term_toggle<CR>")
 --     vim.api.nvim_set_keymap(mode, "a" .. char, string.format(':<C-u>normal! F%svf%s<CR>', char, char, char), { noremap = true, silent = true })
 --   end
 -- end
+
+-- _goto_textobj_(dotrepeat)
+map('n', "g.", function() return GotoTextObj("") end, { expr = true, desc = "StartOf TextObj" })
+map('n', "g:", function() return GotoTextObj(":normal `[v`]<cr><esc>") end, { expr = true, desc = "EndOf TextObj" })
 
 -- https://www.reddit.com/r/vim/comments/xnuaxs/last_change_text_object
 -- keymap("v", 'im', '<Esc>u<C-r>vgi', opts)            -- <left> unsupported
@@ -239,18 +243,18 @@ map({ "o", "x" }, "gu", function() require("various-textobjs").url() vim.call("r
   { desc = "Url textobj" })
 
 -- _nvim_various_textobjs: inner-outer
-map({ "o", "x" }, "av", function() require("various-textobjs").value(false) vim.call("repeat#set", "vav") end,
-  { desc = "outer value textobj" })
-map({ "o", "x" }, "iv", function() require("various-textobjs").value(true) vim.call("repeat#set", "viv") end,
-  { desc = "inner value textobj" })
-map({ "o", "x" }, "ak", function() require("various-textobjs").key(false) vim.call("repeat#set", "vak") end,
-  { desc = "outer key textobj" })
-map({ "o", "x" }, "ik", function() require("various-textobjs").key(true) vim.call("repeat#set", "vik") end,
-  { desc = "inner key textobj" })
-map({ "o", "x" }, "an", function() require("various-textobjs").number(false) vim.call("repeat#set", "van") end,
-  { desc = "outer number textobj" })
-map({ "o", "x" }, "in", function() require("various-textobjs").number(true) vim.call("repeat#set", "vin") end,
-  { desc = "outer number textobj" })
+-- map({ "o", "x" }, "av", function() require("various-textobjs").value(false) vim.call("repeat#set", "vav") end,
+--   { desc = "outer value textobj" })
+-- map({ "o", "x" }, "iv", function() require("various-textobjs").value(true) vim.call("repeat#set", "viv") end,
+--   { desc = "inner value textobj" })
+-- map({ "o", "x" }, "ak", function() require("various-textobjs").key(false) vim.call("repeat#set", "vak") end,
+--   { desc = "outer key textobj" })
+-- map({ "o", "x" }, "ik", function() require("various-textobjs").key(true) vim.call("repeat#set", "vik") end,
+--   { desc = "inner key textobj" })
+-- map({ "o", "x" }, "an", function() require("various-textobjs").number(false) vim.call("repeat#set", "van") end,
+--   { desc = "outer number textobj" })
+-- map({ "o", "x" }, "in", function() require("various-textobjs").number(true) vim.call("repeat#set", "vin") end,
+--   { desc = "inner number textobj" })
 -- map({ "o", "x" }, "al", function() require("various-textobjs").mdlink(false) end)
 -- map({ "o", "x" }, "il", function() require("various-textobjs").mdlink(true) end)
 -- map({ "o", "x" }, "aC", function() require("various-textobjs").mdFencedCodeBlock(false) end)
@@ -289,10 +293,28 @@ vim.g.textobj_space_no_default_key_mappings = true
 map({ "o", "x" }, "ir", "<Plug>(textobj-space-i)", { desc = "Space textobj" })
 map({ "o", "x" }, "ar", "<Plug>(textobj-space-a)", { desc = "Space textobj" })
 
--- _vim-textobj-numeral
-vim.g.textobj_numeral_no_default_key_mappings = true
-map({ "o", "x" }, "ix", "<Plug>(textobj-numeral-hex-i)", { desc = "Hex textobj" })
-map({ "o", "x" }, "ax", "<Plug>(textobj-numeral-hex-a)", { desc = "Hex textobj" })
+-- _clipboard_textobj
+vim.cmd [[
+  let g:EasyClipUseCutDefaults = 0
+  let g:EasyClipEnableBlackHoleRedirect = 0
+  nmap gx "_d
+  nmap gxx "_dd
+  xmap gx "_d
+
+  let g:EasyClipUseYankDefaults = 0
+  nmap <silent> gy <plug>SubstituteOverMotionMap
+  nmap gyy <plug>SubstituteLine
+  xmap gy <plug>XEasyClipPaste
+
+  let g:EasyClipUsePasteDefaults = 0
+  nmap gY <plug>G_EasyClipPasteBefore
+  xmap gY <Plug>XG_EasyClipPaste
+
+  let g:EasyClipUsePasteToggleDefaults = 0
+  nmap gz <plug>EasyClipSwapPasteForward
+  nmap gZ <plug>EasyClipSwapPasteBackwards
+
+]]
 
 -- ╭─────────╮
 -- │ Motions │
@@ -479,45 +501,85 @@ local next_startline, prev_startline = ts_repeat_move.make_repeatable_move_pair(
 map({ "n", "x", "o" }, "<leader><leader>+", next_startline, { desc = "Next StartLine" })
 map({ "n", "x", "o" }, "<leader><leader>-", prev_startline, { desc = "Prev StartLine" })
 
--- _vim-textobj-numeral_(goto_repeatable)
+-- _number_textobj_(goto_repeatable)
 local next_inner_hex, prev_inner_hex = ts_repeat_move.make_repeatable_move_pair(
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-hex-n)" ]] end,
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-hex-p)" ]] end
+  function() require("mini.ai").move_cursor('left', 'i', 'x', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'i', 'x', { search_method = 'prev' }) end
 )
 map({ "n", "x", "o" }, "gnx", next_inner_hex, { desc = "Next Inner Hex" })
 map({ "n", "x", "o" }, "gpx", prev_inner_hex, { desc = "Prev Inner Hex" })
 
-local next_inner_numeral, prev_inner_numeral = ts_repeat_move.make_repeatable_move_pair(
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-n)" ]] end,
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-p)" ]] end
-)
-map({ "n", "x", "o" }, "gnn", next_inner_numeral, { desc = "Next Inner Number" })
-map({ "n", "x", "o" }, "gpn", prev_inner_numeral, { desc = "Prev Inner Number" })
-
 local next_around_hex, prev_around_hex = ts_repeat_move.make_repeatable_move_pair(
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-hex-N)" ]] end,
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-hex-P)" ]] end
+  function() require("mini.ai").move_cursor('left', 'a', 'x', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'a', 'x', { search_method = 'prev' }) end
 )
 map({ "n", "x", "o" }, "gNx", next_around_hex, { desc = "Next Around Hex" })
 map({ "n", "x", "o" }, "gPx", prev_around_hex, { desc = "Prev Around Hex" })
 
+-- hexadecimalcolor_textobj_(goto_repeatable)
+local next_inner_numeral, prev_inner_numeral = ts_repeat_move.make_repeatable_move_pair(
+  function() require("mini.ai").move_cursor('left', 'i', 'n', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'i', 'n', { search_method = 'prev' }) end
+)
+map({ "n", "x", "o" }, "gnn", next_inner_numeral, { desc = "Next Inner Number" })
+map({ "n", "x", "o" }, "gpn", prev_inner_numeral, { desc = "Prev Inner Number" })
+
 local next_around_numeral, prev_around_numeral = ts_repeat_move.make_repeatable_move_pair(
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-N)" ]] end,
-  function() vim.cmd [[ execute "normal \<Plug>(textobj-numeral-P)" ]] end
+  function() require("mini.ai").move_cursor('left', 'a', 'n', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'a', 'n', { search_method = 'prev' }) end
 )
 map({ "n", "x", "o" }, "gNn", next_around_numeral, { desc = "Next Around Number" })
 map({ "n", "x", "o" }, "gPn", prev_around_numeral, { desc = "Prev Around Number" })
 
+-- _vert_horz_incremental_(goto_repeatable)
 local vert_increment, vert_decrement = ts_repeat_move.make_repeatable_move_pair(
-  function() vim.cmd [[ normal "zyanjvan"zp ]] require("user.autocommands").FeedKeysCorrectly('<C-a>') end,
-  function() vim.cmd [[ normal "zyanjvan"zp ]] require("user.autocommands").FeedKeysCorrectly('<C-x>') end
+  function() vim.cmd [[ normal "zyanjvan"zp ]] FeedKeysCorrectly('<C-a>') end,
+  function() vim.cmd [[ normal "zyanjvan"zp ]] FeedKeysCorrectly('<C-x>') end
 )
 map({ "n" }, "g+", vert_increment, { desc = "Vert Increment" })
 map({ "n" }, "g-", vert_decrement, { desc = "Vert Decrement" })
 
 local horz_increment, horz_decrement = ts_repeat_move.make_repeatable_move_pair(
-  function() vim.cmd [[ IncrementHorz ]] end,
-  function() vim.cmd [[ DecrementHorz ]] end
+  function() vim.cmd [[ normal "zyanvaNn"zp ]] FeedKeysCorrectly('<C-a>') end,
+  function() vim.cmd [[ normal "zyanvaNn"zp ]] FeedKeysCorrectly('<C-x>') end
 )
 map({ "n" }, "gn+", horz_increment, { desc = "Horz increment" })
 map({ "n" }, "gn-", horz_decrement, { desc = "Horz Decrement" })
+
+-- _key_textobj_(goto_repeatable)
+local next_inner_key, prev_inner_key = ts_repeat_move.make_repeatable_move_pair(
+  function() require("mini.ai").move_cursor('left', 'i', 'k', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'i', 'k', { search_method = 'prev' }) end
+)
+map({ "n", "x", "o" }, "gnk", next_inner_key, { desc = "Next Inner Key" })
+map({ "n", "x", "o" }, "gpk", prev_inner_key, { desc = "Prev Inner Key" })
+
+local next_around_key, prev_around_key = ts_repeat_move.make_repeatable_move_pair(
+  function() require("mini.ai").move_cursor('left', 'a', 'k', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'a', 'k', { search_method = 'prev' }) end
+)
+map({ "n", "x", "o" }, "gNk", next_around_key, { desc = "Next Around Key" })
+map({ "n", "x", "o" }, "gNk", prev_around_key, { desc = "Prev Around Key" })
+
+-- _value_textobj_(goto_repeatable)
+local next_inner_value, prev_inner_value = ts_repeat_move.make_repeatable_move_pair(
+  function() require("mini.ai").move_cursor('left', 'i', 'v', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'i', 'v', { search_method = 'prev' }) end
+)
+map({ "n", "x", "o" }, "gnv", next_inner_value, { desc = "Next Inner Value" })
+map({ "n", "x", "o" }, "gpv", prev_inner_value, { desc = "Prev Inner Value" })
+
+local next_around_value, prev_around_value = ts_repeat_move.make_repeatable_move_pair(
+  function() require("mini.ai").move_cursor('left', 'a', 'v', { search_method = 'next' }) end,
+  function() require("mini.ai").move_cursor('left', 'a', 'v', { search_method = 'prev' }) end
+)
+map({ "n", "x", "o" }, "gNv", next_around_value, { desc = "Next Around Value" })
+map({ "n", "x", "o" }, "gNv", prev_around_value, { desc = "Prev Around Value" })
+
+-- _comment_(goto_repeatable)
+local next_comment, prev_comment = ts_repeat_move.make_repeatable_move_pair(
+  function() require('mini.bracketed').comment('forward') end,
+  function() require('mini.bracketed').comment('backward') end
+)
+map({ "n", "x", "o" }, "gnc", next_comment, { desc = "Next Comment" })
+map({ "n", "x", "o" }, "gpc", prev_comment, { desc = "Prev Comment" })

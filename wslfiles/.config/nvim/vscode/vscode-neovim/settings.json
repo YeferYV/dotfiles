@@ -1,225 +1,16 @@
 {
-  "vim.easymotion": true,
-  "vim.incsearch": true,
-  "vim.foldfix": true,
-  "vim.hlsearch": true,
-  "vim.highlightedyank.enable": true,
-  "vim.sneak": true,
-  "vim.sneakHighlightBackgroundColor": "#0c0c0c",
-  "vim.sneakHighlightFontColor": "#ff1c1c",
-  // "vim.sneakLabelMode": true,
-  // "vim.sneakLabelTargets": ";sftunq/SFGHLTUNRMQZ?0",
-  "vim.sneakReplacesF": true,
-  "vim.sneakUseIgnorecaseAndSmartcase": true,
-  "vim.useSystemClipboard": true,
-  "vim.useCtrlKeys": true,
-  "vim.insertModeKeyBindings": [
-    {
-      "before": [ "j", "k" ],
-      "after": [ "<Esc>" ]
-    },
-    {
-      "before": [ "k", "j" ],
-      "after": [ "<Esc>" ]
-    }
-  ],
-  "vim.visualModeKeyBindingsNonRecursive": [
-    {
-      "before": [ "<space>" ],
-      "commands": [ "whichkey.show" ]
-    },
-    {
-      "before": [ "p" ],
-      // "after": ["c","<C-r>","0"],
-      "after": [ "p", "g", "v", "y" ]
-    },
-    {
-      "before": [ "*" ],
-      "after": [ "y", "/", "\\V", "<C-R>", "\"", "<CR>" ]
-    },
-    {
-      "before": [ ">" ],
-      "commands": [ "editor.action.indentLines" ]
-    },
-    {
-      "before": [ "<" ],
-      "commands": [ "editor.action.outdentLines" ]
-    }
-  ],
-  "vim.normalModeKeyBindingsNonRecursive": [
-    {
-      "before": [ "<space>" ],
-      "commands": [ "whichkey.show" ]
-    },
-    {
-      "before": [ "<S-q>" ],
-      "commands": [ ":q" ]
-    },
-    {
-      "before": [ "<S-r>" ],
-      "commands": [ ":w", "editor.action.format" ]
-    },
-    // {
-    //   "before": ["h"],
-    //   "commands": [ "fakeVirtualSpace.cursorLeft" ]
-    // },
-    // {
-    //   "before": ["j"],
-    //   "commands": [ "fakeVirtualSpace.cursorDown" ]
-    // },
-    // {
-    //   "before": ["k"],
-    //   "commands": [ "fakeVirtualSpace.cursorUp" ]
-    // },
-    // {
-    //   "before": ["l"],
-    //   "commands": [ "fakeVirtualSpace.cursorRight" ]
-    // },
-    {
-      "before": [ "J" ],
-      "after": [ "1", "0", "j" ]
-    },
-    {
-      "before": [ "K" ],
-      "after": [ "1", "0", "k" ]
-    },
-    {
-      "before": [ "H" ],
-      "after": [ "1", "0", "h" ]
-    },
-    {
-      "before": [ "L" ],
-      "after": [ "1", "0", "l" ]
-    },
-    {
-      "before": [ "g", ";" ],
-      "commands": [ "editor.action.refactor" ]
-    },
-    {
-      "before": [ "g", "A" ],
-      "commands": [ "editor.action.autoFix" ]
-    },
-    {
-      "before": [ "g", "d" ],
-      "commands": [ "editor.action.revealDefinition" ]
-    },
-    {
-      "before": [ "g", "D" ],
-      "commands": [ "editor.action.revealDeclaration" ]
-    },
-    {
-      "before": [ "g", "F" ],
-      "commands": [ "editor.action.format" ]
-    },
-    {
-      "before": [ "g", "h" ],
-      "commands": [ "editor.action.showHover" ]
-    },
-    {
-      "before": [ "g", "H" ],
-      "commands": [ "editor.action.triggerParameterHints" ]
-    },
-    {
-      "before": [ "g", "I" ],
-      "commands": [ "editor.action.goToImplementation" ]
-    },
-    {
-      "before": [ "g", "l" ],
-      "commands": [ "workbench.action.navigateToLastEditLocation" ]
-    },
-    {
-      "before": [ "g","n","h" ],
-      "commands": [ "editor.action.marker.nextChange" ]
-    },
-    {
-      "before": [ "g", "n", "m" ],
-      "commands": [ "editor.action.marker.next" ]
-    },
-    {
-      "before": [ "g", "n","M" ],
-      "commands": [ "editor.action.marker.nextInFiles" ]
-    },
-    {
-      "before": [ "g", "o" ],
-      "commands": [ "workbench.actions.view.problems" ]
-    },
-    {
-      "before": ["g","O"],
-      "commands": [ "outline.focus" ]
-    },
-    {
-      "before": [ "g","p","h" ],
-      "commands": [ "editor.action.marker.previousChange" ]
-    },
-    {
-      "before": [ "g", "p","m" ],
-      "commands": [ "editor.action.marker.prev" ]
-    },
-    {
-      "before": [ "g", "p","M" ],
-      "commands": [ "editor.action.marker.prevInFiles" ]
-    },
-    {
-      "before": [ "g", "q" ],
-      "commands": [ "editor.action.quickFix" ]
-    },
-    {
-      "before": [ "g", "r" ],
-      "commands": [ "editor.action.goToReferences" ]
-    },
-    {
-      "before": [ "g", "R" ],
-      "commands": [ "editor.action.Rename" ]
-    },
-    {
-      "before": ["g","s"],
-      "commands": [ "workbench.action.gotoSymbol" ]
-    },
-    {
-      "before": ["g","S"],
-      "commands": [ "workbench.action.showAllSymbols" ]
-    },
-    {
-      "before": [ "g", "t" ],
-      "commands": [ "editor.action.goToTypeDefinition" ]
-    },
-    {
-      "before": [ "g", "T" ],
-      "commands": [ "editor.action.formatDocument" ]
-    },
-    {
-      "before": [ "g", "V" ],
-      "commands": [ "references-view.find" ]
-    }
-    {
-      "before": [ "g", "W" ],
-      "commands": [ "references-view.findImplementations" ]
-    }
-    {
-      "before": [ "g", "z" ],
-      "commands": [ "references-view.showCallHierarchy" ]
-    }
-    // {
-    //   "before": ["<leader>", "e"],
-    //   "commands": [ "workbench.action.toggleSidebarVisibility","workbench.view.explorer" ]
-    // },
-    // {
-    //   "before": ["<leader>","h"],
-    //   "commands": [":set hlsearch!"]
-    // },
-    // {
-    //   "before": ["<leader>", "v"],
-    //   "commands": [ "workbench.action.terminal.toggleTerminal"]
-    // },
-  ],
-  // "vim.leader": "<space>",
-  "vim.leader": "\\",
-  "vim.handleKeys": {
-    "<C-b>": false,
-    "<C-f>": false
-  },
-  // "whichkey.delay": 1,
+  "vscode-neovim.neovimInitVimPaths.linux": "/home/drknss/.config/nvim/vscode/vscode-neovim/init.lua",
+  "vscode-neovim.useCtrlKeysForNormalMode": true,
+  "extensions.experimental.affinity": { "asvetliakov.vscode-neovim": 1 },
   "whichkey.bindings": [
+    {
+      "key": " ",
+      "name": "tmux copy mode",
+      "type": "command",
+      "command": "workbench.action.tasks.runTask",
+      "args": "tmux-copy-mode",
+      "when": "terminalFocus"
+    },
     {
       "key": ".",
       "name": "Repeat Which-key",
@@ -247,10 +38,7 @@
           "key": ";",
           "name": "Recent editor",
           "type": "command",
-          "command": "vim.remap",
-          "args": {
-            "after": [ "<C-6>" ]
-          }
+          "commands": [ "workbench.action.quickOpenPreviousRecentlyUsedEditor", "workbench.action.acceptSelectedQuickOpenItem" ]
         },
         {
           "key": "b",
@@ -417,25 +205,13 @@
           "key": "q",
           "name": "Quokka start",
           "type": "command",
-          "command": "workbench.action.tasks.runTask",
-          "args": "quokka-start"
+          "command": "quokka.makeQuokkaFromExistingFile"
         },
         {
           "key": "Q",
           "name": "Quokka stop",
           "type": "command",
-          "command": "vim.remap",
-          "args": {
-            "commands": [
-              {
-                "command": "workbench.action.tasks.runTask",
-                "args": "quokka-stop"
-              },
-              {
-                "command": "workbench.action.toggleAuxiliaryBar"
-              }
-            ]
-          }
+          "commands": [ "quokka.stopAll", "workbench.action.toggleAuxiliaryBar" ]
         },
         {
           "key": "r",
@@ -471,15 +247,13 @@
           "key": "w",
           "name": "Wolf start",
           "type": "command",
-          "command": "workbench.action.tasks.runTask",
-          "args": "wolf-start"
+          "command": "wolf.barkAtCurrentFile"
         },
         {
           "key": "W",
           "name": "Wolf stop",
           "type": "command",
-          "command": "workbench.action.tasks.runTask",
-          "args": "wolf-stop"
+          "command": "wolf.stopBarking"
         }
       ]
     },
@@ -807,7 +581,7 @@
           "key": "l",
           "name": "Jump to last change",
           "type": "command",
-          "command": "workbench.action.navigateToLastEditLocation",
+          "command": "workbench.action.navigateToLastEditLocation"
         },
         {
           "key": "n",
@@ -1351,10 +1125,8 @@
           "key": "h",
           "name": "Toggle highlight search",
           "type": "command",
-          "command": "vim.remap",
-          "args": {
-            "commands": [ { "command": ":nohl" } ]
-          }
+          "command": "vscode-neovim.send",
+          "args": "<cmd>:nohl<cr>"
         },
         {
           "key": "m",
@@ -1468,13 +1240,6 @@
       ]
     },
     {
-      "key": " ",
-      "name": "tmux copy mode",
-      "type": "command",
-      "command": "workbench.action.tasks.runTask",
-      "args": "tmux-copy-mode"
-    },
-    {
       "key": "w",
       "name": "Window...",
       "type": "bindings",
@@ -1483,17 +1248,7 @@
           "key": ";",
           "name": "Recent editor group",
           "type": "command",
-          "command": "vim.remap",
-          "args": {
-            "commands": [
-              {
-                "command": "workbench.action.quickOpenPreviousRecentlyUsedEditor"
-              },
-              {
-                "command": "workbench.action.acceptSelectedQuickOpenItem"
-              }
-            ]
-          }
+          "commands": [ "workbench.action.quickOpenPreviousRecentlyUsedEditor", "workbench.action.acceptSelectedQuickOpenItem" ]
         },
         {
           "key": "c",
@@ -1686,7 +1441,7 @@
   "editor.inlineSuggest.enabled": true,
   "editor.minimap.enabled": false,
   "editor.renderLineHighlight": "none",
-  "editor.suggest.preview": true,
+  // "editor.suggest.preview": true,
   "editor.tabSize": 2,
   "editor.tokenColorCustomizations": {
     "[Hacker]": {
@@ -1755,7 +1510,7 @@
         {
           "scope": "storage.type.function",
           "settings": { "fontStyle": "", "foreground": "#4141ff" }
-        },
+        }
       ]
     },
     "[Tokyo Night Dark]": {
@@ -1764,7 +1519,7 @@
           "name": "Tags",
           "scope": [
             "entity.name.tag",
-            "punctuation.definition.tag",
+            "punctuation.definition.tag"
           ],
           "settings": { "fontStyle": "", "foreground": "#7574a5" }
         },
@@ -1784,7 +1539,7 @@
           "name": "Constants",
           "scope": [
             "constant.language",
-            "constant.numeric",
+            "constant.numeric"
           ],
           "settings": { "fontStyle": "", "foreground": "#1cff1c" }
         },
@@ -1793,7 +1548,7 @@
           "scope": [
             "keyword.control.export",
             "keyword.control.default",
-            "keyword.control.flow", //return
+            "keyword.control.flow" //return
           ],
           "settings": { "fontStyle": "", "foreground": "#9d7cd8" }
         },
@@ -1801,14 +1556,14 @@
           "name": "Parameters",
           "scope": [
             "variable.parameter",
-            "variable.parameter.function.language.special",
+            "variable.parameter.function.language.special"
           ],
           "settings": { "fontStyle": "", "foreground": "#c0caf5" }
         },
         {
           "scope": "storage.type.function",
           "settings": { "fontStyle": "bold", "foreground": "#6e51a2" }
-        },
+        }
       ]
     },
     "[Poimandres Alternate]": {
@@ -1817,7 +1572,7 @@
           "name": "Tags",
           "scope": [
             "entity.name.tag",
-            "punctuation.definition.tag",
+            "punctuation.definition.tag"
           ],
           "settings": { "fontStyle": "", "foreground": "#515171" }
         },
@@ -1841,7 +1596,7 @@
           "name": "Keywords",
           "scope": [
             "keyword.control.export",
-            "keyword.control.default",
+            "keyword.control.default"
           ],
           "settings": { "fontStyle": "", "foreground": "#91b4d5" }
         },
@@ -1852,7 +1607,7 @@
             "variable.other.property"
           ],
           "settings": { "fontStyle": "", "foreground": "#add7ff" }
-        },
+        }
       ]
     }
   },
@@ -1883,8 +1638,11 @@
       // "terminalCursor.background": "#000000",
       // "terminalCursor.foreground": "#ffffff",
       // "scrollbarSlider.background": "#55555555",
+
       "editor.selectionBackground": "#55555555",
+      // "editor.selectionBackground": "#1c1c1c",
       "editor.selectionHighlightBackground": "#33333333",
+
       "editor.wordHighlightStrongBackground": "#33333333",
       "editor.wordHighlightBackground": "#33333333",
       "editorLineNumber.foreground": "#55555555",
@@ -1928,7 +1686,7 @@
       "list.activeSelectionBackground": "#0a0a0d", // explorer focused opened file
       "list.activeSelectionForeground": "#2ac3de", // explorer focused opened file
       "quickInputList.focusBackground": "#1c1d29",
-      "quickInputList.focusForeground": "#c0caf5",
+      "quickInputList.focusForeground": "#c0caf5"
     },
     "[poimandres-noitalics][poimandres-storm][Tokyo Night Ported Nvim][Tokyo Night]": { // transparent background
       "activityBar.background": "#0c0c0c",
@@ -1940,9 +1698,12 @@
       "quickInput.background": "#0c0c0c",
       "sideBar.background": "#0c0c0c",
       "statusBar.background": "#0c0c0c",
-      "tab.inactiveBackground": "#0c0c0c",
+      "tab.inactiveBackground": "#0c0c0c"
     }
   },
+  "Codegeex.Privacy": false,
+  "Codegeex.Translation": "replace",
+  "codeium.enableSearch": true,
   "debug.inlineValues": "on",
   "diffEditor.renderSideBySide": false,
   // "git.autofetch": true,
@@ -1961,7 +1722,7 @@
   "scm.alwaysShowActions": true,
   "search.defaultViewMode": "tree",
   "security.workspace.trust.untrustedFiles": "open",
-  "tabnine.experimentalAutoImports": true,
+  // "tabnine.experimentalAutoImports": true,
   "telemetry.telemetryLevel": "off",
   "terminal.integrated.defaultProfile.linux": "tmux",
   "terminal.integrated.fontFamily": "'3270 Nerd Font','TerminessTTF Nerd Font','Font Awesome 6 Free Solid'",
@@ -1980,5 +1741,6 @@
   "workbench.folderLabelColor": "#ff0000",
   "workbench.panel.defaultLocation": "right",
   "workbench.startupEditor": "none",
-  "workbench.colorTheme": "Hacker"
+  "workbench.colorTheme": "Hacker",
+  // "window.zoomLevel": -1,
 }

@@ -1,9 +1,11 @@
 -- vim:ft=lua:ts=2:sw=2:sts=2
 
 local M = {}
-local cmd = vim.api.nvim_create_autocmd
+local autocmd = vim.api.nvim_create_autocmd
 local augroup = vim.api.nvim_create_augroup
 local create_command = vim.api.nvim_create_user_command
+
+------------------------------------------------------------------------------------------------------------------------
 
 vim.cmd [[
   " augroup _alpha
@@ -111,6 +113,8 @@ vim.cmd [[
 
 ]]
 
+------------------------------------------------------------------------------------------------------------------------
+
 -- Last Active Tab
 vim.cmd [[
   function! LastActiveTab()
@@ -194,6 +198,8 @@ vim.cmd [[
   " nmap <silent> <C-x> :call DoWindowSwap()<CR>
 ]]
 
+------------------------------------------------------------------------------------------------------------------------
+
 -- -- _toogle_neotree_cursor
 -- local toogle_neotree_cursor = augroup("_toogle_neotree_cursor", { clear = true })
 -- cmd({"BufEnter","Filetype"}, {
@@ -213,6 +219,8 @@ vim.cmd [[
 --   end,
 -- })
 
+------------------------------------------------------------------------------------------------------------------------
+
 -- _enable_terminal_insert_and_hide_terminal_statusline
 local hide_terminal_statusline = augroup("_enable_terminal_insert_and_hide_terminal_statusline", { clear = true })
 
@@ -222,7 +230,7 @@ local hide_terminal_statusline = augroup("_enable_terminal_insert_and_hide_termi
 --   command = "startinsert"
 -- })
 
-cmd({ "TermEnter", "TermOpen" }, {
+autocmd({ "TermEnter", "TermOpen" }, {
   group = hide_terminal_statusline,
   callback = function()
     -- require('lualine').hide()
@@ -240,7 +248,7 @@ cmd({ "TermEnter", "TermOpen" }, {
 -- })
 
 -- _autoclose_tab-terminal_if_last_window
-cmd({ "TermClose" }, {
+autocmd({ "TermClose" }, {
   group = hide_terminal_statusline,
   callback = function()
 
@@ -254,7 +262,7 @@ cmd({ "TermClose" }, {
       else
         -- if number of buffers of the current tab is equal to 1 (last window)
         if #vim.fn.getbufinfo({ buflisted = 1 }) == 1 then
-          -- M.FeedKeysCorrectly("<esc><esc>:close<cr>")
+          -- FeedKeysCorrectly("<esc><esc>:close<cr>")
           vim.cmd [[ call feedkeys("\<Esc>\<Esc>:close\<CR>") ]]
         end
       end
@@ -268,6 +276,8 @@ cmd({ "TermClose" }, {
     end
   end,
 })
+
+------------------------------------------------------------------------------------------------------------------------
 
 M.EnableAutoNoHighlightSearch = function()
   vim.on_key(function(char)
@@ -286,7 +296,16 @@ end
 
 M.EnableAutoNoHighlightSearch() -- autostart
 
-M.GoToParentIndent = function()
+------------------------------------------------------------------------------------------------------------------------
+
+_G.FeedKeysCorrectly = function(keys)
+  local feedableKeys = vim.api.nvim_replace_termcodes(keys, true, false, true)
+  vim.api.nvim_feedkeys(feedableKeys, "n", true)
+end
+
+------------------------------------------------------------------------------------------------------------------------
+
+_G.GoToParentIndent = function()
   local ok, start = require("indent_blankline.utils").get_current_context(
     vim.g.indent_blankline_context_patterns,
     vim.g.indent_blankline_use_treesitter_scope
@@ -297,41 +316,35 @@ M.GoToParentIndent = function()
   end
 end
 
-local My_count = 0
+------------------------------------------------------------------------------------------------------------------------
 
-M.GoToParentIndent_Repeat = function()
-  My_count = 0
-  vim.go.operatorfunc = "v:lua.GoToParentIndent_Callback"
-  return "g@l"
+function GotoTextObj_Callback()
+  FeedKeysCorrectly(vim.g.dotargs)
 end
 
-function GoToParentIndent_Callback()
-  My_count = My_count + 1
-  if My_count >= 2 then
-    vim.cmd [[ normal 0 ]]
-  end
-  M.GoToParentIndent()
-  -- print("Count: " .. My_count)
+_G.GotoTextObj = function(action)
+  vim.g.dotargs = action
+  vim.o.operatorfunc = 'v:lua.GotoTextObj_Callback'
+  return "g@"
 end
 
-M.FeedKeysCorrectly = function(keys)
-  local feedableKeys = vim.api.nvim_replace_termcodes(keys, true, false, true)
-  vim.api.nvim_feedkeys(feedableKeys, "n", true)
+------------------------------------------------------------------------------------------------------------------------
+
+function WhichKeyRepeat_Callback()
+  if vim.g.dotfirstcmd ~= nil then vim.cmd(vim.g.dotfirstcmd) end
+  if vim.g.dotsecondcmd ~= nil then vim.cmd(vim.g.dotsecondcmd) end
+  if vim.g.dotthirdcmd ~= nil then vim.cmd(vim.g.dotthirdcmd) end
 end
 
-function HorzIncrement()
-  vim.cmd [[ normal "zyan ]]
-  vim.cmd [[ execute "normal \<Plug>(textobj-numeral-N)" ]]
-  vim.cmd [[ normal van"zp ]]
-  M.FeedKeysCorrectly('<C-a>')
+_G.WhichkeyRepeat = function(firstcmd, secondcmd, thirdcmd)
+  vim.g.dotfirstcmd = firstcmd
+  vim.g.dotsecondcmd = secondcmd
+  vim.g.dotthirdcmd = thirdcmd
+  vim.o.operatorfunc = 'v:lua.WhichKeyRepeat_Callback'
+  vim.cmd.normal { "g@l", bang = true }
 end
 
-function HorzDecrement()
-  vim.cmd [[ normal "zyan ]]
-  vim.cmd [[ execute "normal \<Plug>(textobj-numeral-N)" ]]
-  vim.cmd [[ normal van"zp ]]
-  M.FeedKeysCorrectly('<C-x>')
-end
+------------------------------------------------------------------------------------------------------------------------
 
 function ShowBufferline()
   require('bufferline').setup {
@@ -342,9 +355,9 @@ function ShowBufferline()
   }
 end
 
-create_command("IncrementHorz", HorzIncrement, {})
-create_command("DecrementHorz", HorzDecrement, {})
 create_command("BufferlineShow", ShowBufferline, {})
+
+------------------------------------------------------------------------------------------------------------------------
 
 -- -- _json_to_jsonc
 -- cmd({ "BufEnter", "BufWinEnter", "WinEnter" }, {

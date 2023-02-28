@@ -147,15 +147,15 @@ return require("packer").startup(function(use)
   -- use { "godlygeek/tabular", commit = "339091ac4dd1f17e225fe7d57b48aff55f99b23a" }
   -- use { 'nvim-treesitter/playground', commit = "1290fdf6f2f0189eb3b4ce8073d3fda6a3658376" }
   use { "paraduxos/vim-indent-object", branch = "new_branch", commit = "2408bf0d2d54f70e6cd9cfcb558bd43283bf5003" }
-  use { "echasnovski/mini.nvim", commit = "81a575e0c51d4607bf6690f12906c7590d961717" }
+  use { "echasnovski/mini.nvim", commit = "c65901227e5a3671dbcb054745566a1c78f9f0c8" }
   use { "kana/vim-textobj-user", commit = "41a675ddbeefd6a93664a4dc52f302fe3086a933" }
   use { "saihoooooooo/vim-textobj-space", commit = "d4dc141aad3ad973a0509956ce753dfd0fc87114" }
-  use { "tkhren/vim-textobj-numeral", commit = "264883112b4a34fdd81b29d880f04f3f6437814d" }
-  use { "nvim-treesitter/nvim-treesitter", commit = "44289d817e7ec9df9bbe874ebe24a96375d59e16" }
-  use { "nvim-treesitter/nvim-treesitter-textobjects", commit = "13edf91f47c91b390bb00e1df2f7cc1ca250af3a" }
+  use { "nvim-treesitter/nvim-treesitter", commit = "252c1011c4bae91d25a8c54be4ed1a7b341c088c" }
+  use { "nvim-treesitter/nvim-treesitter-textobjects", commit = "4b30081d2736e09f90c890a8a7adfe4df36f5b36" }
   use { "RRethy/nvim-treesitter-textsubjects", commit = "bc047b20768845fd54340eb76272b2cf2f6fa3f3" }
   use { "coderifous/textobj-word-column.vim", commit = "cb40e1459817a7fa23741ff6df05e4481bde5a33" }
   use { "mg979/vim-visual-multi", commit = "724bd53adfbaf32e129b001658b45d4c5c29ca1a" }
+  use { "svermeulen/vim-easyclip", commit = "f1a3b95463402b30dd1e22dae7d0b6ea858db2df" }
   use {
     "chrisgrieser/nvim-various-textobjs",
     commit = "7915b4567dbf3542652e3ada6f9660bfa81d94f7",

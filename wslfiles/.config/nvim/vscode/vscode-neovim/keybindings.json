@@ -51,24 +51,14 @@
     },
     {
         "key": "Down",
-        "command": "vim.remap",
-        "args": {
-            "commands": [
-                { "command": "list.focusDown" },
-                { "command": "filesExplorer.openFilePreserveFocus" },
-            ]
-        },
+        "command": "vscode-neovim.send",
+        "args": "<Cmd>lua vim.cmd [[ call VSCodeNotify('list.focusDown') ]] vim.cmd [[ call VSCodeNotify('filesExplorer.openFilePreserveFocus') ]]<CR>",
         "when": "listFocus && !inputFocus"
     },
     {
         "key": "Up",
-        "command": "vim.remap",
-        "args": {
-            "commands": [
-                { "command": "list.focusUp" },
-                { "command": "filesExplorer.openFilePreserveFocus" },
-            ]
-        },
+        "command": "vscode-neovim.send",
+        "args": "<Cmd>lua vim.cmd [[ call VSCodeNotify('list.focusUp') ]] vim.cmd [[ call VSCodeNotify('filesExplorer.openFilePreserveFocus') ]]<CR>",
         "when": "listFocus && !inputFocus"
     },
     {
@@ -83,41 +73,16 @@
     },
     {
         "key": "shift+j",
-        "command": "vim.remap",
-        "args": {
-            "commands": [
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-                { "command": "list.focusDown" },
-            ]
-        },
-        "when": "listFocus && !inputFocus"
+        "command": "vscode-neovim.send",
+        "args": "<Cmd>lua for i = 1,10 do vim.cmd [[ call VSCodeNotify('list.focusDown') ]] end <CR>",
+        "when": "listFocus && !inputFocus",
     },
     {
         "key": "shift+k",
-        "command": "vim.remap",
-        "args": {
-            "commands": [
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-                { "command": "list.focusUp" },
-            ]
-        },
-        "when": "listFocus && !inputFocus"
+        "command": "vscode-neovim.send",
+        "args": "<Cmd>lua for i = 1,10 do vim.cmd [[ call VSCodeNotify('list.focusUp') ]] end <CR>",
+        "when": "listFocus && !inputFocus",
+
     },
     {
         "key": "shift+l",
@@ -127,13 +92,8 @@
     },
     {
         "key": "l",
-        "command": "vim.remap",
-        "args": {
-            "commands": [
-                { "command": "explorer.openAndPassFocus" },
-                { "command": "workbench.action.toggleSidebarVisibility" },
-            ]
-        },
+        "command": "vscode-neovim.send",
+        "args": "<Cmd>lua vim.cmd [[ call VSCodeNotify('explorer.openAndPassFocus') ]] vim.cmd [[ call VSCodeNotify('workbench.action.toggleSidebarVisibility') ]]<CR>",
         "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
     },
     {
@@ -143,13 +103,8 @@
     },
     {
         "key": "v",
-        "command": "vim.remap",
-        "args": {
-            "commands": [
-                { "command": "explorer.openToSide" },
-                { "command": "workbench.action.toggleSidebarVisibility" },
-            ]
-        },
+        "command": "vscode-neovim.send",
+        "args": "<Cmd>lua vim.cmd [[ call VSCodeNotify('explorer.openToSide') ]] vim.cmd [[ call VSCodeNotify('workbench.action.toggleSidebarVisibility') ]]<CR>",
         "when": "explorerViewletFocus && explorerViewletVisible && !inputFocus"
     },
     {
@@ -162,6 +117,11 @@
     {
         "key": "alt+space",
         "command": "whichkey.show",
+    },
+    {
+        "key": "space",
+        "command": "whichkey.show",
+        "when": "editorTextFocus && neovim.mode == normal",
     },
 
     // References Navigation
@@ -198,46 +158,48 @@
 
     // Escape Navigation
     {
+        "key": "j",
+        "command": "vscode-neovim.compositeEscape1",
+        "when": "neovim.mode == insert && editorTextFocus",
+        "args": "j"
+    },
+    {
+        "key": "k",
+        "command": "vscode-neovim.compositeEscape2",
+        "when": "neovim.mode == insert && editorTextFocus",
+        "args": "k"
+    },
+    {
         "key": "alt+h",
-        "command": "vim.remap",
-        "when": "inputFocus && vim.mode == 'Insert' || vim.mode == 'Visual' || vim.mode == 'VisualLine' || vim.mode == 'VisualBlock'",
-        "args": {
-            "after": [ "<esc>", "h" ]
-        }
+        "command": "vscode-neovim.send",
+        "args": "<esc>h",
+        "when": "inputFocus && neovim.mode == 'insert' || neovim.mode == 'visual' || neovim.mode == 'visualLine' || neovim.mode == 'visualBlock'",
     },
     {
         "key": "alt+j",
-        "command": "vim.remap",
-        "when": "inputFocus && !inQuickOpen && vim.mode == 'Insert' || vim.mode == 'Visual' || vim.mode == 'VisualLine' || vim.mode == 'VisualBlock'",
-        "args": {
-            "after": [ "<esc>", "j" ]
-        }
+        "command": "vscode-neovim.send",
+        "args": "<esc>j",
+        "when": "inputFocus && neovim.mode == 'insert' || neovim.mode == 'visual' || neovim.mode == 'visualLine' || neovim.mode == 'visualBlock'",
     },
     {
         "key": "alt+k",
-        "command": "vim.remap",
-        "when": "inputFocus && !inQuickOpen && vim.mode == 'Insert' || vim.mode == 'Visual' || vim.mode == 'VisualLine' || vim.mode == 'VisualBlock'",
-        "args": {
-            "after": [ "<esc>", "k" ]
-        }
+        "command": "vscode-neovim.send",
+        "args": "<esc>k",
+        "when": "inputFocus && neovim.mode == 'insert' || neovim.mode == 'visual' || neovim.mode == 'visualLine' || neovim.mode == 'visualBlock'",
     },
     {
         "key": "alt+l",
-        "command": "vim.remap",
-        "when": "inputFocus && vim.mode == 'Insert' || vim.mode == 'Visual' || vim.mode == 'VisualLine' || vim.mode == 'VisualBlock'",
-        "args": {
-            "after": [ "<esc>", "l" ]
-        }
+        "command": "vscode-neovim.send",
+        "args": "<esc>l",
+        "when": "inputFocus && neovim.mode == 'insert' || neovim.mode == 'visual' || neovim.mode == 'visualLine' || neovim.mode == 'visualBlock'",
     },
 
     // Buffer Navigation
     {
         "key": "alt+;",
-        "command": "vim.remap",
+        "command": "vscode-neovim.send",
+        "args": "<A-;>",
         "when": "!terminalFocus",
-        "args": {
-            "after": [ "<C-6>" ]
-        }
     },
     {
         "key": "alt+s",
@@ -319,31 +281,23 @@
     // Window Resize
     {
         "key": "alt+left",
-        "command": "vim.remap",
-        "args": {
-            "after": [ "<C-w>", "<" ]
-        }
-    },
-    {
-        "key": "alt+down",
-        "command": "vim.remap",
-        "args": {
-            "after": [ "<C-w>", "-" ]
-        }
-    },
-    {
-        "key": "alt+up",
-        "command": "vim.remap",
-        "args": {
-            "after": [ "<C-w>", "+" ]
-        }
+        "command": "workbench.action.decreaseViewSize",
+        "when": "neovim.mode != insert",
     },
     {
         "key": "alt+right",
-        "command": "vim.remap",
-        "args": {
-            "after": [ "<C-w>", ">" ]
-        }
+        "command": "workbench.action.increaseViewSize",
+        "when": "neovim.mode != insert",
+    },
+    {
+        "key": "alt+down",
+        "command": "vscode-neovim.send",
+        "args": "<C-w>-",
+    },
+    {
+        "key": "alt+up",
+        "command": "vscode-neovim.send",
+        "args": "<C-w>+",
     },
 
     // Terminal Resize
@@ -372,34 +326,34 @@
     {
         "key": "ctrl+h",
         "command": "workbench.action.navigateLeft",
-        "when": "vim.mode == 'Normal'",
+        "when": "neovim.mode == 'normal'",
     },
     {
         "key": "ctrl+j",
         "command": "workbench.action.navigateDown",
-        "when": "vim.mode == 'Normal'",
+        "when": "neovim.mode == 'normal'",
     },
     {
         "key": "ctrl+k",
         "command": "workbench.action.navigateUp",
-        "when": "vim.mode == 'Normal'",
+        "when": "neovim.mode == 'normal'",
     },
     {
         "key": "ctrl+l",
         "command": "workbench.action.navigateRight",
-        "when": "vim.mode == 'Normal'",
+        "when": "neovim.mode == 'normal'",
     },
 
-    // Toggle ParameterHints (vim.mode=='Normal' -> <C-p>:GoToFile, gH:triggerParameterHints)
+    // Toggle ParameterHints (neovim.mode=='Normal' -> <C-p>:GoToFile, gH:triggerParameterHints)
     {
         "key": "ctrl+p",
         "command": "editor.action.triggerParameterHints",
-        "when": "editorFocus && editorHasSignatureHelpProvider && vim.mode == 'Insert'"
+        "when": "editorFocus && editorHasSignatureHelpProvider && neovim.mode == 'insert'"
     },
     {
         "key": "ctrl+p",
         "command": "closeParameterHints",
-        "when": "editorFocus && parameterHintsVisible && vim.mode == 'Insert'"
+        "when": "editorFocus && parameterHintsVisible && neovim.mode == 'insert'"
     },
 
     // Tasks Runners
@@ -419,25 +373,25 @@
     // {
     //     "key": "ctrl+h",
     //     "command": "codeium.toggleEnable",
-    //     "when": "inlineSuggestionVisible && vim.mode == 'Insert'"
+    //     "when": "inlineSuggestionVisible && neovim.mode == 'insert'"
     // },
     {
         "key": "ctrl+j",
         // "command": "codeium.showNextCompletion",
         "command": "editor.action.inlineSuggest.showNext",
-        "when": "inlineSuggestionVisible && vim.mode == 'Insert'"
+        "when": "inlineSuggestionVisible && neovim.mode == 'insert'"
     },
     {
         "key": "ctrl+k",
         // "command": "codeium.showPreviousCompletion",
         "command": "editor.action.inlineSuggest.showPrevious",
-        "when": "inlineSuggestionVisible && vim.mode == 'Insert'"
+        "when": "inlineSuggestionVisible && neovim.mode == 'insert'"
     },
     {
         "key": "ctrl+l",
-        // "command": "codeium.acceptCompletion"
+        // "command": "codeium.acceptCompletion",
         "command": "editor.action.inlineSuggest.commit",
-        "when": "inlineSuggestionVisible && vim.mode == 'Insert'"
+        "when": "inlineSuggestionVisible && neovim.mode == 'insert'"
     },
     {
         "key": "alt+j",
@@ -499,26 +453,59 @@
         "when": "suggestWidgetVisible && textInputFocus"
     },
 
+    // VScode-neovim
+    {
+        "key": "alt+/",
+        "command": "vscode-neovim.send",
+        "when": "inputFocus && neovim.mode == 'visual' || neovim.mode == 'visualLine' || neovim.mode == 'visualBlock'",
+        "args": "<cmd>lua vim.fn.VSCodeNotifyVisual('editor.action.commentLine', false)<cr><esc>"
+    },
+    {
+        "key": "alt+/",
+        "command": "vscode-neovim.send",
+        "when": "inputFocus && neovim.mode == 'normal'",
+        "args": "<Cmd>call VSCodeNotify('editor.action.commentLine')<CR>"
+    },
+    {
+        "key": "ctrl+space",
+        "command": "vscode-neovim.send",
+        "when": "editorTextFocus && neovim.mode != insert",
+        "args": "<C-space>",
+    },
+    {
+        "key": "shift+q",
+        "command": "workbench.action.closeActiveEditor",
+        "when": "editorTextFocus && neovim.mode == normal",
+    },
+    {
+        "key": "shift+r",
+        "command": "vscode-neovim.send",
+        // "args": "<cmd>lua vim.fn.VSCodeCall('editor.action.format') vim.fn.VSCodeCall('workbench.action.files.save')<cr>",
+        "args": "<cmd>call VSCodeCall('editor.action.format')<cr><cmd>call VSCodeCall('workbench.action.files.save')<cr>",
+        "when": "editorTextFocus && neovim.mode == normal",
+    },
+
+
     // Buffer Navigation
     {
         "key": "tab",
         "command": "workbench.action.nextEditor",
-        "when": "!terminalFocus && !sideBarFocus && vim.mode == 'Normal' && editorFocus",
+        "when": "!terminalFocus && !sideBarFocus && neovim.mode == 'normal' && editorFocus",
     },
     {
         "key": "shift+tab",
         "command": "workbench.action.previousEditor",
-        "when": "!terminalFocus && !sideBarFocus && vim.mode == 'Normal' && editorFocus",
+        "when": "!terminalFocus && !sideBarFocus && neovim.mode == 'normal' && editorFocus",
     },
     {
         "key": "right",
         "command": "workbench.action.nextEditor",
-        "when": "!terminalFocus && !sideBarFocus && vim.mode == 'Normal' && editorFocus",
+        "when": "!terminalFocus && !sideBarFocus && neovim.mode == 'normal' && editorFocus",
     },
     {
         "key": "left",
         "command": "workbench.action.previousEditor",
-        "when": "!terminalFocus && !sideBarFocus && vim.mode == 'Normal' && editorFocus",
+        "when": "!terminalFocus && !sideBarFocus && neovim.mode == 'normal' && editorFocus",
     },
     {
         "key": "ctrl+tab",
@@ -579,5 +566,10 @@
         "key": "tab",
         "command": "-editor.action.inlineSuggest.commit",
         "when": "inlineSuggestionVisible && tabnine.tab-override && !editorTabMovesFocus"
+    },
+    {
+        "key": "tab",
+        "command": "-editor.action.inlineSuggest.commit",
+        "when": "editorFocus && inlineSuggestionVisible && !editorReadonly"
     },
 ]

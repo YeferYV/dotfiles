@@ -194,16 +194,20 @@ local mappings = {
 
   d = {
     name = "Debugger",
-    b = { "<cmd>lua require'dap'.toggle_breakpoint()<cr>", "Toggle Breakpoint" },
-    c = { "<cmd>lua require'dap'.continue()<cr>", "Continue" },
-    i = { "<cmd>lua require'dap'.step_into()<cr>", "Step Into" },
-    o = { "<cmd>lua require'dap'.step_over()<cr>", "Step Over" },
-    O = { "<cmd>lua require'dap'.step_out()<cr>", "Step Out" },
-    l = { "<cmd>lua require'dap'.run_last()<cr>", "Run last" },
-    s = { "<cmd>lua require'dapui'.toggle()<cr>", "Start/Toggle Dapui" },
-    S = { "<cmd>lua require'dap'.terminate()<cr>", "Stop" },
-    t = { "<cmd>lua require'dap'.repl.toggle()<cr>", "Toggle Repl" },
-
+    b = { function() WhichkeyRepeat("lua require'dap'.toggle_breakpoint()") end, "Toggle Breakpoint" },
+    B = { function() WhichkeyRepeat("lua require'dap'.clear_breakpoints()") end, "Clear Breakpoints" },
+    c = { function() WhichkeyRepeat("lua require'dap'.continue()") end, "Start/Continue" },
+    h = { function() WhichkeyRepeat("lua require'dap.ui.widgets'.hover()") end, "Debugger Hover" },
+    i = { function() WhichkeyRepeat("lua require'dap'.step_into()") end, "Step Into" },
+    l = { function() WhichkeyRepeat("lua require'dap'.run_last()") end, "Run last" },
+    o = { function() WhichkeyRepeat("lua require'dap'.step_over()") end, "Step Over" },
+    O = { function() WhichkeyRepeat("lua require'dap'.step_out()") end, "Step Out" },
+    q = { function() require 'dap'.close() end, "Close Session" },
+    Q = { function() require 'dap'.terminate() end, "Terminate Session" },
+    p = { function() WhichkeyRepeat("lua require'dap'.pause()") end, "Pause" },
+    r = { function() WhichkeyRepeat("lua require'dap'.restart_frame()") end, "Restart" },
+    R = { function() WhichkeyRepeat("lua require'dap'.repl.toggle()") end, "Toggle REPL" },
+    u = { function() WhichkeyRepeat("lua require'dapui'.toggle()") end, "Toggle Debugger UI" },
   },
 
   ["f"] = {
@@ -219,6 +223,7 @@ local mappings = {
   ["h"] = { "<cmd>noh<cr>", "NoHighlight" },
   ["e"] = { "<cmd>lua _G.neotree_blend=false<cr><cmd>Neotree toggle left<cr>", "Neotree Toggle" },
   ["o"] = { "<cmd>lua _G.neotree_blend=true<cr><cmd>Neotree focus<cr>", "Neotree focus" },
+  ["."] = { "<cmd>Telescope resume<cr>", "Telescope resume" },
   ["q"] = {
     function()
       _G.neotree_blend = true
@@ -240,43 +245,43 @@ local mappings = {
     },
     G = { function() _LAZYGIT_FLOAT_TOGGLE() end, "Float Lazygit" },
     L = { "<cmd>terminal lazygit<cr><cmd>set ft=tab-terminal<cr>", "Buffer Lazygit" },
-    j = { "<cmd>lua require 'gitsigns'.next_hunk()<cr>", "Next Hunk" },
-    k = { "<cmd>lua require 'gitsigns'.prev_hunk()<cr>", "Prev Hunk" },
-    l = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", "Blame" },
-    p = { "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", "Preview Hunk" },
-    r = { "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", "Reset Hunk" },
-    R = { "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", "Reset Buffer" },
-    s = { "<cmd>lua require 'gitsigns'.stage_hunk()<cr>", "Stage Hunk" },
-    u = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", "Undo Stage Hunk", },
+    j = { function() WhichkeyRepeat("lua require 'gitsigns'.next_hunk()") end, "Next Hunk" },
+    k = { function() WhichkeyRepeat("lua require 'gitsigns'.prev_hunk()") end, "Prev Hunk" },
+    l = { function() WhichkeyRepeat("lua require 'gitsigns'.blame_line()") end, "Blame" },
+    p = { function() WhichkeyRepeat("lua require 'gitsigns'.preview_hunk()") end, "Preview Hunk" },
+    r = { function() WhichkeyRepeat("lua require 'gitsigns'.reset_hunk()") end, "Reset Hunk" },
+    R = { function() WhichkeyRepeat("lua require 'gitsigns'.reset_buffer()") end, "Reset Buffer" },
+    s = { function() WhichkeyRepeat("lua require 'gitsigns'.stage_hunk()") end, "Stage Hunk" },
+    u = { function() WhichkeyRepeat("lua require 'gitsigns'.undo_stage_hunk()") end, "Undo Stage Hunk" },
+    d = { function() WhichkeyRepeat("Gitsigns diffthis HEAD") end, "Diff", },
     o = { "<cmd>Telescope git_status initial_mode=normal<cr>", "Open Changed File" },
     b = { "<cmd>Telescope git_branches initial_mode=normal<cr>", "Checkout Branch" },
     c = { "<cmd>Telescope git_commits initial_mode=normal<cr>", "Checkout Commit" },
-    d = { "<cmd>Gitsigns diffthis HEAD<cr>", "Diff", },
   },
 
   l = {
     name = "LSP",
-    A = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
+    A = { function() WhichkeyRepeat("lua vim.lsp.buf.code_action()") end, "Code Action" },
     c = { "<cmd>Telescope lsp_incoming_calls initial_mode=normal<cr>", "Telescope incoming calls" },
     C = { "<cmd>Telescope lsp_outgoing_calls initial_mode=normal<cr>", "Telescope outgoing calls" },
-    d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Go to Definition" },
-    D = { "<cmd>lua vim.lsp.buf.declaration()<cr>", "Go to Declaration" },
-    F = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
-    h = { "<cmd>lua vim.lsp.buf.hover()<cr>", "Hover" },
-    H = { "<cmd>lua vim.lsp.buf.signature_help()<cr>", "Signature Help" },
-    I = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Go to Implementation" },
-    L = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens in current line" },
-    n = { "<cmd>lua vim.diagnostic.goto_next()<CR>", "Next Diagnostic", },
-    o = { "<cmd>lua vim.diagnostic.open_float()<cr>", "Errors" },
-    p = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic", },
-    q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "QuickFix LocList" },
+    d = { function() WhichkeyRepeat("lua vim.lsp.buf.definition()") end, "Goto Definition" },
+    D = { function() WhichkeyRepeat("lua vim.lsp.buf.declaration()") end, "Goto Declaration" },
+    F = { function() WhichkeyRepeat("lua vim.lsp.buf.format()") end, "Format" },
+    h = { function() WhichkeyRepeat("lua vim.lsp.buf.hover()") end, "Hover" },
+    H = { function() WhichkeyRepeat("lua vim.lsp.buf.signature_help()") end, "Signature" },
+    I = { function() WhichkeyRepeat("lua vim.lsp.buf.implementation()") end, "Goto Implementation" },
+    L = { function() WhichkeyRepeat("lua vim.lsp.codelens.run()") end, "CodeLens" },
+    n = { function() WhichkeyRepeat("lua vim.diagnostic.goto_next()") end, "Next Diagnostic", },
+    o = { function() WhichkeyRepeat("lua vim.diagnostic.open_float()") end, "Open Diagnostic" },
+    p = { function() WhichkeyRepeat("lua vim.diagnostic.goto_prev()") end, "Prev Diagnostic", },
+    q = { function() WhichkeyRepeat("lua vim.diagnostic.setloclist()") end, "Diagnostic List" },
     Q = { "<cmd>Telescope loclist initial_mode=normal<cr>", "Telescope QuickFix LocList" },
-    r = { "<cmd>lua vim.lsp.buf.references()<cr>", "Go to References" },
-    R = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+    r = { function() WhichkeyRepeat("lua vim.lsp.buf.references()") end, "References" },
+    R = { function() WhichkeyRepeat("lua vim.lsp.buf.rename()") end, "Rename" },
     s = { "<cmd>Telescope lsp_document_symbols<cr>", "Telescope Document Symbols" },
     S = { "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", "Telescope Dynamic Workspace Symbols", },
     T = { "<cmd>Telescope lsp_workspace_symbols<cr>", "Telescope Workspace Symbols", },
-    t = { "<cmd>lua vim.lsp.buf.type_definition()<cr>", "Go to Typedefinition" },
+    t = { function() WhichkeyRepeat("lua vim.lsp.buf.type_definition()") end, "Goto TypeDefinition" },
     v = { "<cmd>Telescope diagnostics<cr>", "Telescope View Diagnostics", },
     V = { "<cmd>Telescope lsp_references initial_mode=normal<cr>", "Telescope View References" },
     w = { "<cmd>Telescope lsp_implementations initial_mode=normal<cr>", "Telescope View Implementations" },
@@ -287,34 +292,34 @@ local mappings = {
 
   p = {
     name = "Peek LspSaga",
-    a = { "<cmd>Lspsaga code_action<cr>", "Code Action" },
-    b = { "<cmd>Lspsaga show_buf_diagnostics<cr>", "Show Buf Diagnostics" },
-    c = { "<cmd>Lspsaga incoming_calls<cr>", "Incomming Calls" },
-    C = { "<cmd>Lspsaga outgoing_calls<cr>", "outgoing Calls" },
-    d = { "<cmd>Lspsaga peek_definition<cr>", "Peek Definition" },
-    D = { "<cmd>Lspsaga goto_definition<cr>", "Peek Definition" },
-    f = { "<cmd>Lspsaga lsp_finder<cr>", "Finder" },
-    h = { "<cmd>Lspsaga hover_doc<cr>", "Hover" },
-    n = { "<cmd>Lspsaga diagnostic_jump_next<cr>", "Next Diagnostics" },
+    a = { function() WhichkeyRepeat("Lspsaga code_action") end, "Code Action" },
+    b = { function() WhichkeyRepeat("Lspsaga show_buf_diagnostics") end, "Show Buf Diagnostics" },
+    c = { function() WhichkeyRepeat("Lspsaga incoming_calls") end, "Incomming Calls" },
+    C = { function() WhichkeyRepeat("Lspsaga outgoing_calls") end, "outgoing Calls" },
+    d = { function() WhichkeyRepeat("Lspsaga peek_definition") end, "Peek Definition" },
+    D = { function() WhichkeyRepeat("Lspsaga goto_definition") end, "Peek Definition" },
+    f = { function() WhichkeyRepeat("Lspsaga lsp_finder") end, "Finder" },
+    h = { function() WhichkeyRepeat("Lspsaga hover_doc") end, "Hover" },
+    n = { function() WhichkeyRepeat("Lspsaga diagnostic_jump_next") end, "Next Diagnostics" },
     N = {
       function()
-        require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR })
+        WhichkeyRepeat('require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR })')
       end,
       "Next Error"
     },
-    o = { "<cmd>Lspsaga show_line_diagnostics<cr>", "Show Line Diagnostics" },
-    O = { "<cmd>Lspsaga show_cursor_diagnostics<cr>", "Show Cursor Diagnostics" },
-    p = { "<cmd>Lspsaga diagnostic_jump_prev<cr>", "Prev Diagnostics" },
+    o = { function() WhichkeyRepeat("Lspsaga show_line_diagnostics") end, "Show Line Diagnostics" },
+    O = { function() WhichkeyRepeat("Lspsaga show_cursor_diagnostics") end, "Show Cursor Diagnostics" },
+    p = { function() WhichkeyRepeat("Lspsaga diagnostic_jump_prev") end, "Prev Diagnostics" },
     P = {
       function()
-        require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR })
+        WhichkeyRepeat('require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR })')
       end,
       "Prev Error"
     },
-    r = { "<cmd>Lspsaga term_toggle ranger<cr>", "Ranger" },
-    R = { "<cmd>Lspsaga rename<cr>", "Rename" },
-    t = { "<cmd>Lspsaga term_toggle<cr>", "Toggle Terminal" },
-    z = { "<cmd>Lspsaga outline<cr>", "Toggle outline" },
+    r = { function() WhichkeyRepeat("Lspsaga term_toggle ranger") end, "Ranger" },
+    R = { function() WhichkeyRepeat("Lspsaga rename") end, "Rename" },
+    t = { function() WhichkeyRepeat("Lspsaga term_toggle") end, "Toggle Terminal" },
+    z = { function() WhichkeyRepeat("Lspsaga outline") end, "Toggle outline" },
   },
 
   P = {
@@ -575,12 +580,20 @@ local mappings = {
     },
     -- u = {
     --   function()
-    --     require("user.autocommands").GoToParentIndent()
-    --     vim.call("repeat#set", "k uu")
+    --     GoToParentIndent()
+    --     vim.call("repeat#set", "0 uu")
     --   end,
     --   "Jump to current_context",
     -- },
-    u = { require("user.autocommands").GoToParentIndent_Repeat, "Jump to current_context", expr = true }, -- No "()" disables autorun at startup
+    u = {
+      function()
+        WhichkeyRepeat(
+          "normal! 0",
+          "lua GoToParentIndent()"
+        )
+      end,
+      "Jump to current_context",
+    },
     -- w = { "<cmd>set winbar=%@<cr>", "enable winbar" },
     -- W = { "<cmd>set winbar=  <cr>", "disable winbar" },
     [";"] = { ":clearjumps<cr>:normal m'<cr>", "Clear and Add jump" }, -- Reset JumpList
@@ -652,6 +665,66 @@ local mappings = {
 require('legendary').setup({ which_key = { auto_register = true } })
 which_key.setup(setup)
 which_key.register(mappings, opts)
+
+local mini_textobj = {
+  q = '@call',
+  Q = '@class',
+  g = '@comment',
+  G = '@conditional',
+  B = '@block',
+  F = '@function',
+  L = '@loop',
+  P = '@parameter',
+  R = '@return',
+  ["="] = '@assignment.side',
+  ["+"] = '@assignment.whole',
+  ['a'] = 'Function Parameters',
+  ['A'] = 'Whole Buffer',
+  ['b'] = 'Alias )]}',
+  ['f'] = 'Function Definition',
+  ['k'] = 'Key',
+  ['n'] = 'Number',
+  ['p'] = 'Paragraph',
+  ['s'] = 'Sentence',
+  ['t'] = 'Tag',
+  ['u'] = 'Alias "\'`',
+  ['v'] = 'Value',
+  ['w'] = 'Word',
+  ['x'] = 'Hex',
+  ['?'] = 'Prompt',
+  ['('] = 'Same as )',
+  ['['] = 'Same as ]',
+  ['{'] = 'Same as }',
+  ['<'] = 'Same as >',
+  ['"'] = 'punctuations...',
+  ["'"] = 'punctuations...',
+  ["`"] = 'punctuations...',
+  ['.'] = 'punctuations...',
+  [','] = 'punctuations...',
+  [';'] = 'punctuations...',
+  ['-'] = 'punctuations...',
+  ['_'] = 'punctuations...',
+  ['/'] = 'punctuations...',
+  ['|'] = 'punctuations...',
+  ['&'] = 'punctuations...',
+  -- `!@#$%^&*()_+-=[]{};'\:"|,./<>?
+}
+
+which_key.register({
+  mode = { "o", "x" },
+  ["i"] = mini_textobj,
+  ["il"] = { name = "+Last", mini_textobj },
+  ["iN"] = { name = "+Next", mini_textobj },
+  ["a"] = mini_textobj,
+  ["al"] = { name = "+Last", mini_textobj },
+  ["aN"] = { name = "+Next", mini_textobj },
+})
+
+which_key.register({
+  mode = { "n" },
+  ["g["] = vim.tbl_extend("force", { name = "+Cursor to Left Around" }, mini_textobj),
+  ["g]"] = vim.tbl_extend("force", { name = "+Cursor to Rigth Around" }, mini_textobj),
+})
 
 -- Disable some operators (like v)
 -- make sure to run this code before calling setup()
