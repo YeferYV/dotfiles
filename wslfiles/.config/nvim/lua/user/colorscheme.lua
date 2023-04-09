@@ -6,10 +6,10 @@ local colorscheme = "tokyonight-night"
 vim.api.nvim_create_autocmd("ColorScheme", {
   pattern = "*",
   callback = function()
-
     local hl_groups = {
       "EndOfBuffer",
       "FloatBorder",
+      "FoldColumn",
       "MsgArea",
       "NeoTreeNormal",
       "NeoTreeNormalNC",
@@ -45,6 +45,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
       BufferLineTabSelected       = { fg = "#80a0ff" },
       BufferLineTab               = { fg = "#5c5c5c" },
       CursorLine                  = { bg = "#0c0c0c" },
+      Folded                      = { bg = '#0c0c0c' },
       LspSagaWinbarKey            = { fg = '#495466' },
       LspSagaWinbarSep            = { fg = '#495466' },
       LspSagaWinbarEnum           = { fg = '#495466' },
@@ -87,6 +88,8 @@ vim.api.nvim_create_autocmd("ColorScheme", {
       NeoTreeGitStaged            = { fg = "#495466" },
       NeoTreeRootName             = { fg = "#7aa2f7" },
       NeoTreeTabActive            = { fg = "#c0caf5" },
+      SagaWinbarSep               = { fg = "#495466" },
+      SagaWinbarFilename          = { fg = "#495466" },
       SagaNormal                  = { fg = "NONE", bg = "NONE" },
       TerminalNormal              = { fg = "NONE", bg = "NONE" },
       Normal                      = { fg = "NONE", bg = "NONE" },
@@ -117,6 +120,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
           ["@keyword"]               = { fg = "#9d7cd8", italic = false },
           ["@keyword.function"]      = { fg = "#6e51a2" },
           ["@field"]                 = { fg = "#7aa2f7" },
+          ["@property"]              = { fg = "#7aa2f7" },
           ["@string"]                = { fg = "#73daca" },
           ["@boolean"]               = { fg = "#1cff1c" },
           ["@number"]                = { fg = "#1cff1c" },
@@ -178,7 +182,8 @@ vim.api.nvim_create_autocmd("ColorScheme", {
         }
       },
       poimandres = {
-        custom_colorscheme = { -- a table of overrides/changes to the poimandres theme
+        custom_colorscheme = {
+          -- a table of overrides/changes to the poimandres theme
           ["@punctuation"]           = { fg = "#e8e8e8" },
           ["@punctuation.bracket"]   = { fg = "#515171" },
           ["@punctuation.delimiter"] = { fg = "#e8e8e8" },
@@ -188,7 +193,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
           ["@tag.delimiter"]         = { fg = "#515171" },
           ["@constructor"]           = { fg = "#5de4c7" },
           ["@comment"]               = { fg = "#3e4041" },
-          ["Comment"]                = { fg = "#a6accd" },
+          ["Comment"]                = { fg = "#3e4041" },
           ["Visual"]                 = { bg = "#1c1c1c" },
           GitSignsAdd                = { fg = "#1abc9c" },
           GitSignsChange             = { fg = "#3c3cff" },
@@ -230,7 +235,6 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 
     local selected_colorscheme = custom_themes[vim.g.colors_name]
     if selected_colorscheme then
-
       -- setting custom_colorscheme
       for group, conf in pairs(selected_colorscheme.custom_colorscheme) do
         vim.api.nvim_set_hl(0, group, conf)
@@ -240,14 +244,14 @@ vim.api.nvim_create_autocmd("ColorScheme", {
       for group, conf in pairs(selected_colorscheme.custom_terminal_colors) do
         vim.g[group] = conf
       end
-
     end
+
+    -- DevIcons background
+    -- vim.cmd [[ for hl in getcompletion('BufferLineDevIcon', 'highlight') | execute 'hi '.hl.' guibg=#00ff00' | endfor ]]
   end,
 })
 
-vim.opt.fillchars = "eob: "
-
 local status_ok, _ = pcall(vim.cmd.colorscheme, colorscheme)
 if not status_ok then
-  vim.cmd[[ colorscheme leet ]]
+  vim.cmd [[ colorscheme leet ]]
 end

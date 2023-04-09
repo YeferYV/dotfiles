@@ -324,15 +324,15 @@ local mappings = {
 
   P = {
     name = "Packages",
-    ["c"] = { "<cmd>PackerCompile<cr>", "Packer Compile" },
-    ["C"] = { "<cmd>PackerClean<cr>", "Packer Clean" },
-    ["i"] = { "<cmd>PackerInstall<cr>", "Packer Install" },
-    ["I"] = { "<cmd>Mason<cr>", "Mason Installer" },
+    ["C"] = { "<cmd>Lazy clean<cr>", "Lazy Clean" },
+    ["i"] = { "<cmd>Lazy install<cr>", "Lazy Install" },
+    ["m"] = { "<cmd>Mason<cr>", "Mason Installer" },
     ["L"] = { "<cmd>LspInfo<cr>", "Lsp Info" },
     ["N"] = { "<cmd>NullLsInfo<cr>", "NullLs Info" },
-    ["s"] = { "<cmd>PackerSync<cr>", "Packer Sync" },
-    ["S"] = { "<cmd>PackerStatus<cr>", "Packer Status" },
-    ["u"] = { "<cmd>PackerUpdate<cr>", "Packer Update" },
+    ["P"] = { "<cmd>Lazy profile<cr>", "Lazy Profile" },
+    ["s"] = { "<cmd>Lazy<cr>", "Lazy Status" },
+    ["S"] = { "<cmd>Lazy sync<cr>", "Lazy Sync" },
+    ["U"] = { "<cmd>Lazy update<cr>", "Lazy Update" },
   },
 
   s = {
@@ -457,12 +457,26 @@ local mappings = {
     V = { "<cmd>vsplit +te | vertical resize 80 | setlocal ft=vs-terminal<cr>", "Vertical terminal" },
     h = { "<cmd>ToggleTerm direction=horizontal size=10<cr>", "Horizontal ToggleTerm" },
     v = { "<cmd>ToggleTerm direction=vertical   size=80<cr>", "Vertical ToggleTerm" },
+    ["1h"] = { "<cmd>1ToggleTerm direction=vertical   <cr>", "Toggle first horizontal ToggleTerm" },
+    ["1v"] = { "<cmd>1ToggleTerm direction=horizontal <cr>", "Toggle first vertical ToggleTerm" },
     ["2h"] = { "<cmd>2ToggleTerm direction=vertical   <cr>", "Toggle second horizontal ToggleTerm" },
     ["2v"] = { "<cmd>2ToggleTerm direction=horizontal <cr>", "Toggle second vertical ToggleTerm" },
     ["3h"] = { "<cmd>3ToggleTerm direction=vertical   <cr>", "Toggle third horizontal ToggleTerm" },
     ["3v"] = { "<cmd>3ToggleTerm direction=horizontal <cr>", "Toggle third vertical ToggleTerm" },
     ["4h"] = { "<cmd>4ToggleTerm direction=vertical   <cr>", "Toggle fourth horizontal ToggleTerm" },
     ["4v"] = { "<cmd>4ToggleTerm direction=horizontal <cr>", "Toggle fourth vertical ToggleTerm" },
+    ["5h"] = { "<cmd>5ToggleTerm direction=vertical   <cr>", "Toggle fifth horizontal ToggleTerm" },
+    ["5v"] = { "<cmd>5ToggleTerm direction=horizontal <cr>", "Toggle fifth vertical ToggleTerm" },
+    ["6h"] = { "<cmd>6ToggleTerm direction=vertical   <cr>", "Toggle sixth horizontal ToggleTerm" },
+    ["6v"] = { "<cmd>6ToggleTerm direction=horizontal <cr>", "Toggle sixth vertical ToggleTerm" },
+    ["7h"] = { "<cmd>7ToggleTerm direction=vertical   <cr>", "Toggle seventh horizontal ToggleTerm" },
+    ["7v"] = { "<cmd>7ToggleTerm direction=horizontal <cr>", "Toggle seventh vertical ToggleTerm" },
+    ["8h"] = { "<cmd>8ToggleTerm direction=vertical   <cr>", "Toggle eighth horizontal ToggleTerm" },
+    ["8v"] = { "<cmd>8ToggleTerm direction=horizontal <cr>", "Toggle eighth vertical ToggleTerm" },
+    ["9h"] = { "<cmd>9ToggleTerm direction=vertical   <cr>", "Toggle ninth horizontal ToggleTerm" },
+    ["9v"] = { "<cmd>9ToggleTerm direction=horizontal <cr>", "Toggle ninth vertical ToggleTerm" },
+    ["0h"] = { "<cmd>0ToggleTerm direction=vertical   <cr>", "Toggle tenth horizontal ToggleTerm" },
+    ["0v"] = { "<cmd>0ToggleTerm direction=horizontal <cr>", "Toggle tenth vertical ToggleTerm" },
   },
 
   u = {
@@ -655,6 +669,7 @@ local mappings = {
     ["s"] = { "<cmd>mkview<cr>", "save folds" },
     ["l"] = { "<cmd>loadview<cr>", "load folds" },
     ["p"] = { "zfip", "fold paragraph" },
+    ["P"] = { function() require("ufo").peekFoldedLinesUnderCursor() end, "peek FoldedLines" },
     ["}"] = { "zfa}", "fold curly-bracket block" },
     ["]"] = { "zfa]", "fold square-bracket block" },
     [")"] = { "zfa)", "fold parenthesis block" },
@@ -662,7 +677,18 @@ local mappings = {
   },
 }
 
-require('legendary').setup({ which_key = { auto_register = true } })
+-- require('legendary').setup({ which_key = { auto_register = true } })
+require('legendary').setup({
+  which_key = {
+    mappings = mappings,
+    opts = opts,
+    -- false if which-key.nvim handles binding them,
+    -- set to true if you want legendary.nvim to handle binding
+    -- the mappings; if not passed, true by default
+    do_binding = false,
+  },
+})
+
 which_key.setup(setup)
 which_key.register(mappings, opts)
 
@@ -718,6 +744,10 @@ which_key.register({
   ["a"] = mini_textobj,
   ["al"] = { name = "+Last", mini_textobj },
   ["aN"] = { name = "+Next", mini_textobj },
+  ["Q"] = { "Textsubjects Prev Selection" },
+  ["K"] = { "Textsubjects Smart" },
+  ["aK"] = { "Textsubjects Container Outer" },
+  ["iK"] = { "Textsubjects Container Inner" },
 })
 
 which_key.register({
