@@ -525,14 +525,13 @@ local mappings = {
     C = { "<cmd>ColorizerToggle<cr>", "Toggle Colorizer" },
     d = {
       function()
-        local function bool2str(bool) return bool and "on" or "off" end
-
         if vim.g.diagnostics_enabled then
+          vim.diagnostic.disable()
           vim.g.diagnostics_enabled = false
         else
+          vim.diagnostic.enable()
           vim.g.diagnostics_enabled = true
         end
-        vim.diagnostic.config(require("user.lsp.handlers").setup(bool2str(vim.g.diagnostics_enabled)))
       end,
       "Toggle Diagnostics"
     },
@@ -608,6 +607,20 @@ local mappings = {
       end,
       "Jump to current_context",
     },
+    v = {
+      function()
+        local function bool2str(bool) return bool and "on" or "off" end
+
+        if vim.g.diagnostics_enabled then
+          vim.g.diagnostics_enabled = false
+        else
+          vim.g.diagnostics_enabled = true
+        end
+
+        vim.diagnostic.config(require("user.lsp.handlers").setup(bool2str(vim.g.diagnostics_enabled)))
+      end,
+      "Toggle VirtualText"
+    },
     -- w = { "<cmd>set winbar=%@<cr>", "enable winbar" },
     -- W = { "<cmd>set winbar=  <cr>", "disable winbar" },
     [";"] = { ":clearjumps<cr>:normal m'<cr>", "Clear and Add jump" }, -- Reset JumpList
@@ -678,17 +691,6 @@ local mappings = {
 }
 
 -- require('legendary').setup({ which_key = { auto_register = true } })
-require('legendary').setup({
-  which_key = {
-    mappings = mappings,
-    opts = opts,
-    -- false if which-key.nvim handles binding them,
-    -- set to true if you want legendary.nvim to handle binding
-    -- the mappings; if not passed, true by default
-    do_binding = false,
-  },
-})
-
 which_key.setup(setup)
 which_key.register(mappings, opts)
 
@@ -704,6 +706,7 @@ local mini_textobj = {
   R = '@return',
   ["="] = '@assignment.side',
   ["+"] = '@assignment.whole',
+  ["*"] = '@number',
   ['a'] = 'Function Parameters',
   ['A'] = 'Whole Buffer',
   ['b'] = 'Alias )]}',

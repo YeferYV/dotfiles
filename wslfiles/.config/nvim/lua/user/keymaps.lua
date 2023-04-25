@@ -71,8 +71,8 @@ keymap("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
 keymap("x", "<A-k>", ":move '<-2<CR>gv-gv", opts)
 
 -- Replace all/visual_selected
-map({ "n" }, "<C-s>", ":%s//g<Left><Left>", { noremap = true, silent = false })
-map({ "x" }, "<C-s>", ":s//g<Left><Left>", { noremap = true, silent = false })
+map({ "n" }, "<C-s>", ":%s//g<Left><Left>", { noremap = true, silent = false, desc = "Replace in Buffer" })
+map({ "x" }, "<C-s>", ":s//g<Left><Left>", { noremap = true, silent = false, desc = "Replace in Visual_selected" })
 
 -- Intellisense
 -- map("i", "<A-h>", "<Plug>(copilot-dismiss)", { expr = true, silent = true })
@@ -83,6 +83,31 @@ map({ "x" }, "<C-s>", ":s//g<Left><Left>", { noremap = true, silent = false })
 map('i', '<A-j>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true, silent = true })
 map('i', '<A-k>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true, silent = true })
 map('i', '<A-l>', function() return vim.fn['codeium#Accept']() end, { expr = true, silent = true })
+
+keymap("i", "<C-e>", "<esc><C-e>a", opts)
+keymap("i", "<C-y>", "<esc><C-y>a", opts)
+keymap("i", "<C-n>", "<C-e>", opts) -- completes next line
+keymap("i", "<C-p>", "<C-y>", opts) -- completes previous line
+-- map('i', '<C-g>', function() vim.lsp.buf.signature_help() end, opts)
+-- map('i', '<C-g>', function() vim.lsp.buf.hover() end, opts)
+map('i', '<C-h>', function() require('lsp_signature').toggle_float_win() end, opts)
+
+map('i', '<C-v>', function()
+  if vim.g.diagnosticsEnabled == "on" or vim.g.diagnosticsEnabled == nil then
+    vim.g.diagnosticsEnabled = "off"
+    vim.diagnostic.config({ virtual_text = false })
+    vim.cmd [[
+      augroup _toggle_virtualtext_insertmode
+      autocmd InsertEnter * lua vim.diagnostic.config({ virtual_text = false })
+      autocmd InsertLeave * lua vim.diagnostic.config({ virtual_text = true })
+      augroup end
+    ]]
+  else
+    vim.g.diagnosticsEnabled = "on"
+    vim.diagnostic.config({ virtual_text = true })
+    vim.cmd [[ autocmd! _toggle_virtualtext_insertmode ]] -- remove the autocmd, `:autocmd _toggle_virtualtext_insertmode` to view it
+  end
+end, { silent = true, desc = "Toggle VirtualText (InsertMode Only)" })
 
 -- Quick Escape
 keymap("i", "jk", "<ESC>", opts)
@@ -234,6 +259,8 @@ map({ "o", "x" }, "gd", "<cmd>lua require('various-textobjs').diagnostic()<cr>",
   { silent = true, desc = "Diagnostic textobj" })
 map({ "o", "x" }, "gL", "<cmd>lua require('various-textobjs').nearEoL()<cr>",
   { silent = true, desc = "nearEoL textobj" })
+map({ "o", "x" }, "g_", "<cmd>lua require('various-textobjs').lineCharacterwise()<CR>",
+  { silent = true, desc = "lineCharacterwise textobj" })
 map({ "o", "x" }, "g|", "<cmd>lua require('various-textobjs').column()<cr>",
   { silent = true, desc = "ColumnDown textobj" })
 map({ "o", "x" }, "gr", "<cmd>lua require('various-textobjs').restOfParagraph()<cr>",
@@ -263,10 +290,18 @@ map({ "o", "x" }, "gu", "<cmd>lua require('various-textobjs').url()<cr>",
 -- map({ "o", "x" }, "aD", "<cmd>lua require('various-textobjs').doubleSquareBrackets(false)<cr>")
 -- map({ "o", "x" }, "iD", "<cmd>lua require('various-textobjs').doubleSquareBrackets(true)<cr>")
 
+map({ "o", "x" }, "am", "<cmd>lua require('various-textobjs').chainMember(false)<CR>",
+  { silent = true, desc = "inner chainMember textobj" })
+map({ "o", "x" }, "im", "<cmd>lua require('various-textobjs').chainMember(true)<CR>",
+  { silent = true, desc = "inner chainMember textobj" })
 map({ "o", "x" }, "aS", "<cmd>lua require('various-textobjs').subword(false)<cr>",
   { silent = true, desc = "outer Subword textobj" })
 map({ "o", "x" }, "iS", "<cmd>lua require('various-textobjs').subword(true)<cr>",
   { silent = true, desc = "inner Subword textobj" })
+map({ "o", "x" }, "az", "<cmd>lua require('various-textobjs').closedFold(false)<CR>",
+  { silent = true, desc = "outer ClosedFold textobj" })
+map({ "o", "x" }, "iz", "<cmd>lua require('various-textobjs').closedFold(true)<CR>",
+  { silent = true, desc = "inner ClosedFold textobj" })
 
 -- _nvim_various_textobjs: indentation textobj requires two parameters, first for
 -- exclusion of the starting border, second for the exclusion of ending border

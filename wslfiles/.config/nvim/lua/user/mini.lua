@@ -50,7 +50,7 @@ mini_ai.setup({
     R = spec_treesitter({ a = '@return.outer', i = '@return.inner', }),
     ["="] = spec_treesitter({ a = '@assignment.rhs', i = '@assignment.lhs', }),
     ["+"] = spec_treesitter({ a = '@assignment.outer', i = '@assignment.inner', }),
-    ["z"] = spec_treesitter({ a = '@number.outer', i = '@number.inner', }),
+    ["*"] = spec_treesitter({ a = '@number.outer', i = '@number.inner', }),
 
     -- Tweak argument textobject
     a = require('mini.ai').gen_spec.argument({ brackets = { '%b()' } }), -- brackets = { '%b()', '%b[]', '%b{}' },
@@ -197,13 +197,14 @@ require('mini.comment').setup({
   mappings = {
     -- Toggle comment (like `gcip` - comment inner paragraph) for both
     -- Normal and Visual modes
-    comment = '',
+    comment = 'gc',
 
     -- Toggle comment on current line
-    comment_line = '',
+    comment_line = 'gcc',
 
     -- Define 'comment' textobject (like `dgc` - delete whole comment block)
-    textobject = '',
+    -- Define 'comment' textobject (like `dgc` - delete whole comment block)
+    textobject = '', -- mapped as `gk` in keymaps.lua
   },
   -- Hook functions to be executed at certain stage of commenting
   hooks = {

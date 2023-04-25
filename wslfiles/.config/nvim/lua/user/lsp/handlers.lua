@@ -23,10 +23,11 @@ M.setup = function(diagnostic_status)
 
   local config = {
     off = {
-      underline = false,
+      underline = true,
+      -- virtual_text = { spacing = 4, prefix = "■" },
       virtual_text = false,
-      signs = false,
-      update_in_insert = false,
+      signs = true,
+      update_in_insert = true,
     },
     on = {
       virtual_text = true,
@@ -46,6 +47,10 @@ M.setup = function(diagnostic_status)
   }
 
   vim.diagnostic.config(config[diagnostic_status])
+
+  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+    border = "rounded",
+  })
 
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
     border = "rounded",

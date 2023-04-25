@@ -31,19 +31,29 @@ local opts = {
 local plugins = {
 
   -- Automation
-  { 'tpope/vim-commentary', event = "VeryLazy" },
+  -- { 'tpope/vim-commentary', event = "VeryLazy" },
   -- {
   --   "numToStr/Comment.nvim",
   --   commit = "5f01c1a89adafc52bf34e3bf690f80d9d726715d",
   --   config = true
   -- },
-  { "JoosepAlviste/nvim-ts-context-commentstring", event = "InsertEnter" },
+  { "JoosepAlviste/nvim-ts-context-commentstring", event = "VeryLazy" },
   {
     "windwp/nvim-autopairs", -- Autopairs, integrates with both cmp and treesitter
     event = "InsertEnter",
     config = function()
+
       require("nvim-autopairs").setup()
-      require("cmp").event:on("confirm_done", require("nvim-autopairs.completion.cmp").on_confirm_done())
+      -- require("cmp").event:on("confirm_done", require("nvim-autopairs.completion.cmp").on_confirm_done())
+
+      local ts_utils = require("nvim-treesitter.ts_utils")
+      require("cmp").event:on("confirm_done", function(evt)
+        local name = ts_utils.get_node_at_cursor():type()
+        if name ~= "named_imports" then
+          require("nvim-autopairs.completion.cmp").on_confirm_done()(evt)
+        end
+      end)
+
     end,
   },
   {
@@ -55,17 +65,10 @@ local plugins = {
   -- Bufferline/ScopeBuffer
   {
     "akinsho/bufferline.nvim",
+    lazy = false,
     tag = "v2.7.0", -- Icon bg color linked to selected buffer color #137
     dependencies = { { "tiagovla/scope.nvim", config = true } },
     config = function() require("user.bufferline") end
-  },
-
-  -- ColorSchemes
-  { 'olivercederborg/poimandres.nvim' },
-  { 'folke/tokyonight.nvim' },
-  {
-    "NvChad/nvim-colorizer.lua",
-    config = function() require("user.colorizer") end
   },
 
   -- cmp-plugins
@@ -83,6 +86,11 @@ local plugins = {
     },
     config = function() require("user.cmp") end
   },
+  {
+    "ray-x/lsp_signature.nvim",
+    event = { "InsertEnter" },
+    config = function() require "lsp_signature".on_attach({ hint_enable = false }) end
+  },
 
   -- DAP
   {
@@ -97,7 +105,6 @@ local plugins = {
     cmd = "Neotree",
     dependencies = {
       { "MunifTanjim/nui.nvim" },
-      { "akinsho/bufferline.nvim" },
       { "mrjones2014/smart-splits.nvim" },
     },
     config = function() require("user.neo-tree") end
@@ -107,12 +114,12 @@ local plugins = {
   -- { "github/copilot.vim" },
   -- { "tzachar/cmp-tabnine", build = "./install.ps1" },
   { "Exafunction/codeium.vim", event = "InsertEnter" },
-  {
-    "tzachar/cmp-tabnine",
-    build = "./install.sh",
-    event = "InsertEnter",
-    config = function() require("user.cmp-tabnine") end
-  },
+  -- {
+  --   "tzachar/cmp-tabnine",
+  --   build = "./install.sh",
+  --   event = "InsertEnter",
+  --   config = function() require("user.cmp-tabnine") end
+  -- },
 
   -- LSP
   { "neovim/nvim-lspconfig" }, -- enable LSP
@@ -131,9 +138,7 @@ local plugins = {
 
   -- Motions
   { "tpope/vim-repeat", event = "VeryLazy" },
-  { "machakann/vim-columnmove", event = "VeryLazy" },
   { "justinmk/vim-sneak", event = "VeryLazy" },
-  { "phaazon/hop.nvim", event = "VeryLazy", config = true },
 
   -- Status-Line
   { "nvim-lualine/lualine.nvim" },
@@ -163,7 +168,7 @@ local plugins = {
   { "svermeulen/vim-easyclip", event = "VeryLazy" },
   {
     "chrisgrieser/nvim-various-textobjs",
-    config = { useDefaultKeymaps = false, lookForwardLines = 30 },
+    config = { useDefaultKeymaps = false, lookForwardSmall = 30, lookForwardBig = 30 },
   },
   -- _surround_code_blocks
   -- { 'tpope/vim-surround' },
@@ -206,7 +211,9 @@ local plugins = {
   {
     "folke/which-key.nvim",
     dependencies = {
-      { "mrjones2014/legendary.nvim" },
+      -- { "mrjones2014/legendary.nvim" },
+      { "machakann/vim-columnmove" },
+      { "phaazon/hop.nvim", config = true },
     },
   },
   {
@@ -214,7 +221,26 @@ local plugins = {
     event = "LspAttach",
     config = function() require("user.aerial") end
   },
-  { "goolord/alpha-nvim" },
+  {
+    "goolord/alpha-nvim",
+    dependencies = {
+      {
+        "Shatur/neovim-session-manager",
+        config = { autoload_mode = "disabled" }
+      },
+      {
+        "NvChad/nvim-colorizer.lua",
+        config = function() require("user.colorizer") end
+      },
+      {
+        'olivercederborg/poimandres.nvim'
+      },
+      {
+        'folke/tokyonight.nvim'
+      },
+    }
+  },
+
   -- { "HUAHUAI23/telescope-session.nvim", config = function() require("telescope").load_extension("xray23") end },
   -- { "nvim-telescope/telescope-ui-select.nvim", config = function() require("telescope").load_extension("ui-select") end },
   {
@@ -226,10 +252,6 @@ local plugins = {
         select = { telescope = require('telescope.themes').get_dropdown { initial_mode = 'normal' } }
       }
     end
-  },
-  {
-    "Shatur/neovim-session-manager",
-    config = { autoload_mode = "disabled" }
   },
   {
     "lewis6991/gitsigns.nvim",
