@@ -14,9 +14,9 @@ super + {_,shift +,ctrl + }Return
 mod1 + {_,shift +,ctrl +,shift + ctrl +}Return
   { nixGL neovide, nixGL kitty, nixGL alacritty, cool-retro-term }
 
-# borderless window
+# toggle borderless window
 super + alt + b
-  borderless
+  borderless toggle
 
 # dunst close/reopen notification
 ctrl + {_,shift + }Return
@@ -201,8 +201,8 @@ super + alt + {_,shift + } n
 super + {_,shift + }n
   xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id); \
   { \
-	  xdotool getactivewindow windowsize 100% y; \
-	, xdotool getactivewindow windowsize 80% y windowmove 20% x; \
+	  borderless disable; xdotool getactivewindow windowsize 100% y windowmove 0% 0%; \
+	, borderless enable; xdotool getactivewindow windowsize 100% y windowmove 0% 0%; \
   }
 
 ########################################
