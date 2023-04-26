@@ -525,13 +525,6 @@
       "type": "bindings",
       "bindings": [
         {
-          "key": ";",
-          "name": "Refactor",
-          "type": "command",
-          "command": "editor.action.refactor",
-          "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
-        },
-        {
           "key": "A",
           "name": "Auto Fix",
           "type": "command",
@@ -686,6 +679,13 @@
           "name": "View Calls Hierarchy",
           "command": "references-view.showCallHierarchy",
           "when": "editorHasCallHierarchyProvider"
+        },
+        {
+          "key": "Z",
+          "name": "Refactor",
+          "type": "command",
+          "command": "editor.action.refactor",
+          "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
         }
       ]
     },
@@ -1747,5 +1747,8 @@
   "workbench.panel.defaultLocation": "right",
   "workbench.startupEditor": "none",
   "workbench.colorTheme": "Hacker",
+  "workbench.activityBar.visible": false,
+  "workbench.editor.enablePreview": false,
+  // "workbench.editor.showTabs": false,
   // "window.zoomLevel": -1,
 }
