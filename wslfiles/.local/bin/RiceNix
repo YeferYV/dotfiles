@@ -285,6 +285,14 @@ install_fonts() {
   cp -r fonts/NotoSerif/googlefonts "$HOME"/.local/share/fonts/NotoSerif/
   cd ..
 
+  # Noto CJK:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/notofonts/noto-cjk
+  cd noto-cjk
+  git sparse-checkout add google-fonts
+  mkdir /home/$USER/.local/share/fonts/NotoCJK
+  cp -r google-fonts /home/$USER/.local/share/fonts/NotoCJK/
+  cd ..
+
   # Noto Color-Emoji:
   git clone --depth=1 --filter=blob:none --sparse https://github.com/googlefonts/noto-emoji
   cd noto-emoji
@@ -424,10 +432,10 @@ install_configs () {
 
 }
 
-# neovim version v0.9.0 (appimage-run nvim.appimage on NIXOS) + wezterm version 20230408:
+# neovim version v0.9.1 (appimage-run nvim.appimage on NIXOS) + wezterm version 20230712:
 install_neovim_wezterm() {
-  curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.9.0/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
-  curl -Lo "$HOME"/.local/bin/wezterm https://github.com/wez/wezterm/releases/download/20230408-112425-69ae8472/WezTerm-20230408-112425-69ae8472-Ubuntu20.04.AppImage && chmod +x "$HOME"/.local/bin/wezterm
+  curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
+  curl -Lo "$HOME"/.local/bin/wezterm https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage && chmod +x "$HOME"/.local/bin/wezterm
 }
 
 # install neovim plugins  $(ulimit -n 4096):

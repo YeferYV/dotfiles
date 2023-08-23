@@ -28,7 +28,7 @@ local diagnostics = {
   symbols = { error = " ", warn = " " },
   colored = false,
   update_in_insert = false,
-  always_visible = true,
+  always_visible = false,
 }
 
 local diff = {
@@ -137,7 +137,7 @@ local neotree_status = {
   color = { fg = '#ff8800', gui = 'none' },
   function()
     if vim.bo.filetype == "neo-tree" then
-      return ''
+      return '󰉓'
     else
       return ''
     end
@@ -148,9 +148,9 @@ local toggleterm_status = {
   color = { fg = '#31B53E', gui = 'none' },
   function()
     if vim.bo.filetype == "sp-terminal" or vim.bo.filetype == "vs-terminal" then
-      return ''
+      return ''
     else
-      return ' ' .. vim.b.toggle_number
+      return ' ' .. vim.b.toggle_number
       -- return ' ' .. vim.b.toggle_number
       -- return ' ' .. vim.b.toggle_number
       -- return ' ' .. vim.b.toggle_number
@@ -202,8 +202,7 @@ lualine.setup({
     lualine_a = { branch },
     lualine_b = {},
     lualine_c = {},
-    lualine_x = { 'searchcount', show_macro_recording, 'diagnostics', treesitterIcon, lspServer, 'filetype', diff, spaces,
-      number_of_lines }, -- "encoding"
+    lualine_x = { 'searchcount', show_macro_recording, diagnostics, diff, treesitterIcon, lspServer, 'filetype',spaces, number_of_lines }, -- "encoding"
     lualine_y = { location },
     lualine_z = { progress },
   },

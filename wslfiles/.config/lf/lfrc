@@ -28,7 +28,11 @@ set cleaner ~/.config/lf/lf-wiki-previewer/lf_kitty_clean
 # set cleaner stpvimgclr
 # &stpvimg --listen $id
 # cmd on-quit $stpvimg --end $id
-set promptfmt "[1;90m%w "
+set cursoractivefmt  "\033[40m" # "\033[7m\033[30m\033[46m"
+set cursorparentfmt  "\033[40m" # "\033[7m\033[30m\033[46m"
+set cursorpreviewfmt "\033[40m" # "\033[7m\033[30m\033[46m"
+set mouse true
+set promptfmt        "[1;90m%w "
 set shell /bin/bash
 set scrolloff 50
 set ratios 1:2
@@ -297,6 +301,10 @@ cmd zip ${{
 }}
 
 # Bindings
+# map <m-1> ???
+map <m-2> :updir
+map <m-3> :open
+
 map <a-j> :down; redraw; &[[ $f =~ .png|.jpg ]] && (tput cup 1 55 && wezterm imgcat --width 50% $f) >/dev/tty &
 map <a-k> :up; redraw; &[[ $f =~ .png|.jpg ]] && (tput cup 1 55 && wezterm imgcat --width 50% $f) >/dev/tty &
 map <a-i> imgcat
@@ -327,10 +335,13 @@ map gdt   duplicateterm
 map gdl   duplicatelf
 map gdd   draganddrop
 map gfr   fzf_rg
-map gfk   fzf_preview "fzf_kit"
-map gfs   fzf_preview "fzf_six"
+map gfk   fzf_preview "./fmz-img/fzf_kit"
+map gfs   fzf_preview "./fmz-img/fzf_six"
+map gfu   $~/.config/lf/fmz-img/fzf_ub
+map gfi   $~/.config/lf/fmz-img/img 0 0 $(tput cols) $(tput lines) $f
+map gff   $~/.config/lf/fmz-img/fmz # yay -S stpv-git
 map gll   $lazygit
-map glk   $lf -remote "send $id select '$(KITTY_PID=1000 fzfp)'" #yay -S stpv-git
+map glk   $lf -remote "send $id select '$(KITTY_PID=1000 fzfp)'" # yay -S stpv-git
 map glu   $lf -remote "send $id select '$(~/.config/lf/fzfimg/fzfimg.sh)'" #https://github.com/seebye/ueberzug/blob/master/examples/fzfimg.sh
 map glw   $lf -remote "send $id select '$(fzf --bind='alt-p:execute-silent((tput cup 2 $(($COLUMNS/2)); wezterm imgcat --width $(($COLUMNS/2)) {})>/dev/tty)')'"
 map glc   $lf -remote "send $id cd $(awk '{ gsub(/#.*/, ""); } !/^$/ { print $2 }' $HOME/.config/shell/bm-dirs | fzf | sed "s/\${.*-// ; s/}//" | envsubst)"
