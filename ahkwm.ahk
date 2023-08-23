@@ -51,15 +51,20 @@ Browser_Back::
     return
 
 #q::SendInput {LAlt down}{F4}{LAlt up}                          ;close_window
+#x::SendInput {LAlt down}{F4}{LAlt up}                          ;close_window
 #a::SendInput {LCtrl down}{Esc}{LCtrl up}                       ;cortana
 #e::SendInput {LWin down}{up}{LWin up}                          ;maximize_windows
 #d::SendInput {LWin down}{down}{LWin up}                        ;minimize_windows
 #s::SendInput {LWin down}{LCtrl down}{Left}{LCtrl up}{LWin up}  ;desktop_switch_right
 #f::SendInput {LWin down}{LCtrl down}{Right}{LCtrl up}{LWin up} ;desktop_switch_left
-#w::run chrome
+#w::run C:\Users\yeste\scoop\apps\googlechrome\current\chrome.exe
+#+w::run pkill chrome
 #v::run C:\Users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe start -- pwsh -command "lf && pwsh"
 #+v::run C:\Users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe start -- arch run bash -c "source ~/.zprofile && cd ~ && lf && zsh"
 #b::run explorer.exe
+#VKBA::send !{tab}
+; #Space::send !{tab} ;keyboard layout
+
 #+b::
     IF HideStatusBar := !HideStatusBar
     {
@@ -249,11 +254,16 @@ Browser_Back::
     return
 
 ;#+enter::run c:\users\yeste\scoop\apps\alacritty\current\alacritty.exe -e arch, \\wsl$\arch\home\drksl\docs
-#enter::run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe,,max
+;#enter::run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe,,max
+#enter::
+    run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe,,max,process_id
+    WinWait, ahk_pid %process_id%
+    WinActivate, ahk_pid %process_id%
+  return
 #+enter::run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe
 #^enter::run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe start -- arch ,,max ;arch config --default-user drksl
 !enter::run c:\users\yeste\scoop\apps\windows-terminal\current\wt.exe pwsh -nologo, c:\users\yeste
-^enter::run c:\users\yeste\scoop\apps\alacritty\current\alacritty.exe -e pwsh -nologo, c:\users\yeste
+^enter::run pkill wezterm
 
 wheelright::
     send ^{tab}
@@ -280,6 +290,7 @@ wheelleft::
 <!d::sendinput {wheeldown}
 <!s::send ^+{tab}
 <!f::send ^{tab}
+<!Space::Send {RAlt down}{RCtrl down}{RShift down}{Space}{RShift up}{RCtrl up}{RAlt up}
 
 ralt::send {rshift down}
 ralt up::send % (a_priorkey = "ralt") ? "{rshift up}{ralt up}{bs}" : "{rshift up}{ralt up}"
