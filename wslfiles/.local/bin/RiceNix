@@ -173,7 +173,6 @@ fi
 [ ! -e /.dockerenv ] && nix-env -iA \
   dmenu \
   devour \
-  kitty \
   light \
   maim \
   mpc_cli \
@@ -211,11 +210,9 @@ nix-env -iA \
   git \
   less \
   lazygit \
-  lf \
   libsixel \
   moreutils \
   mupdf \
-  neovim \
   perl534Packages.FileMimeInfo \
   pipewire \
   ripgrep \
@@ -224,12 +221,15 @@ nix-env -iA \
   sxiv \
   trash-cli \
   unzip \
-  wezterm \
   xclip \
   zathura \
   zsh-autosuggestions \
   zsh-fast-syntax-highlighting \
   -f https://github.com/NixOS/nixpkgs/archive/2abf40d9b5bfaa49898af7b18b69a86247c29f2c.tar.gz #PR 204000
+  # kitty \
+  # lf \
+  # neovim \
+  # wezterm \
 
 # Dotfiles:
 install_dotfiles() {
@@ -434,8 +434,10 @@ install_configs () {
 
 # neovim version v0.9.1 (appimage-run nvim.appimage on NIXOS) + wezterm version 20230712:
 install_neovim_wezterm() {
-  curl -Lo "$HOME"/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage && chmod +x "$HOME"/.local/bin/nvim
-  curl -Lo "$HOME"/.local/bin/wezterm https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage && chmod +x "$HOME"/.local/bin/wezterm
+  sudo curl -L https://github.com/kovidgoyal/kitty/releases/download/v0.29.2/kitty-0.29.2-x86_64.txz | sudo tar -xJf- --directory="/usr/local/" # --skip-old-files
+  sudo curl -L https://github.com/gokcehan/lf/releases/download/r30/lf-linux-amd64.tar.gz | sudo tar -xzf- --directory="/usr/local/bin/"
+  sudo curl -Lo "/usr/local/bin/nvim" https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage && sudo chmod +x "/usr/local/bin/nvim"
+  sudo curl -Lo "/usr/local/bin/wezterm" https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage && sudo chmod +x "/usr/local/bin/wezterm"
 }
 
 # install neovim plugins  $(ulimit -n 4096):
@@ -450,7 +452,7 @@ install_dotfiles                             #|| echo $(tput -T ansi setaf 1) in
 install_xsixel                               #|| echo $(tput -T ansi setaf 1) install_xsixel failed
 install_mpv                                  #|| echo $(tput -T ansi setaf 1) install_mpv failed
 install_configs                              #|| echo $(tput -T ansi setaf 1) install_configs failed
-# install_neovim_wezterm                     #|| echo $(tput -T ansi setaf 1) install_neovim_wezterm failed
+install_neovim_wezterm                       #|| echo $(tput -T ansi setaf 1) install_neovim_wezterm failed
 install_neovim_plugins                       #|| echo $(tput -T ansi setaf 1) install_neovim_plugins failed
 
 printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"
