@@ -1,58 +1,79 @@
-# window manager
-# sudo ln -s "$PWD\ahkwm.ahk" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+# _startups_programs:
+# sudo ln -s "$PWD\ahkwm.ahk"     "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+# sudo ln -s "$PWD\toucursor.exe" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+# sudo ln -s "$PWD\flux.exe"      "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
 
-# WSL
-wsl --install
+# WSL:
+# wsl --install
 
-# policies
+# _policies:
 Set-ExecutionPolicy Bypass -Scope Process
 
-# package manager
+# _package_manager:
 iwr -useb get.scoop.sh | iex
 
-# buckets
-scoop bucket add main extras games nerd-fonts nirsoft nonportable version
+# _buckets:
+scoop bucket add main
+scoop bucket add extras
+scoop bucket add nerd-fonts
+scoop bucket add nonportable
+scoop bucket add versions
+# scoop bucket add games
+# scoop bucket add nirsoft
 
-# scoop packages
+# _scoop_packages:
 scoop install `
-7zip `
+3270-NF `
 archwsl `
-autohotkey-installer `
+autohotkey1.1 `
 bat `
-bugn `
 busybox `
 CascadiaCode-NF `
 CascadiaCode-NF-Mono `
-coreutils `
-ffmpeg `
+chafa `
 file `
 flux `
 fzf `
-gawk `
 gcc `
 git `
 googlechrome `
-gzip `
+lazygit `
 less `
 lf `
-lua `
+make `
 mpv `
 mupdf `
 neovim `
+pwsh `
 recycle-bin `
 starship `
 sudo `
 touchcursor `
-vcredist2017 `
+vcredist2022 `
 vscode `
 wezterm-nightly `
-winbtrfs-np `
-windows-terminal `
-winrar-np `
+# 7zip `
+# bugn `
+# cmake `
+# coreutils `
+# ffmpeg `
+# gawk `
+# go `
+# gzip `
+# lua `
+# mingw-winlibs-llvm-ucrt `
+# msys2 `
+# vcpkg `
+# winbtrfs-np `
+# windows-terminal `
+# winrar `
 
-# winget packages
-winget install --force `
-IObit.DriverBooster9 `
-GWSL `
-OpenInWSL `
-Microsoft.Powershell `
+# _winget_packages:
+# winget install --force `
+# Elantech `
+# IObit.DriverBooster9 `
+# GWSL `
+# OpenInWSL `
+# Microsoft.Powershell `
+# LibreOffice `
+# Microsoft.VisualStudio.2022.Community # https://github.com/microsoft/vcpkg/issues/22074#issuecomment-1310105006
