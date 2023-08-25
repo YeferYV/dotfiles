@@ -103,7 +103,7 @@ map <enter> shell
 map i $echo $FX | xargs bat --paging=always --wrap=never
 
 # change the shell used in default shell keybinding
-map D $recycle-bin $FX
+map D $echo $FX | xargs recycle-bin
 
 # _lazygit:
 map gll $lazygit

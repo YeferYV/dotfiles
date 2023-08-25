@@ -1,3 +1,5 @@
+run, C:\Users\yeste\scoop\apps\flux\current\flux.exe
+run, C:\Users\yeste\scoop\apps\touchcursor\current\touchcursor.exe
 
 Browser_Forward::
    loop,3
