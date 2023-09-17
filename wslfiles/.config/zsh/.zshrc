@@ -4,7 +4,7 @@
 fpath=(~/.config/zsh/ $fpath)
 
 ## Enable colors and change prompt:
-autoload -U colors && colors	# Load colors
+# autoload -U colors && colors	# Load colors
 
 ## Bash like prompt
 # PS1="\
@@ -22,18 +22,18 @@ autoload -U colors && colors	# Load colors
 # RPROMPT="$GITSTATUS_PROMPT"  # right prompt
 # PS1="%B%~ ﲵ "
 
-customprompt()
-{
-    if [[ $PWD == $HOME ]]; then
-        # echo ''
-        # PS1="%F{green}%Bﲵ "
-        export SPACESHIP_DIR_SHOW="false"
-    else
-        # echo $PWD
-        # PS1="%F{green}%~ ﲵ "
-        export SPACESHIP_DIR_SHOW="true"
-    fi
-}
+# customprompt()
+# {
+#   if [[ $PWD == $HOME ]]; then
+#     # PS1="%F{green}%Bﲵ "
+#     # starship config directory.disabled true
+#     export SPACESHIP_DIR_SHOW="false"
+#   else
+#     # PS1="%F{green}%~ ﲵ "
+#     # starship config directory.disabled false
+#     export SPACESHIP_DIR_SHOW="true"
+#   fi
+# }
 # typeset -a precmd_functions
 # precmd_functions+=(customprompt)
 # precmd() { customprompt }
@@ -44,10 +44,12 @@ customprompt()
 # export PROMPT_COMMAND='echo -ne "\033]0; ${${PWD/#$HOME/~}##*/} \a"'
 # export PROMPT_COMMAND='echo -ne "\033]0; ${${PWD/#$HOME/~}##*/} \007"'
 export PROMPT_COMMAND='echo -ne "\033]0; $(TMP=${PWD/#$HOME/\~}; echo ${TMP##*/}) \007"'
-precmd() { customprompt; eval "$PROMPT_COMMAND" }
+precmd() { eval "$PROMPT_COMMAND" }
 
 # export LC_ALL=en_US.UTF-8
 export LS_COLORS="tw=30:di=90:ow=94:ln=34"
+[[ -z $TMUX ]] && [[ -z $NVIM ]] && export PTS=$TTY
+[[ $TERM_PROGRAM == "vscode" ]] && export IMG="iterm2" || export IMG="x11"
 
 setopt autocd		# Automatically cd into typed directory.
 stty stop undef		# Disable ctrl-s to freeze terminal.
@@ -105,21 +107,16 @@ echo -ne '\e[6 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[6 q' ;} # Use beam shape cursor for each new prompt.
 
 # x2xalarm() { ssh -YC drksl@4l4rm x2x -north -to :0.0; }
-l() {                                            tty > /tmp/sixel-$WEZTERM_PANE; lfcd $1; trap "rm /tmp/sixel-$WEZTERM_PANE >/dev/null" EXIT; }
-n() { printf "\033]0; ${1##*/} \007" > /dev/tty; tty > /tmp/sixel-$WEZTERM_PANE; nvim $1; trap "rm /tmp/sixel-$WEZTERM_PANE >/dev/null" EXIT; }
 
 ## Tmux not-printed(archwiki)
 tmux-attach() {
-    (exec </dev/tty; exec <&1; tty >> /tmp/sixel-$WEZTERM_PANE; tmux attach || tmux new-session)
-    trap "rm /tmp/sixel-$WEZTERM_PANE" EXIT
+    (exec </dev/tty; exec <&1; tmux attach || tmux new-session)
 }
 tmux-choose-tree() {
-    (exec </dev/tty; exec <&1; tty >> /tmp/sixel-$WEZTERM_PANE; tmux attach\; choose-tree -s -w)
-    trap "rm /tmp/sixel-$WEZTERM_PANE" EXIT
+    (exec </dev/tty; exec <&1; tmux attach\; choose-tree -s -w)
 }
 tmux-new-session() {
-    (exec </dev/tty; exec <&1; tty >> /tmp/sixel-$WEZTERM_PANE; tmux new-session)
-    trap "rm /tmp/sixel-$WEZTERM_PANE" EXIT
+    (exec </dev/tty; exec <&1; tmux new-session)
 }
 zle -N tmux-attach
 zle -N tmux-choose-tree
@@ -182,8 +179,8 @@ lfcd () {
         dir="$(cat "$tmp")"
         rm -f "$tmp" >/dev/null
         [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
-        customprompt
-        [[ -d $1 ]] || zle reset-prompt
+        # customprompt
+        [[ -d $1 ]] || zle reset-prompt 2>/dev/null
         eval "$PROMPT_COMMAND"
     fi
 }
@@ -195,43 +192,43 @@ bindkey '\eo' 'lfcd'
 [ -n "$LF_CD" ] && unset LF_CD && lfcd $PWD
 
 lfub () {
-    cleanup() { exec 3>&-; rm "$LF_UEBERZUG" >/dev/null; }
-    [ ! -d "$HOME/.cache/lf" ] && mkdir -p "$HOME/.cache/lf";
-    export LF_UEBERZUG="$HOME/.cache/lf/ueberzug-$$";
-    mkfifo "$LF_UEBERZUG";
-    ueberzug layer -s <"$LF_UEBERZUG" &;
-    exec 3>"$LF_UEBERZUG";
-    trap cleanup HUP INT QUIT TERM PWR EXIT;
-    lfcd "$@" 3>&-;
+    cleanup() { exec 3>&-; ueberzugpp cmd -s $UB_SOCKET -a exit }
+    [ ! -d "$HOME/.cache/lf" ] && mkdir --parents "$HOME/.cache/lf"
+    ueberzugpp layer --output=$IMG --silent --no-stdin --pid-file $UB_PID_$$
+    UB_PID=$(cat $UB_PID_$$)
+    rm $UB_PID_$$ >/dev/null
+    export UB_SOCKET="/tmp/ueberzugpp-${UB_PID}.socket"
+    trap cleanup INT QUIT TERM PWR EXIT
+    lfcd "$@" 3>&-
 }
 zle -N lfub
 bindkey '\eu' 'lfub'
 
-## fzf scripts
+## fmz_file_manager ( dependency `yay -S stpv-git` )
 fmzcd () {
     tmp=$(mktemp)
     FZF_DEFAULT_OPTS="--layout=reverse --height=60% --border" \
-    command ~/.config/lf/fmz/fmz --cd "$tmp" "$@" <$TTY
+    command ~/.config/lf/fmz-img/fmz --cd "$tmp" "$@" <$TTY
     res=$(tail -n 1 "$tmp")
     if [ -d "$res" ] && [ "$res" != "$PWD" ]; then
         cd "$res" || return 1
     fi
-    customprompt
+    # customprompt
     zle reset-prompt
     rm "$tmp" >/dev/null
 }
 
-## stpv-git(AUR)
+## pacman -Ql stpv-git --> /bin/fzfp
 fzfprev() {
   cd $(dirname "$(fzfp --layout=reverse --height 70% --border --color hl+:#ff0000\
     --bind='?:toggle-preview' <$TTY )")
-  customprompt
+  # customprompt
   zle reset-prompt
 }
 
 fzf_cd () {
   cd $(dirname "$(fzf --layout=reverse --height 40% --border --color hl+:#ff0000 <$TTY )")
-  customprompt
+  # customprompt
   zle reset-prompt
 }
 
@@ -296,10 +293,6 @@ bindkey '^v' edit-command-line
   source /usr/share/fzf/key-bindings.zsh
   source /usr/share/fzf/completion.zsh }
 
-# [ -e $HOME/.nix-profile/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh ]&& \
-#   source $HOME/.nix-profile/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh ||\
-#   source /usr/share/zsh/plugins/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
 [ -e $HOME/.nix-profile/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]&&\
   source $HOME/.nix-profile/share/zsh-autosuggestions/zsh-autosuggestions.zsh ||\
   source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
@@ -308,9 +301,7 @@ bindkey '^v' edit-command-line
   source $HOME/.nix-profile/share/zsh/site-functions/fast-syntax-highlighting.plugin.zsh ||\
   source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 
-## Spaceship Prompt
-[ -e $HOME/.nix-profile/lib/spaceship-prompt/spaceship.zsh ]&&\
-  source ~/.nix-profile/lib/spaceship-prompt/spaceship.zsh ||{
-  source ~/.config/spaceship/spaceship.zsh }
-
 # bindkey '^I' expand-or-complete
+
+# Starship
+eval "$(starship init zsh)"

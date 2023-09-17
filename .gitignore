@@ -1,9 +1,9 @@
-.config/nvim/plugin
 AppData/Roaming/mpv/gallery-thumbs-dir
 
+wslfiles/.config/lazygit/state.yml
+wslfiles/.config/mpv/playlists
 wslfiles/.config/ncmpcpp/lyrics/
 wslfiles/.config/ncmpcpp/error.log
-wslfiles/.config/nvim/plugin
 wslfiles/.config/zsh/.zcompdump
 
 wslfiles/.local/bin/*

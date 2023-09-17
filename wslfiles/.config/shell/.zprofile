@@ -17,7 +17,7 @@ export PROMPT_COMMAND='echo -ne "\033]0;$(TMP=${PWD/#$HOME/\~};echo ${TMP##*/})\
 export BAT_THEME="base16"
 export BROWSER="google-chrome-stable"
 export EDITOR="nvim"
-export OPENER="xdg-open"
+export OPENER="gio open" #"xdg-open"
 export PAGER="less"
 export SHELL="$(which zsh)"
 export SURFRAW_graphical=no
@@ -75,11 +75,10 @@ export LOCALE_ARCHIVE="/lib/locale/locale-archive" # nix locale
 export MOZ_USE_XINPUT2="1"		# Mozilla smooth scrolling/touchpads.
 export QT_QPA_PLATFORMTHEME="gtk2"	# Have QT use gtk2 theme.
 export SUDO_ASKPASS="$HOME/.local/bin/dmenupass"
-export YT_API_KEY="AIzaSyDWLUg9KCJ6CAw2KXIsQTcOzMZRXOQ7OC0"
 export _JAVA_AWT_WM_NONREPARENTING=1	# Fix for Java applications in dwm
 
 # export MANPAGER="less -R --use-color -Dd+r -Du+b"
-export MANROFFOPT="-P -c"
+# export MANROFFOPT="-P -c"
 # export LESS="-R --use-color --LINE-NUMBERS --color=Nk" #causes manpages badformatting
 export LESS='-RS'
 export LESSOPEN="| /usr/bin/bat --style full --color always --paging always --wrap never %s"
