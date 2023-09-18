@@ -14,6 +14,11 @@ wezterm.on("open_in_vim", function(window, pane)
 	)
 end)
 
+wezterm.on("move_pane_to_new_tab", function()
+	wezterm.run_child_process({ "wezterm", "cli", "move-pane-to-new-tab" })
+	wezterm.run_child_process({ "wezterm", "cli", "activate-tab", "--tab-relative", "1" })
+end)
+
 local set_environment_variables = {}
 set_environment_variables["DIRCMD"] = "/d"
 set_environment_variables["PROFILE.CurrentUserAllHosts"] = "C:\\Users\\yeste\\.config\\Powershell\\Profile.ps1"
@@ -21,30 +26,30 @@ set_environment_variables["PROFILE.CurrentUserAllHosts"] = "C:\\Users\\yeste\\.c
 
 return {
 
-  default_prog = { "pwsh.exe","-NoLogo" },
-  set_environment_variables = set_environment_variables,
-  check_for_updates = false,
-  enable_kitty_graphics=true,
-  use_fancy_tab_bar = false,
+  -- animation_fps = 60,
   -- hide_tab_bar_if_only_one_tab = true,
+  -- line_height = 1.00,
   -- tab_bar_at_bottom = true,
   adjust_window_size_when_changing_font_size = false,
-  -- front_end = "OpenGL",
-  front_end = "WebGpu",
-  -- animation_fps = 60,
-  font_size = 10,
-  -- line_height = 1.00,
   bold_brightens_ansi_colors = true,
+  check_for_updates = false,
+  default_prog = { "pwsh.exe","-NoLogo" },
+  enable_kitty_graphics=true,
+  font_size = 10,
+  front_end = "WebGpu",
+  set_environment_variables = set_environment_variables,
+  use_fancy_tab_bar = false,
   window_close_confirmation = "NeverPrompt",
-  -- window_padding = {left = 8, right = 8, top = 18, bottom = 8},
-  -- window_padding = {left = 8, right = 8, top = 14, bottom = 10},
-  -- window_padding = {left = 8, right = 8, top = 12, bottom = 12},
-  -- window_padding = {left = 8, right = 8, top = 9, bottom = 9},
-  -- window_padding = {left = 8, right = 8, top = 8, bottom = 8},
-  -- window_padding = {left = "8px", right = "8px", top = "8px", bottom = "8px"},
-  -- window_padding = {left = "6pt", right = "6pt", top = "10pt", bottom = "10pt"},
-  -- window_padding = {left = "1cell", right = "1cell", top = "1cell", bottom = "1cell"},
+
   -- window_padding = {left = "1%", right = "1%", top = "2%", bottom = "2%"},
+  -- window_padding = {left = "1cell", right = "1cell", top = "1cell", bottom = "1cell"},
+  -- window_padding = {left = "6pt", right = "6pt", top = "10pt", bottom = "10pt"},
+  -- window_padding = {left = "8px", right = "8px", top = "8px", bottom = "8px"},
+  -- window_padding = {left = 8, right = 8, top = 12, bottom = 12},
+  -- window_padding = {left = 8, right = 8, top = 14, bottom = 10},
+  -- window_padding = {left = 8, right = 8, top = 18, bottom = 8},
+  -- window_padding = {left = 8, right = 8, top = 8, bottom = 8},
+  -- window_padding = {left = 8, right = 8, top = 9, bottom = 9},
   window_background_opacity = 0.9,
   -- text_background_opacity = 0.5,
   scrollback_lines = 10000,
@@ -57,8 +62,6 @@ return {
 
   font = wezterm.font("CaskaydiaCove Nerd Font", {weight="Bold", stretch="Normal", style=Normal}), -- /usr/share/fonts/TTF/Caskaydia Cove Nerd Font Complete.ttf, FontConfig
   -- font = wezterm.font("CaskaydiaCove Nerd Font Mono", {weight="Bold", stretch="Normal", style=Normal}), -- /usr/share/fonts/TTF/Caskaydia Cove Nerd Font Complete Mono.ttf, FontConfig
-  -- font = wezterm.font("Cascadia Code", {weight="Bold", stretch="Normal", style=Normal}), -- /usr/share/fonts/TTF/CascadiaCode.ttf index=0 variation=6, FontConfig
-  -- font = wezterm.font("Cascadia Code", {weight="Bold", stretch="Normal", style=Italic}), -- /usr/share/fonts/TTF/CascadiaCodeItalic.ttf index=0 variation=6, FontConfig
 
   key_tables = {
     copy_mode = {
@@ -248,7 +251,14 @@ return {
     -- Send "CTRL-A" to the terminal when pressing CTRL-A, CTRL-A
     { key = "a", mods = "LEADER|CTRL", action = wezterm.action { SendString = "\x01" } },
     { key = "[", mods = "LEADER", action = wezterm.action({ EmitEvent = "open_in_vim" }) },
-    { key = "]", mods = "LEADER", action = "QuickSelect" },
+    { key = "]", mods = "LEADER", action = wezterm.action({ EmitEvent = "move_pane_to_new_tab" }) },
+    {
+		  mods = "LEADER", key = ".",
+		  action = wezterm.action_callback(function()
+			  wezterm.run_child_process({ "wezterm", "cli", "move-pane-to-new-tab" })
+		  end)
+	  },
+    { key = "q", mods = "LEADER", action = "QuickSelect" },
 
     -- {key="i", mods="CTRL", action={SendKey={key="i", mods="CTRL"}}}, -- default:tab
     -- {key="[", mods="CTRL", action={SendKey={key="[", mods="CTRL"}}}, -- default:esc
