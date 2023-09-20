@@ -1,144 +1,95 @@
-#======== Dockerfile build/run arch-no-nix-dockerfile ========#
+#================================= Docker run ricenix ==================================#
 
-# sudo pkill dockerd && sleep 1 && sudo dockerd --experimental & disown
-# docker build --squash -t arch-no-nix-dockerfile .
+# xhost +
+# docker build --tag ricenix .
 # docker run -it \
-#            --name arch-no-nix-dockerfile \
-#            --volume=${PWD%/*}:/home/drksl/.config/dotfiles/docker-shared-volume \
-#            --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
-#            --volume=/tmp/.X11-unix:/tmp/.X11-unix \
-#            arch-no-nix-dockerfile
+#     --name ricenix \
+#     --ipc=host \
+#     --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#     --volume=/tmp/.X11-unix:/tmp/.X11-unix \
+#     ricenix
 
-#============= Dockerfile: arch-no-nix-dockerfile ============#
+#===================================== Dockerfile ======================================#
 
-FROM archlinux/archlinux:base-devel
+# FROM ubuntu
+FROM archlinux:base-devel
 
-RUN  sed -i '33s/#//' /etc/pacman.conf \
-     && sed -i '34s/N/#N/' /etc/pacman.conf \
-     && sed -i '37s/V/#V/' /etc/pacman.conf \
-     && pacman-key --init \
-     && pacman-key --populate \
-     && pacman -Sy  --noconfirm archlinux-keyring \
-     && pacman -Syu --noconfirm \
-     bat \
-     clang \
-     ffmpegthumbnailer \
-     fzf \
-     lazygit \
-     lf \
-     libsixel \
-     moreutils \
-     mupdf-tools \
-     openssh \
-     perl-file-mimeinfo \
-     pipewire \
-     pipewire-pulse \
-     ripgrep \
-     stow \
-     sxiv \
-     trash-cli \
-     unzip \
-     wezterm \
-     xclip \
-     zathura-pdf-mupdf \
-     zsh-autosuggestions\
-     # XSIXEL_DEPENDENCIES: \
-     && pacman -S --noconfirm libxkbfile xorg-font-util xorg-xkbcomp \
-     # USER_SETTINGS: \
-     && useradd -mG wheel drksl \
-     && chsh --shell /usr/bin/zsh drksl \
-     && echo root:toor | chpasswd \
-     && echo drksl:toor | chpasswd \
-     && echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
-     # AUR: \
-     # && echo "drksl ALL=(ALL) NOPASSWD: /usr/bin/pacman" > /etc/sudoers.d/allow_drksl_to_pacman \
-     # && echo "root ALL=(ALL) CWD=* ALL" > /etc/sudoers.d/permissive_root_Chdir_Spec \
-     # && sudo -u "drksl" bash -c "git clone https://aur.archlinux.org/paru-bin.git /home/drksl/paru-bin" \
-     # && sudo -u "drksl" bash -c "cd /home/drksl/paru-bin && makepkg -s" \
-     # && pacman -U --noconfirm /home/drksl/paru-bin/paru-bin* \
-     # && sudo -u "drksl" -D~ bash -c "paru -S --noconfirm cht.sh-git lf-bin zsh-fast-syntax-highlighting libsixel"
+SHELL ["/bin/bash","-c"]
 
-# Expose ports:
-EXPOSE 22/tcp
-EXPOSE 8080/tcp
-EXPOSE 5900/tcp
+# add user:
+RUN if [[ -e /bin/pacman ]]; then useradd -mG wheel drksl; fi; \
+  if [[ -e /bin/apt    ]]; then useradd -mG sudo  drksl; fi; \
+  echo root:toor  | chpasswd; \
+  echo drksl:toor | chpasswd; \
+  mkdir -p /etc/sudoers.d; \
+  echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/sudo; \
+  echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 
-# Set environments:
+# Arch dependencies:
+RUN if [[ -e /bin/pacman ]]; then  \
+  pacman -Sy --noconfirm git libsixel ripgrep unzip xclip zsh glibc \
+  && curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory="/usr/local/bin" "yay_12.1.2_x86_64/yay" \
+  && curl -L https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage                               --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim; \
+  fi
+
+# Debian dependencies:
+RUN if [[ -e /bin/apt ]]; then \
+  apt update \
+  && DEBIAN_FRONTEND=noninteractive apt install -y curl file git gcc libglib2.0-bin libsixel-bin locales make ripgrep sudo unzip xclip xz-utils zsh \
+  && curl -L https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage                               --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim; \
+  fi
+
+# locales for zsh-autosuggestions:
+RUN sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen
+
 USER drksl
 WORKDIR /home/drksl
+EXPOSE 22/tcp
+EXPOSE 8080/tcp
+ENV HOME="/home/drksl"
 ENV USER="drksl"
+ENV SHELL="/bin/zsh"
 ENV DISPLAY=:0
 ENV XDG_RUNTIME_DIR=/run/user/1000
-ENV APPIMAGE_EXTRACT_AND_RUN=1
+SHELL ["/bin/zsh","-c"]
+
+# install nixpkgs:
+RUN curl -L https://nixos.org/nix/install | sh \
+  && . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
+  && nix-channel --update \
+  && nix-env -iA \
+  bat \
+  ffmpeg \
+  fzf \
+  ghostscript \
+  imagemagick \
+  lazygit \
+  lf \
+  mpv \
+  pipewire \
+  poppler \
+  starship \
+  stow \
+  zsh-autosuggestions \
+  zsh-fast-syntax-highlighting \
+  -f https://github.com/NixOS/nixpkgs/archive/f3841aa99b019e827633141317ee504a50c8c936.tar.gz # NixOS/nixpkgs/pull/253000/commits
 
 # Dotfiles:
-# COPY --chown=drksl wslfiles/.config /home/drksl/.config
-# COPY --chown=drksl wslfiles/.local /home/drksl/.local
-# COPY --chown=drksl wslfiles/.config/shell/.zprofile /home/drksl/.zprofile
 COPY --chown=drksl . /home/drksl/.config/dotfiles/winfiles
 
 # stow:
-RUN  mkdir /home/drksl/.local \
-     && cd /home/drksl/.config/dotfiles/winfiles/wslfiles \
-     && sudo chown -R drksl:drksl /home/drksl/.config \
-     && stow --restow --verbose --target=/home/drksl/.config .config \
-     && stow --restow --verbose --target=/home/drksl/.local .local \
-     && ln -sf /home/drksl/.config/shell/.zprofile /home/drksl/.zprofile \
-     && echo "/dev/pts/0" >> /tmp/sixel-$WEZTERM_PANE
-
-
-# AUR:
-RUN  git clone https://aur.archlinux.org/yay-bin.git /home/drksl/yay-bin \
-     && cd  /home/drksl/yay-bin && makepkg --noconfirm -si \
-     && yay -S --noconfirm cht.sh-git zsh-fast-syntax-highlighting
-
-# libxfont:
-RUN  yay -G libxfont \
-     && cd libxfont \
-     && sed -i "s/'xproto' 'fontsproto'/'xorgproto'/" PKGBUILD \
-     && makepkg -si --noconfirm \
-     && cd ..
-
-# xsixel:
-RUN  git clone --depth 1 https://github.com/saitoha/xserver-sixel \
-     && cd xserver-sixel \
-     && sed -i '/sixel/a\    --disable-xwayland \\' build-xsixel.sh \
-     && CC=clang ./build-xsixel.sh && sudo make install \
-     && cd ..
-
-# mpv-sixel:
-RUN  git clone --depth 1 https://github.com/mpv-player/mpv \
-     && cd mpv \
-     && ./bootstrap.py \
-     && ./waf configure --enable-sixel && ./waf build && sudo ./waf install \
-     && cd ..
-
-# pipewire:
-RUN  sudo mkdir /run/user/1000 \
-     && sudo chown -R drksl:drksl /run/user/1000
-
-# openssh:
-RUN  sudo /usr/bin/ssh-keygen -A \
-     && echo "sudo /sbin/sshd" >>/home/drksl/.zprofile
-
-# neovim version 0.7:
-RUN  curl -Lo $HOME/.local/bin/nvim https://github.com/neovim/neovim/releases/download/v0.7.2/nvim.appimage \
-     && chmod +x $HOME/.local/bin/nvim
-
-# neovim plugins:
-RUN  git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim \
-     && $HOME/.local/bin/nvim -u ~/.config/nvim/lua/user/plugins.lua --headless -c "autocmd User PackerComplete quitall" -c "PackerSync"
-
-# Spaceship version 3.16.4:
-RUN  git clone --branch "v3.16.4" --depth=1 https://github.com/spaceship-prompt/spaceship-prompt ~/.config/spaceship
+RUN . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
+  && cd /home/drksl/.config/dotfiles/winfiles/wslfiles \
+  && stow --restow --verbose --target="$HOME"/.config .config \
+  && stow --restow --verbose --target="$HOME"/.local .local \
+  && ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
 
 # clean:
-RUN  sudo pacman -R --noconfirm clang \
-     && yes | yay -Scc \
-     && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc,libxfont,mpv,neovim,xserver-sixel,yay-bin} \
-     && mkdir /home/drksl/.cache/zsh \
-     && printf "\e[1;32m Done! \e[0m\n"
+RUN . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
+  && mkdir /home/drksl/.cache/zsh \
+  && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc} \
+  && yes | yay -Scc \
+  && nix-collect-garbage -d \
+  && printf "\e[1;32m Done! \e[0m\n"
 
-# CMD [ "sudo","/usr/sbin/sshd"]
-# SHELL ["/bin/zsh","-l"]
 ENTRYPOINT ["/bin/zsh","-l"]
