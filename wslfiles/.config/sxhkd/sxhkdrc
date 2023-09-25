@@ -3,23 +3,24 @@
 #
 
 # terminal emulator
-super + {_,shift +,ctrl + }Return
+super + {_, shift, ctrl, alt } + Return
 	{ \
-	  nixGL wezterm --config initial_rows=47 --config initial_cols=169; \
-	, nixGL wezterm --config initial_rows=25 --config initial_cols=85; \
-	, nixGL wezterm --config "window_decorations='NONE'" ; \
+	  wezterm --config initial_rows=47 --config initial_cols=169; \
+  , wezterm --config window_background_opacity=0.0 --config text_background_opacity=0.3; \
+	, wezterm --config "window_decorations='NONE'" ; \
+	, wezterm --config initial_rows=25 --config initial_cols=85; \
 	}
 
 # terminal emulator
-mod1 + {_,shift +,ctrl +,shift + ctrl +}Return
-  { nixGL neovide, nixGL kitty, nixGL alacritty, cool-retro-term }
+mod1 + {_, shift, ctrl, shift + ctrl} + Return
+  {neovide, kitty, cool-retro-term -e tmux, alacritty -e tmux}
 
 # toggle borderless window
 super + alt + b
   borderless toggle
 
 # dunst close/reopen notification
-ctrl + {_,shift + }Return
+ctrl + {_, shift } + Return
 	dunstctl {close, history-pop}
 
 # stop cronbat
@@ -102,7 +103,7 @@ XF86DOS
 
 # fzf alt-tab
 super + alt + z
-  nixGL wezterm --config "window_decorations='NONE'" start --always-new-process -- bash -c \
+  wezterm --config "window_decorations='NONE'" start --always-new-process -- bash -c \
   'test=$((xdo id -D & xdo id -d) | xargs -I var xprop -id var _NET_WM_NAME | cut -d"\"" -f2 | fzf); xdo activate $( xdo id -a "$test");'
 
 # rofi alt-tab like
@@ -296,10 +297,9 @@ mod1 + XF86Audio{RaiseVolume,Mute,LowerVolume}
 mod1 + ctrl + {1,2,3,4,5}
   redshift {-x, -O 2222, -O 3333, -O 4444, -O 5555}
 
-# compositor start/end
+# compositor wallpaper background
 super + BackSpace
 	{\
-    nixGL \
 		picom --glx-no-rebind-pixmap \
           --use-damage \
           --xrender-sync-fence \
@@ -316,7 +316,7 @@ super + BackSpace
 # compositor blur background
 super + alt + BackSpace
 	{ \
-	  nixGL picom --backend="glx" \
+	  picom --backend="glx" \
 	        --blur-strength="1" \
 	        --blur-method="dual_kawase" \
 	        --opacity-rule="70:class_g *= 'neovide'" \
@@ -327,7 +327,11 @@ super + alt + BackSpace
 
 # compositor keep background
 super + ctrl + BackSpace
-	{ nixGL picom,killall picom }
+	{ picom,killall picom }
+
+# compositor no shadow
+super + shift + BackSpace
+	{picom --shadow-opacity=0 --transparent-clipping, killall picom}
 
 # compositor decrease/increase transparency
 super + ctrl + {minus,equal}
@@ -339,7 +343,7 @@ super + {_,shift,ctrl} + Next
 
 # browser media
 super + shift + b
-  nixGL wezterm start ncmpcpp
+  wezterm start ncmpcpp
 
 # dmenu launcher
 super + {_,shift +,alt +} p
@@ -352,7 +356,7 @@ super + {_,shift +,alt +} p
 
 # lf user/root
 super + {_,shift +} r
-	{LF_CD=true nixGL wezterm, sudo -i LF_CD=true LS_COLORS="" nixGL wezterm}
+	{LF_CD=true wezterm, sudo -i LF_CD=true LS_COLORS="" wezterm}
 
 # browser
 super + {_,shift +} w

@@ -19,7 +19,7 @@ xmodmap -e 'keycode 66 = Control_L'
 xmodmap -e 'keycode 108 = Shift_R'
 
 ## To use Menu as mod5
-xmodmap -e 'keycode 135 = Control_R'
+xmodmap -e 'keycode 135 = Super_R'
 
 xmodmap -e 'add shift   = Shift_L Shift_R'
 xmodmap -e 'add control = Control_L Control_R'
@@ -39,5 +39,5 @@ xcape -e 'Alt_L=XF86Game'
 xcape -e 'Shift_R=BackSpace'
 
 ## to use Menu as Task-Switcher
-xcape -e 'Control_R=XF86Shop'
+xcape -e 'Super_R=XF86Shop'
 
