@@ -10,6 +10,7 @@ wslfiles/.local/bin/*
 !wslfiles/.local/bin/cron/
 !wslfiles/.local/bin/borderless
 !wslfiles/.local/bin/dmenupass
+!wslfiles/.local/bin/devour
 !wslfiles/.local/bin/maimpick
 !wslfiles/.local/bin/remaps
 !wslfiles/.local/bin/RiceNix
