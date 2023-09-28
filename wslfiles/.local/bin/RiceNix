@@ -107,7 +107,8 @@ $SUDO sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
 $SUDO locale-gen
 
 # Install nix (nix-daemon doesn't work without systemd):
-curl -L nixos.org/nix/install | sh && source "$HOME/.nix-profile/etc/profile.d/nix.sh"
+[ -e /.dockerenv ] && curl -L nixos.org/nix/install | sh ||
+yes | sh <(curl -L https://nixos.org/nix/install) --daemon
 
 # nix overrides:
 # nix-env --install -E 'f: (import <nixpkgs> {}).mpv-unwrapped.override { sixelSupport = true; }'
@@ -341,7 +342,7 @@ install_configs () {
   mkdir -p "$HOME"/.local/share/mpd  "$HOME"/.cache/zsh
   $SUDO mkdir -p /etc/X11/xorg.conf.d && $SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
   command -v crontab                  && $SUDO crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
-  nix-collect-garbage -d
+  # nix-collect-garbage -d
   [ -e /bin/apt ] && $SUDO apt autoremove -y
   [ -e /bin/pacman ] && yes | $SUDO pacman -Scc
 
