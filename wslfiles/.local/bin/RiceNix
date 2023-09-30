@@ -54,7 +54,7 @@
 set -eu
 
 # Detect non-root user:
-[ "$(id -u)" == 0 ]      && printf "\e[1;31m Run it as non-root user, nix-env doesn't suport root \e[0m\n" && exit 1
+# [ "$(id -u)" == 0 ]      && printf "\e[1;31m Run it as non-root user, nix-env doesn't suport root (update: nix-daemon supports it) \e[0m\n" && exit 1
 ( which sudo >/dev/null ) || ( printf "\e[1;31m Install sudo, pacman/apt needs it                    \e[0m\n" && exit 1 )
 export SUDO="sudo"
 export DEBIAN_FRONTEND=noninteractive
@@ -82,7 +82,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Debian server/docker dependencies:
 [ -e /bin/apt ] && {
   $SUDO apt update --fix-missing
-  $SUDO eatmydata apt install --no-install-recommends -y curl file git gcc libsixel-bin locales make ripgrep sudo unzip xclip xz-utils zsh # ( libglib2.0-bin gio binary breaks dependencies) (locales zsh-autosuggestions dep)
+  $SUDO apt install --no-install-recommends -y curl file git gcc libsixel-bin locales make ripgrep sudo unzip xclip xz-utils zsh # ( libglib2.0-bin gio binary breaks dependencies) (locales zsh-autosuggestions dep)
   $SUDO curl -L https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-gnu.tar.gz    | $SUDO tar -xzf- --directory="/tmp"  && $SUDO cp "/tmp/bat-v0.23.0-x86_64-unknown-linux-gnu/bat" "/usr/local/bin"
   $SUDO curl -L https://github.com/starship/starship/releases/download/v1.16.0/starship-x86_64-unknown-linux-gnu.tar.gz | $SUDO tar -xzf- --directory="/usr/local/bin/"
   $SUDO curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.40.2/lazygit_0.40.2_Linux_x86_64.tar.gz   | $SUDO tar -xzf- --directory="/usr/local/bin/"
@@ -97,7 +97,7 @@ export DEBIAN_FRONTEND=noninteractive
   $SUDO curl -L https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage                                     --create-dirs --output "/usr/local/bin/nvim"    && $SUDO chmod +x /usr/local/bin/nvim
 
   # [ ! -e /.dockerenv ] && $SUDO apt install -y festvox-us-slt-hts python3-gi
-  $SUDO eatmydata apt --no-install-recommends -y install ghostscript mpv poppler-utils stow # imagemagick pipewire-pulse || ( $SUDO dpkg --configure -a; apt reinstall gdm3 lightdm )
+  $SUDO apt --no-install-recommends -y install ghostscript mpv poppler-utils stow # imagemagick pipewire-pulse || ( $SUDO dpkg --configure -a; apt reinstall gdm3 lightdm )
   git clone --depth=1                        https://github.com/zsh-users/zsh-autosuggestions                                "$HOME/.config/zsh-autosuggestions"
   git clone --depth=1                        https://github.com/zdharma-continuum/fast-syntax-highlighting                   "$HOME/.config/fast-syntax-highlighting"
 }
@@ -106,27 +106,26 @@ export DEBIAN_FRONTEND=noninteractive
 $SUDO sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
 $SUDO locale-gen
 
-# Install nix (nix-daemon doesn't work without systemd):
-[ -e /.dockerenv ] && curl -L nixos.org/nix/install | sh ||
-yes | sh <(curl -L https://nixos.org/nix/install) --daemon
+# Install nix:
+[ ! -e /nix ] && yes | sh <(curl -L https://nixos.org/nix/install) --daemon
 
 # nix overrides:
 # nix-env --install -E 'f: (import <nixpkgs> {}).mpv-unwrapped.override { sixelSupport = true; }'
 
 # GUI dependencies:
-[ ! -e /.dockerenv ] && {
-
-  $SUDO curl -L https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage --create-dirs --output "/usr/local/bin/wezterm" && $SUDO chmod +x /usr/local/bin/wezterm
+[ ! -e /.dockerenv ] && [ "$(id -u)" != 0 ] && {
 
   # [ -e /bin/apt ] && $SUDO eatmydata apt --only-upgrade full-upgrade
   # [ -e /bin/apt ] && $SUDO eatmydata apt install -y libgtk-3-dev # https://stackoverflow.com/questions/38752214/installing-libgtk-3-dev-unmet-dependencies
+  [ -e /bin/apt ] && $SUDO curl -L https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage --create-dirs --output "/usr/local/bin/wezterm" && $SUDO chmod +x /usr/local/bin/wezterm
   [ -e /bin/apt ] && $SUDO eatmydata apt --no-install-recommends -y install cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp
-  [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm cronie dmenu light playerctl redshift sxhkd sxiv xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp gtk3
+  [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm cronie dmenu light playerctl redshift sxhkd sxiv wezterm xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp gtk3
 
   # git clone https://github.com/mwh/dragon                    && cd dragon            && $SUDO make NAME=dragon-drop PREFIX=/usr/local install && cd .. && $SUDO rm -rf dragon # dragon-drop depends on gtk3
   git clone https://github.com/donniebreve/touchcursor-linux && cd touchcursor-linux && $SUDO make && make install && cd .. && $SUDO rm -rf touchcursor-linux
   git clone https://github.com/jrabinow/snapper-rollback.git && cd snapper-rollback  && $SUDO cp snapper-rollback.py /usr/local/sbin/snapper-rollback && $SUDO cp snapper-rollback.conf /etc && cd .. && $SUDO rm -rf snapper-rollback
 
+  # sudo -u "root" -i -- <<'===='
   # nix-env -iA \
   # dmenu \     # suckless-tools
   # devour \    # curl devour.sh
@@ -171,10 +170,12 @@ yes | sh <(curl -L https://nixos.org/nix/install) --daemon
   # unclutter \
   # xorg.xorgserver \
   # xorg.xinit
+  # ====
 
 }
 
 # Non GUI dependencies:
+  # sudo -u "root" -i -- <<'===='
   # nix-env -iA \
   # ffmpeg \
   # ghostscript \
@@ -200,6 +201,7 @@ yes | sh <(curl -L https://nixos.org/nix/install) --daemon
   # xclip \
   # wezterm \
   # zsh \
+  # ====
 
 #---------------------------------------------- User Configs ---------------------------------------------#
 
@@ -369,12 +371,12 @@ install_configs () {
 
 #------------------------------------------------ main -----------------------------------------------#
 
-install_dotfiles                                || ( echo $(tput -T ansi setaf 1) install_dotfiles failed    && exit 1; )
-[ ! -e /.dockerenv ] && ( install_fonts         || ( echo $(tput -T ansi setaf 1) install_fonts failed       && exit 1; ))
-# [ ! -e /.dockerenv ] && ( install_touchcursor || ( echo $(tput -T ansi setaf 1) install_touchcursor failed && exit 1; ))
-# install_tmuxsixel                             || ( echo $(tput -T ansi setaf 1) install_tmuxsixel failed   && exit 1; )
-# install_xsixel                                || ( echo $(tput -T ansi setaf 1) install_xsixel failed      && exit 1; )
-install_configs                                 || ( echo $(tput -T ansi setaf 1) install_configs failed     && exit 1; )
+install_dotfiles                                                       || ( echo $(tput -T ansi setaf 1) install_dotfiles failed    && exit 1; )
+[ ! -e /.dockerenv ] && [ "$(id -u)" != 0 ] && ( install_fonts         || ( echo $(tput -T ansi setaf 1) install_fonts failed       && exit 1; ))
+# [ ! -e /.dockerenv ] && [ "$(id -u)" != 0 ] && ( install_touchcursor || ( echo $(tput -T ansi setaf 1) install_touchcursor failed && exit 1; ))
+# install_tmuxsixel                                                    || ( echo $(tput -T ansi setaf 1) install_tmuxsixel failed   && exit 1; )
+# install_xsixel                                                       || ( echo $(tput -T ansi setaf 1) install_xsixel failed      && exit 1; )
+install_configs                                                        || ( echo $(tput -T ansi setaf 1) install_configs failed     && exit 1; )
 
 printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"
 printf "\e[1;32m Done! \e[0m\n"

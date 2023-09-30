@@ -2,6 +2,7 @@
 
 # tmux inside docker
 if [ -e /.dockerenv ] && [ -z $TMUX ]; then exec tmux -u; fi
+if [ "$(id -u)" = 0 ] && [ -z $TMUX ]; then exec tmux -u; fi
 
 ## To activate tab completion support for cht.sh
 fpath=(~/.config/zsh/ $fpath)
