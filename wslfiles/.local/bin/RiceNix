@@ -82,7 +82,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Debian server/docker dependencies:
 [ -e /bin/apt ] && {
   $SUDO apt update --fix-missing
-  $SUDO apt install --no-install-recommends -y curl file git gcc libsixel-bin locales make ripgrep sudo unzip xclip xz-utils zsh # ( libglib2.0-bin gio binary breaks dependencies) (locales zsh-autosuggestions dep)
+  $SUDO apt install --no-install-recommends -y curl file git gcc libsixel-bin locales make ripgrep sudo unzip xclip xdg-utils xz-utils zsh # (locales zsh-autosuggestions dep)
   $SUDO curl -L https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-gnu.tar.gz    | $SUDO tar -xzf- --directory="/tmp"  && $SUDO cp "/tmp/bat-v0.23.0-x86_64-unknown-linux-gnu/bat" "/usr/local/bin"
   $SUDO curl -L https://github.com/starship/starship/releases/download/v1.16.0/starship-x86_64-unknown-linux-gnu.tar.gz | $SUDO tar -xzf- --directory="/usr/local/bin/"
   $SUDO curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.40.2/lazygit_0.40.2_Linux_x86_64.tar.gz   | $SUDO tar -xzf- --directory="/usr/local/bin/"
