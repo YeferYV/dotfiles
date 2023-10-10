@@ -1,1 +1,0 @@
-2021-12-14 12:12:06 DEBUG[0] Monitor_getWorkArea: #1, l: 0, r: 1366, t: 0, b: 768.

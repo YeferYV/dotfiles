@@ -27,7 +27,7 @@ RUN if [[ -e /bin/pacman ]]; then useradd -mG wheel drksl; fi; \
 
 # Arch dependencies:
 RUN if [[ -e /bin/pacman ]]; then  \
-  pacman -Sy --noconfirm bat fzf lazygit libsixel lf ripgrep starship tmux unzip xclip zsh glibc \
+  pacman -Sy --noconfirm bat fzf lazygit libsixel lf ripgrep starship unzip xclip zsh glibc zellij \
   && curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory="/usr/local/bin" "yay_12.1.2_x86_64/yay" \
   && curl -L https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage                               --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim; \
   fi
@@ -39,11 +39,11 @@ RUN if [[ -e /bin/apt ]]; then \
   && curl -L https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-gnu.tar.gz    | $SUDO tar -xzf- --directory="/tmp"  && $SUDO cp "/tmp/bat-v0.23.0-x86_64-unknown-linux-gnu/bat" "/usr/local/bin" \
   && curl -L https://github.com/starship/starship/releases/download/v1.16.0/starship-x86_64-unknown-linux-gnu.tar.gz | $SUDO tar -xzf- --directory="/usr/local/bin/" \
   && curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.40.2/lazygit_0.40.2_Linux_x86_64.tar.gz   | $SUDO tar -xzf- --directory="/usr/local/bin/" \
+  && curl -L https://github.com/zellij-org/zellij/releases/download/v0.38.2/zellij-x86_64-unknown-linux-musl.tar.gz  | $SUDO tar -xzf- --directory="/usr/local/bin/" \
   && curl -L https://github.com/gokcehan/lf/releases/download/r30/lf-linux-amd64.tar.gz                              | $SUDO tar -xzf- --directory="/usr/local/bin/" \
   && curl -L https://github.com/junegunn/fzf/releases/download/0.42.0/fzf-0.42.0-linux_amd64.tar.gz                  | $SUDO tar -xzf- --directory="/usr/local/bin/" \
   && curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/completion.zsh                                     --create-dirs --output "/usr/share/fzf/completion.zsh" \
   && curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.zsh                                   --create-dirs --output "/usr/share/fzf/key-bindings.zsh" \
-  && curl -L https://github.com/antontkv/tmux-appimage/releases/download/3.3a/tmux-3.3a-x86_64.appimage                     --create-dirs --output "/usr/local/bin/tmux" && $SUDO chmod +x /usr/local/bin/tmux \
   && curl -L https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage                                        --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
   && chmod o+rx "/usr/share/fzf"; \
   fi
@@ -79,11 +79,11 @@ RUN curl -L https://nixos.org/nix/install | sh \
   -f https://github.com/NixOS/nixpkgs/archive/f3841aa99b019e827633141317ee504a50c8c936.tar.gz # NixOS/nixpkgs/pull/253000/commits
 
 # Dotfiles:
-COPY --chown=drksl . /home/drksl/.config/dotfiles/winfiles
+COPY --chown=drksl . /home/drksl/.config/dotfiles
 
 # stow:
 RUN . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
-  && cd /home/drksl/.config/dotfiles/winfiles/wslfiles \
+  && cd /home/drksl/.config/dotfiles \
   && stow --restow --verbose --target="$HOME"/.config .config \
   && stow --restow --verbose --target="$HOME"/.local .local \
   && ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile

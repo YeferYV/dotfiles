@@ -1,17 +1,17 @@
-AppData/Roaming/mpv/gallery-thumbs-dir
+.winfiles/AppData/Roaming/mpv/gallery-thumbs-dir
 
-wslfiles/.config/lazygit/state.yml
-wslfiles/.config/mpv/playlists
-wslfiles/.config/ncmpcpp/lyrics/
-wslfiles/.config/ncmpcpp/error.log
-wslfiles/.config/zsh/.zcompdump
+.config/lazygit/state.yml
+.config/mpv/playlists
+.config/ncmpcpp/lyrics/
+.config/ncmpcpp/error.log
+.config/zsh/.zcompdump
 
-wslfiles/.local/bin/*
-!wslfiles/.local/bin/cron/
-!wslfiles/.local/bin/borderless
-!wslfiles/.local/bin/dmenupass
-!wslfiles/.local/bin/devour
-!wslfiles/.local/bin/maimpick
-!wslfiles/.local/bin/remaps
-!wslfiles/.local/bin/RiceNix
-!wslfiles/.local/bin/spdf
+.local/bin/*
+!.local/bin/cron/
+!.local/bin/borderless
+!.local/bin/dmenupass
+!.local/bin/devour
+!.local/bin/maimpick
+!.local/bin/remaps
+!.local/bin/RiceNix
+!.local/bin/spdf

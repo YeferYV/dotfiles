@@ -1,0 +1,325 @@
+#!/usr/bin/env bash
+
+#====================================== Docker run arch-ricenix ======================================#
+
+# xhost +
+# cd "$(git rev-parse --show-toplevel)"
+# docker run -it \
+#     --name archlinux-ricenix \
+#     --ipc=host \
+#     --volume=${PWD%/*}:/home/dtfls/docker-volume \
+#     --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#     --volume=/tmp/.X11-unix:/tmp/.X11-unix \
+#     archlinux:base-devel bash -uelic '
+#     [[ ! -e /home/drksl ]] && {
+#         useradd -mG wheel,tty drksl
+#         echo root:toor | chpasswd
+#         echo drksl:toor | chpasswd
+#         echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
+#         chown -R drksl:drksl /home/dtfls
+#         sudo -u "drksl" bash -c "cd /home/dtfls/docker-volume/dotfiles/.local/bin && ./RiceNix"
+#     }
+#     chmod g+w /dev/pts/0
+#     su - "drksl" bash -c "export XDG_RUNTIME_DIR=/run/user/1000 && script -qI /dev/null"
+#     '
+
+#===================================== Docker run ubuntu-ricenix =====================================#
+
+# xhost +
+# cd "$(git rev-parse --show-toplevel)"
+# docker run -it \
+#     --name ubuntu-ricenix \
+#     --ipc=host \
+#     --volume=${PWD%/*}:/home/dtfls/docker-volume \
+#     --volume=/run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+#     --volume=/tmp/.X11-unix:/tmp/.X11-unix \
+#     ubuntu bash -uelic '
+#     [[ ! -e /home/drksl ]] && {
+#         apt update
+#         DEBIAN_FRONTEND=noninteractive apt install -y sudo
+#         useradd -mG sudo,tty drksl
+#         echo root:toor | chpasswd
+#         echo drksl:toor | chpasswd
+#         echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/sudo
+#         chown -R drksl:drksl /home/dtfls
+#         sudo -u "drksl" bash -c "cd /home/dtfls/docker-volume/dotfiles/.local/bin && ./RiceNix"
+#     }
+#     chmod g+w /dev/pts/0
+#     su - "drksl" bash -c "export XDG_RUNTIME_DIR=/run/user/1000 && script -qI /dev/null"
+#     '
+
+#================================= Post-Install: Run it inside zellij may restart gdm/lighdm =================================#
+
+# exit on error:
+set -eu
+
+# Detect non-root user:
+# [ "$(id -u)" == 0 ]      && printf "\e[1;31m Run it as non-root user, nix-env doesn't suport root (update: nix-daemon supports it) \e[0m\n" && exit 1
+( which sudo >/dev/null ) || ( printf "\e[1;31m Install sudo, pacman/apt needs it                    \e[0m\n" && exit 1 )
+export SUDO="sudo"
+export DEBIAN_FRONTEND=noninteractive
+
+#-------------------------------------------- Dependencies -------------------------------------------#
+
+# Arch server/docker dependencies:
+[ -e /bin/pacman ] && {
+  $SUDO pacman -Sy     --noconfirm base-devel bat fzf lazygit libsixel lf ripgrep starship zellij unzip xclip zsh glibc || # glibc required by git
+  {
+    $SUDO pacman-key  --init
+    $SUDO pacman-key  --populate
+    $SUDO pacman -Sy  --noconfirm archlinux-keyring
+    $SUDO pacman -Syu --noconfirm base-devel bat fzf lazygit libsixel lf ripgrep starship zellij unzip xclip zsh
+  }
+  $SUDO curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | $SUDO tar -xzf- --strip-components=1 --directory="/usr/local/bin" "yay_12.1.2_x86_64/yay"
+  $SUDO curl -L https://github.com/neovim/neovim/releases/download/v0.9.2/nvim.appimage                                     --create-dirs --output "/usr/local/bin/nvim"    && $SUDO chmod +x /usr/local/bin/nvim
+
+  # [ ! -e /.dockerenv ] && $SUDO pacman -S --noconfirm festival-us fakeroot python-gobject # ArchWSL uses fakeroot-tcp
+  $SUDO pacman -S --noconfirm ghostscript imagemagick mpv pipewire-pulse poppler stow
+  git clone --depth=1                        https://github.com/zsh-users/zsh-autosuggestions                                "$HOME/.config/zsh-autosuggestions"
+  git clone --depth=1                        https://github.com/zdharma-continuum/fast-syntax-highlighting                   "$HOME/.config/fast-syntax-highlighting"
+}
+
+# Debian server/docker dependencies:
+[ -e /bin/apt ] && {
+  $SUDO apt update --fix-missing
+  $SUDO apt install --no-install-recommends -y curl file git gcc libsixel-bin locales make ripgrep sudo unzip xclip xdg-utils xz-utils zsh # (locales zsh-autosuggestions dep)
+  $SUDO curl -L https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-gnu.tar.gz    | $SUDO tar -xzf- --directory="/tmp"  && $SUDO cp "/tmp/bat-v0.23.0-x86_64-unknown-linux-gnu/bat" "/usr/local/bin"
+  $SUDO curl -L https://github.com/starship/starship/releases/download/v1.16.0/starship-x86_64-unknown-linux-gnu.tar.gz | $SUDO tar -xzf- --directory="/usr/local/bin/"
+  $SUDO curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.40.2/lazygit_0.40.2_Linux_x86_64.tar.gz   | $SUDO tar -xzf- --directory="/usr/local/bin/"
+  $SUDO curl -L https://github.com/gokcehan/lf/releases/download/r31/lf-linux-amd64.tar.gz                              | $SUDO tar -xzf- --directory="/usr/local/bin/"
+  $SUDO curl -L https://github.com/zellij-org/zellij/releases/download/v0.38.2/zellij-x86_64-unknown-linux-musl.tar.gz  | $SUDO tar -xzf- --directory="/usr/local/bin/"
+  $SUDO curl -L https://github.com/junegunn/fzf/releases/download/0.42.0/fzf-0.42.0-linux_amd64.tar.gz                  | $SUDO tar -xzf- --directory="/usr/local/bin/"
+  $SUDO curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/completion.zsh                                     --create-dirs --output "/usr/share/fzf/completion.zsh"
+  $SUDO curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.zsh                                   --create-dirs --output "/usr/share/fzf/key-bindings.zsh"
+  $SUDO curl -L https://github.com/ImageMagick/ImageMagick/releases/download/7.1.1-18/ImageMagick--gcc-x86_64.AppImage         --create-dirs --output "/usr/local/bin/magick" && $SUDO chmod +x /usr/local/bin/magick
+  $SUDO curl -L https://github.com/ImageMagick/ImageMagick/releases/download/7.1.1-18/ImageMagick--gcc-x86_64.AppImage         --create-dirs --output "/usr/local/bin/convert" && $SUDO chmod +x /usr/local/bin/convert
+  $SUDO chmod o+rx "/usr/share/fzf"
+  $SUDO curl -L https://github.com/neovim/neovim/releases/download/v0.9.2/nvim.appimage                                     --create-dirs --output "/usr/local/bin/nvim"    && $SUDO chmod +x /usr/local/bin/nvim
+
+  # [ ! -e /.dockerenv ] && $SUDO apt install -y festvox-us-slt-hts python3-gi
+  $SUDO apt --no-install-recommends -y install ghostscript mpv poppler-utils stow # imagemagick pipewire-pulse || ( $SUDO dpkg --configure -a; apt reinstall gdm3 lightdm )
+  git clone --depth=1                        https://github.com/zsh-users/zsh-autosuggestions                                "$HOME/.config/zsh-autosuggestions"
+  git clone --depth=1                        https://github.com/zdharma-continuum/fast-syntax-highlighting                   "$HOME/.config/fast-syntax-highlighting"
+}
+
+# locales for zsh-autosuggestions:
+$SUDO sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
+$SUDO locale-gen
+
+# Install nix:
+[ ! -e /nix ] && yes | sh <(curl -L https://nixos.org/nix/install) --daemon
+
+# nix overrides:
+# nix-env --install -E 'f: (import <nixpkgs> {}).mpv-unwrapped.override { sixelSupport = true; }'
+
+# GUI dependencies:
+[ ! -e /.dockerenv ] && [ "$(id -u)" != 0 ] && {
+
+  # [ -e /bin/apt ] && $SUDO eatmydata apt --only-upgrade full-upgrade
+  # [ -e /bin/apt ] && $SUDO eatmydata apt install -y libgtk-3-dev # https://stackoverflow.com/questions/38752214/installing-libgtk-3-dev-unmet-dependencies
+  [ -e /bin/apt ] && $SUDO curl -L https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage --create-dirs --output "/usr/local/bin/wezterm" && $SUDO chmod +x /usr/local/bin/wezterm
+  [ -e /bin/apt ] && $SUDO eatmydata apt --no-install-recommends -y install cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp
+  [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm cronie dmenu light playerctl redshift sxhkd sxiv wezterm xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp gtk3
+
+  # git clone https://github.com/mwh/dragon                    && cd dragon            && $SUDO make NAME=dragon-drop PREFIX=/usr/local install && cd .. && $SUDO rm -rf dragon # dragon-drop depends on gtk3
+  git clone https://github.com/donniebreve/touchcursor-linux && cd touchcursor-linux && $SUDO make && make install && cd .. && $SUDO rm -rf touchcursor-linux
+  git clone https://github.com/jrabinow/snapper-rollback.git && cd snapper-rollback  && $SUDO cp snapper-rollback.py /usr/local/sbin/snapper-rollback && $SUDO cp snapper-rollback.conf /etc && cd .. && $SUDO rm -rf snapper-rollback
+
+  # sudo -u "root" -i -- <<'===='
+  # nix-env -iA \
+  # dmenu \     # suckless-tools
+  # devour \    # curl devour.sh
+  # light \     # light
+  # mpc_cli \
+  # mpd \
+  # ncmpcpp \
+  # playerctl \
+  # redshift \
+  # sxhkd \
+  # sxiv \
+  # xcape \
+  # xdo \
+  # xdotool \
+  # xdragon \      # git clone and make
+  # xorg.xmodmap \ #x11-xserver-utils
+  # xorg.xset \    #x11-xserver-utils
+  # zathura \
+  # -f https://github.com/NixOS/nixpkgs/archive/f3841aa99b019e827633141317ee504a50c8c936.tar.gz # NixOS/nixpkgs/pull/253000/commits
+  # btrfs-progs \
+  # bspwm \
+  # cron \
+  # dosfstools \
+  # dunst \
+  # exfat \
+  # gnome.gnome-keyring \
+  # google-chrome \
+  # libnotify \
+  # man \
+  # mediainfo \
+  # mimic \
+  # moreutils \
+  # mpvScripts.mpris \
+  # mupdf \
+  # networkmanagerapplet \
+  # ntfs3g \
+  # perl534Packages.FileMimeInfo \
+  # picom \
+  # pywal \
+  # polybar \
+  # snapper \
+  # unclutter \
+  # xorg.xorgserver \
+  # xorg.xinit
+  # ====
+
+}
+
+# Non GUI dependencies:
+  # sudo -u "root" -i -- <<'===='
+  # nix-env -iA \
+  # ffmpeg \
+  # ghostscript \
+  # imagemagick \
+  # mpv \
+  # pipewire \
+  # poppler \
+  # stow \
+  # zsh-autosuggestions \
+  # zsh-fast-syntax-highlighting \
+  # -f https://github.com/NixOS/nixpkgs/archive/f3841aa99b019e827633141317ee504a50c8c936.tar.gz # NixOS/nixpkgs/pull/253000/commits
+  # bat \
+  # cht-sh \
+  # fzf \
+  # lazygit \
+  # lf \
+  # libsixel \
+  # kitty \
+  # neovim \
+  # ripgrep \
+  # starship \
+  # unzip \
+  # xclip \
+  # wezterm \
+  # zsh \
+  # ====
+
+#---------------------------------------------- User Configs ---------------------------------------------#
+
+install_dotfiles() {
+  # git clone https://gitlab.com/yucrayeff36/dotfiles "$HOME"/.config/dotfiles/dotfiles
+  # cd "$HOME"/.config/dotfiles/dotfiles/.local/bin/
+  cd "$(git rev-parse --show-toplevel)"/wslfiles
+  mkdir -p "$HOME"/.config
+  mkdir -p "$HOME"/.local
+  stow --restow --verbose --target="$HOME"/.config .config
+  stow --restow --verbose --target="$HOME"/.local  .local
+  ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
+  ln -sf "$HOME"/.config/shell/.xprofile "$HOME"/.xprofile
+}
+
+install_fonts() {
+  mkdir -p "$HOME"/.local/share/fonts
+
+  # Nerd-Fonts:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts /tmp/nerd-fonts
+  cd /tmp/nerd-fonts
+  git sparse-checkout add patched-fonts/3270
+  git sparse-checkout add patched-fonts/CascadiaCode
+  git sparse-checkout add patched-fonts/FiraCode
+  # git sparse-checkout add patched-fonts/Terminus
+  cp -r patched-fonts/3270         "$HOME"/.local/share/fonts
+  cp -r patched-fonts/CascadiaCode "$HOME"/.local/share/fonts
+  cp -r patched-fonts/FiraCode     "$HOME"/.local/share/fonts
+  # cp -r patched-fonts/Terminus     "$HOME"/.local/share/fonts
+
+  # Font-Awesome:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/FortAwesome/Font-Awesome /tmp/Font-Awesome
+  cd /tmp/Font-Awesome
+  git sparse-checkout add otfs
+  git sparse-checkout add webfonts
+  mkdir -p        "$HOME"/.local/share/fonts/Font-Awesome
+  cp -r otfs/     "$HOME"/.local/share/fonts/Font-Awesome
+  cp -r webfonts/ "$HOME"/.local/share/fonts/Font-Awesome
+
+  # Noto Sans/Serif/Mono:
+  # git clone --depth=1 --filter=blob:none --sparse https://github.com/notofonts/notofonts.github.io /tmp/notofonts.github.io
+  # cd /tmp/notofonts.github.io
+  # git sparse-checkout add fonts/NotoSans/googlefonts
+  # git sparse-checkout add fonts/NotoSansMono/googlefonts
+  # git sparse-checkout add fonts/NotoSerif/googlefonts
+  # mkdir -p                             "$HOME"/.local/share/fonts/NotoSans
+  # mkdir -p                             "$HOME"/.local/share/fonts/NotoSansMono
+  # mkdir -p                             "$HOME"/.local/share/fonts/NotoSerif
+  # cp -r fonts/NotoSans/googlefonts     "$HOME"/.local/share/fonts/NotoSans
+  # cp -r fonts/NotoSansMono/googlefonts "$HOME"/.local/share/fonts/NotoSansMono
+  # cp -r fonts/NotoSerif/googlefonts    "$HOME"/.local/share/fonts/NotoSerif
+
+  # Noto CJK:
+  # git clone --depth=1 --filter=blob:none --sparse https://github.com/notofonts/noto-cjk /tmp/noto-cjk
+  # cd /tmp/noto-cjk
+  # git sparse-checkout add google-fonts
+  # mkdir -p           "$HOME"/.local/share/fonts/NotoCJK
+  # cp -r google-fonts "$HOME"/.local/share/fonts/NotoCJK
+
+  # Noto Color-Emoji:
+  git clone --depth=1 --filter=blob:none --sparse https://github.com/googlefonts/noto-emoji /tmp/noto-emoji
+  cd /tmp/noto-emoji
+  git sparse-checkout add fonts
+  mkdir -p                    "$HOME"/.local/share/fonts/Noto-Emoji
+  cp fonts/NotoColorEmoji.ttf "$HOME"/.local/share/fonts/Noto-Emoji
+
+  # Bedstead Font:
+  # curl -L https://bjh21.me.uk/bedstead/bedstead-002.004.zip --output /tmp/bedstead-002.004.zip
+  # unzip /tmp/bedstead-002.004.zip -d "$HOME"/.local/share/fonts
+
+  # rofimoji version 6.0.0 depends on python version 3.10:
+  # pip install --user --upgrade git+https://github.com/fdw/rofimoji@6.0.0
+  # nix-shell -p python310Packages.pipx --command "pipx install https://github.com/fdw/rofimoji/archive/refs/tags/6.0.0.zip"
+  # nix-env -iA nixpkgs.python310Packages.pipx nixpkgs.rofi
+}
+
+#-------------------------------------------- System Configs -----------------------------------------#
+
+install_configs () {
+
+  # Services:
+  # mpc --port=6601 update
+  # systemctl --user enable --now mpd
+  # systemctl --user enable --now touchcursor
+  mkdir -p "$HOME"/.local/share/mpd  "$HOME"/.cache/zsh
+  [ -e /etc/X11/xorg.conf.d ] && sudo mv /etc/X11/xorg.conf.d /etc/X11/xorg.conf.d.synapticsconflicts
+  $SUDO mkdir -p /etc/X11/xorg.conf.d && $SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
+  command -v crontab                  && crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
+  # nix-collect-garbage -d
+  [ -e /bin/apt ] && $SUDO apt autoremove -y
+  [ -e /bin/pacman ] && yes | $SUDO pacman -Scc
+
+  # Login shell:
+  [ "$(id -u)" == 0 ] && export USER="root"
+  $SUDO chsh -s "$(which zsh)" "$USER"
+  sudo usermod -aG audio $USER
+
+  # GWSL:
+  # echo "export LIBGL_ALWAYS_INDIRECT=1" >>"$HOME"/.zshenv #GWSL
+  # echo "export DISPLAY=\$(cat /etc/resolv.conf | grep nameserver | awk '{print \$2; exit;}'):0.0" >>"$HOME"/.zshenv #GWSL
+  # echo "export PULSE_SERVER=tcp:\$(cat /etc/resolv.conf | grep nameserver | awk '{print \$2; exit;}')" >>"$HOME"/.zshenv #GWSL
+
+  # Pipewire:
+  # echo "export DISPLAY=localhost:0.0" >>"$HOME"/.zshenv #WSL
+  # echo "export PULSE_SERVER=tcp:localhost" >>"$HOME"/.zshenv #WSL
+  # echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zshenv #Docker Audio
+
+  # Blacklisting beep sound (there is no beep in docker):
+  # sudo rmmod pcspkr
+  # echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
+
+}
+
+#------------------------------------------------ main -----------------------------------------------#
+
+install_dotfiles                                                       || ( echo $(tput -T ansi setaf 1) install_dotfiles failed    && exit 1; )
+[ ! -e /.dockerenv ] && [ "$(id -u)" != 0 ] && ( install_fonts         || ( echo $(tput -T ansi setaf 1) install_fonts failed       && exit 1; ))
+install_configs                                                        || ( echo $(tput -T ansi setaf 1) install_configs failed     && exit 1; )
+
+printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"
+printf "\e[1;32m Done! \e[0m\n"
