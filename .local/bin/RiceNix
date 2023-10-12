@@ -48,6 +48,38 @@
 #     su - "drksl" bash -c "export XDG_RUNTIME_DIR=/run/user/1000 && script -qI /dev/null"
 #     '
 
+#========================================== rollback layout ==========================================#
+
+# ● home》
+# ○ snapper-rollback to "base-install"
+# ○ snapper delete old snapshots
+# ○ git pull
+# ○ ./RiceNix
+# ○ check google-chrome
+# ○ check vscode
+# ○ check apt autoremove
+# ○ check dragon-drop
+# ○ check nix-env working
+# ○ check neovim plugins
+# ○ check systemctl .services
+# ○ check broadcom-sta-dkms
+# ○ snapper -c home create -d "after-RiceNix(commit 121)"
+# ○ ./Rice
+# ○ snapper -c home create -d "after-Rice(commit 118)"
+
+# ● root 》
+# ○ snapper-rollback to "base-install"
+# ○ snapper delete old snapshots
+# ○ delete btrfs snapshots created by snapper-rollback
+# ○ ./RiceNix
+# ○ check dataos
+# ○ check sudoers
+# ○ check snapper-rollback.conf
+# ○ check zram
+# ○ snapper create -d "after-RiceNix(commit 121)"
+# ○ ./Rice
+# ○ snapper create -d "after-Rice(commit 118)"
+
 #================================= Post-Install: Run it inside zellij may restart gdm/lighdm =================================#
 
 # exit on error:
@@ -92,11 +124,11 @@ export DEBIAN_FRONTEND=noninteractive
   $SUDO curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/completion.zsh                                     --create-dirs --output "/usr/share/fzf/completion.zsh"
   $SUDO curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.zsh                                   --create-dirs --output "/usr/share/fzf/key-bindings.zsh"
   $SUDO curl -L https://github.com/ImageMagick/ImageMagick/releases/download/7.1.1-18/ImageMagick--gcc-x86_64.AppImage         --create-dirs --output "/usr/local/bin/magick" && $SUDO chmod +x /usr/local/bin/magick
-  $SUDO curl -L https://github.com/ImageMagick/ImageMagick/releases/download/7.1.1-18/ImageMagick--gcc-x86_64.AppImage         --create-dirs --output "/usr/local/bin/convert" && $SUDO chmod +x /usr/local/bin/convert
+  $SUDO ln -sf /usr/local/bin/magick /usr/local/bin/convert
   $SUDO chmod o+rx "/usr/share/fzf"
   $SUDO curl -L https://github.com/neovim/neovim/releases/download/v0.9.2/nvim.appimage                                     --create-dirs --output "/usr/local/bin/nvim"    && $SUDO chmod +x /usr/local/bin/nvim
 
-  # [ ! -e /.dockerenv ] && $SUDO apt install -y festvox-us-slt-hts python3-gi
+  # [ ! -e /.dockerenv ] && $SUDO apt install -y festvox-us-slt-hts python3-gi broadcom-sta-dkms
   $SUDO apt --no-install-recommends -y install ghostscript mpv poppler-utils stow # imagemagick pipewire-pulse || ( $SUDO dpkg --configure -a; apt reinstall gdm3 lightdm )
   git clone --depth=1                        https://github.com/zsh-users/zsh-autosuggestions                                "$HOME/.config/zsh-autosuggestions"
   git clone --depth=1                        https://github.com/zdharma-continuum/fast-syntax-highlighting                   "$HOME/.config/fast-syntax-highlighting"
@@ -118,8 +150,8 @@ $SUDO locale-gen
   # [ -e /bin/apt ] && $SUDO eatmydata apt --only-upgrade full-upgrade
   # [ -e /bin/apt ] && $SUDO eatmydata apt install -y libgtk-3-dev # https://stackoverflow.com/questions/38752214/installing-libgtk-3-dev-unmet-dependencies
   [ -e /bin/apt ] && $SUDO curl -L https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage --create-dirs --output "/usr/local/bin/wezterm" && $SUDO chmod +x /usr/local/bin/wezterm
-  [ -e /bin/apt ] && $SUDO eatmydata apt --no-install-recommends -y install cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp
-  [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm cronie dmenu light playerctl redshift sxhkd sxiv wezterm xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp gtk3
+  [ -e /bin/apt ] && $SUDO apt --no-install-recommends -y install cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp systemd-zram-generator
+  [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm cronie dmenu light playerctl redshift sxhkd sxiv wezterm xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler zram-generator; # mpc mpd ncmpcpp gtk3
 
   # git clone https://github.com/mwh/dragon                    && cd dragon            && $SUDO make NAME=dragon-drop PREFIX=/usr/local install && cd .. && $SUDO rm -rf dragon # dragon-drop depends on gtk3
   git clone https://github.com/donniebreve/touchcursor-linux && cd touchcursor-linux && $SUDO make && make install && cd .. && $SUDO rm -rf touchcursor-linux
@@ -203,6 +235,26 @@ $SUDO locale-gen
   # zsh \
   # ====
 
+#------------------------------------------ Packages Snapshot ----------------------------------------#
+
+install_snapshot(){
+
+  # nix-collect-garbage -d
+  if [ -e /bin/apt ]; then
+
+    $SUDO apt-mark minimize-manual -y
+    apt-mark showmanual > apt-snapshot.list
+    $SUDO apt autoremove -y
+
+  else
+
+    pacman -Qqe > pacman-snapshot.list
+    yes | $SUDO pacman -Scc
+
+  fi
+
+}
+
 #---------------------------------------------- User Configs ---------------------------------------------#
 
 install_dotfiles() {
@@ -284,15 +336,14 @@ install_configs () {
 
   # Services:
   # mpc --port=6601 update
+  # sudo systemctl enable --now NetworkManager
+  # sudo systemctl enable --now cron
   # systemctl --user enable --now mpd
   # systemctl --user enable --now touchcursor
   mkdir -p "$HOME"/.local/share/mpd  "$HOME"/.cache/zsh
   [ -e /etc/X11/xorg.conf.d ] && sudo mv /etc/X11/xorg.conf.d /etc/X11/xorg.conf.d.synapticsconflicts
   $SUDO mkdir -p /etc/X11/xorg.conf.d && $SUDO cp "$HOME"/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d
   command -v crontab                  && crontab "$HOME"/.local/bin/cron/lowbatnotificationcron
-  # nix-collect-garbage -d
-  [ -e /bin/apt ] && $SUDO apt autoremove -y
-  [ -e /bin/pacman ] && yes | $SUDO pacman -Scc
 
   # Login shell:
   [ "$(id -u)" == 0 ] && export USER="root"
@@ -317,6 +368,7 @@ install_configs () {
 
 #------------------------------------------------ main -----------------------------------------------#
 
+install_snapshot                                                       || ( echo $(tput -T ansi setaf 1) install_snapshot failed    && exit 1; )
 install_dotfiles                                                       || ( echo $(tput -T ansi setaf 1) install_dotfiles failed    && exit 1; )
 [ ! -e /.dockerenv ] && [ "$(id -u)" != 0 ] && ( install_fonts         || ( echo $(tput -T ansi setaf 1) install_fonts failed       && exit 1; ))
 install_configs                                                        || ( echo $(tput -T ansi setaf 1) install_configs failed     && exit 1; )

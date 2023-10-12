@@ -66,7 +66,7 @@ export QT_QPA_PLATFORMTHEME="gtk2"	# Have QT use gtk2 theme.
 export SUDO_ASKPASS="$HOME/.local/bin/dmenupass"
 
 # export MANPAGER="less -R --use-color -Dd+r -Du+b"
-export MANROFFOPT="-P -c"
+# export MANROFFOPT="-P -c"
 export LESS='-RS'
 export LESSOPEN="| /usr/bin/bat --style full --color always --paging always --wrap never %s"
 # # export LESS_TERMCAP_so="$(printf '%b' '[01;43;30m')"                                # f: black b: yellow  # start standout (reversed)
