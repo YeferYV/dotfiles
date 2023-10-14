@@ -3,12 +3,12 @@
 #
 
 # terminal emulator
-super + {_, shift, ctrl, alt } + Return
+super + {_, shift, alt, shift + alt } + Return
 	{ \
-	  wezterm --config initial_rows=47 --config initial_cols=169; \
-  , wezterm --config window_background_opacity=0.0 --config text_background_opacity=0.3; \
-	, wezterm --config "window_decorations='NONE'" ; \
+	  wezterm --config initial_rows=32 --config initial_cols=135; \
 	, wezterm --config initial_rows=25 --config initial_cols=85; \
+	, wezterm --config "window_decorations='NONE'" ; \
+  , wezterm --config window_background_opacity=0.0 --config text_background_opacity=0.3; \
 	}
 
 # terminal emulator
@@ -301,14 +301,16 @@ mod1 + ctrl + {1,2,3,4,5}
 # compositor wallpaper background
 super + BackSpace
 	{\
-		picom --glx-no-rebind-pixmap \
-          --use-damage \
-          --xrender-sync-fence \
-          --backend glx \
-          --transparent-clipping \
+		picom --transparent-clipping \
+		      --shadow-radius=10 \
+		      --shadow-opacity=0.9 \
+		      --shadow-offset-x=-10 \
+		      --shadow-offset-y=-15 \
           --frame-opacity=0.5 \
-          # --active-opacity=0.90 \
-          # --inactive-opacity=0.90 \
+          --fade-delta=0 \
+          # --inactive-dim=0.2 \
+          # --active-opacity=0.95 \
+          # --inactive-opacity=1.0 \
           # --refresh-rate 30\
 				  ,\
     killall picom\
@@ -317,24 +319,25 @@ super + BackSpace
 # compositor blur background
 super + alt + BackSpace
 	{ \
-	  picom --backend="glx" \
-	        --blur-strength="1" \
-	        --blur-method="dual_kawase" \
+	  picom --blur-method="dual_kawase" \
+	        --backend="glx" \
 	        --opacity-rule="70:class_g *= 'neovide'" \
 	        --opacity-rule="70:class_g *= 'wezterm'" \
+	        --fade-delta=0 \
+	        # --inactive-dim=0.2 \
 				  ,\
 	  killall picom \
 	}
 
 # compositor keep background
 super + ctrl + BackSpace
-	{ picom,killall picom }
+	{picom --fade-delta=0, killall picom}
 
 # compositor no shadow
 super + shift + BackSpace
-	{picom --shadow-opacity=0 --transparent-clipping, killall picom}
+	{picom --shadow-opacity=0 --transparent-clipping --fade-delta=0, killall picom}
 
-# compositor decrease/increase transparency
+# compositor decrease/increase transparency (picom-trans requires xorg-xwininfo)
 super + ctrl + {minus,equal}
   xdo id -d -c | xargs -I id -n 1 picom-trans -w id {-2,+4}
 
@@ -361,7 +364,7 @@ super + {_,shift +} r
 
 # browser
 super + {_,shift +} w
-  { google-chrome-stable --process-per-tab, killall chrome}
+  { google-chrome --process-per-tab, killall chrome}
 
 # toggle background
 super + alt + ctrl + w

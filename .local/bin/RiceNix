@@ -55,15 +55,16 @@
 # ○ snapper delete old snapshots
 # ○ git pull
 # ○ ./RiceNix
-# ○ check google-chrome
-# ○ check vscode
-# ○ check apt autoremove
+# ○ check google-chrome.appimage
+# ○ check vscode.appimage
+# ○ check broadcom-sta-dkms
 # ○ check dragon-drop
+# ○ check /etc/apt/sources.list unstable
+# ○ check apt autoremove
 # ○ check nix-env working
 # ○ check neovim plugins
 # ○ check systemctl .services
-# ○ check broadcom-sta-dkms
-# ○ snapper -c home create -d "after-RiceNix(commit 121)"
+# ○ snapper -c home create -d "after-RiceNix(commit 122)"
 # ○ ./Rice
 # ○ snapper -c home create -d "after-Rice(commit 118)"
 
@@ -72,11 +73,11 @@
 # ○ snapper delete old snapshots
 # ○ delete btrfs snapshots created by snapper-rollback
 # ○ ./RiceNix
-# ○ check dataos
+# ○ check beep
 # ○ check sudoers
 # ○ check snapper-rollback.conf
 # ○ check zram
-# ○ snapper create -d "after-RiceNix(commit 121)"
+# ○ snapper create -d "after-RiceNix(commit 122)"
 # ○ ./Rice
 # ○ snapper create -d "after-Rice(commit 118)"
 
@@ -150,12 +151,13 @@ $SUDO locale-gen
   # [ -e /bin/apt ] && $SUDO eatmydata apt --only-upgrade full-upgrade
   # [ -e /bin/apt ] && $SUDO eatmydata apt install -y libgtk-3-dev # https://stackoverflow.com/questions/38752214/installing-libgtk-3-dev-unmet-dependencies
   [ -e /bin/apt ] && $SUDO curl -L https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage --create-dirs --output "/usr/local/bin/wezterm" && $SUDO chmod +x /usr/local/bin/wezterm
-  [ -e /bin/apt ] && $SUDO apt --no-install-recommends -y install cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler; # mpc mpd ncmpcpp systemd-zram-generator
+  [ -e /bin/apt ] && $SUDO apt --no-install-recommends -y install cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler zsync; # mpc mpd ncmpcpp systemd-zram-generator # am requires zsync
   [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm cronie dmenu light playerctl redshift sxhkd sxiv wezterm xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler zram-generator; # mpc mpd ncmpcpp gtk3
 
   # git clone https://github.com/mwh/dragon                    && cd dragon            && $SUDO make NAME=dragon-drop PREFIX=/usr/local install && cd .. && $SUDO rm -rf dragon # dragon-drop depends on gtk3
-  git clone https://github.com/donniebreve/touchcursor-linux && cd touchcursor-linux && $SUDO make && make install && cd .. && $SUDO rm -rf touchcursor-linux
-  git clone https://github.com/jrabinow/snapper-rollback.git && cd snapper-rollback  && $SUDO cp snapper-rollback.py /usr/local/sbin/snapper-rollback && $SUDO cp snapper-rollback.conf /etc && cd .. && $SUDO rm -rf snapper-rollback
+  git clone https://github.com/ivan-hc/AM-application-manager && cd AM-application-manager && $SUDO chmod a+x INSTALL && $SUDO ./INSTALL && cd .. && $SUDO rm -rf AM-application-manager
+  git clone https://github.com/donniebreve/touchcursor-linux  && cd touchcursor-linux      && $SUDO make && make install && cd .. && $SUDO rm -rf touchcursor-linux
+  git clone https://github.com/jrabinow/snapper-rollback.git  && cd snapper-rollback       && $SUDO cp snapper-rollback.py /usr/local/sbin/snapper-rollback && $SUDO cp snapper-rollback.conf /etc && cd .. && $SUDO rm -rf snapper-rollback
 
   # sudo -u "root" -i -- <<'===='
   # nix-env -iA \
@@ -260,7 +262,7 @@ install_snapshot(){
 install_dotfiles() {
   # git clone https://gitlab.com/yucrayeff36/dotfiles "$HOME"/.config/dotfiles/dotfiles
   # cd "$HOME"/.config/dotfiles/dotfiles/.local/bin/
-  cd "$(git rev-parse --show-toplevel)"/wslfiles
+  cd "$(git rev-parse --show-toplevel)"
   mkdir -p "$HOME"/.config
   mkdir -p "$HOME"/.local
   stow --restow --verbose --target="$HOME"/.config .config
@@ -361,6 +363,7 @@ install_configs () {
   # echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zshenv #Docker Audio
 
   # Blacklisting beep sound (there is no beep in docker):
+  # xset b off
   # sudo rmmod pcspkr
   # echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
 
