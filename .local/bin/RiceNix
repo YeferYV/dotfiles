@@ -64,9 +64,9 @@
 # ○ check nix-env working
 # ○ check neovim plugins
 # ○ check systemctl .services
-# ○ snapper -c home create -d "after-RiceNix(commit 122)"
+# ○ snapper -c home create -d "after-RiceNix(commit 123)"
 # ○ ./Rice
-# ○ snapper -c home create -d "after-Rice(commit 118)"
+# ○ snapper -c home create -d "after-Rice(commit 119)"
 
 # ● root 》
 # ○ snapper-rollback to "base-install"
@@ -74,12 +74,13 @@
 # ○ delete btrfs snapshots created by snapper-rollback
 # ○ ./RiceNix
 # ○ check beep
+# ○ check neovim plugins
 # ○ check sudoers
 # ○ check snapper-rollback.conf
 # ○ check zram
-# ○ snapper create -d "after-RiceNix(commit 122)"
+# ○ snapper create -d "after-RiceNix(commit 123)"
 # ○ ./Rice
-# ○ snapper create -d "after-Rice(commit 118)"
+# ○ snapper create -d "after-Rice(commit 119)"
 
 #================================= Post-Install: Run it inside zellij may restart gdm/lighdm =================================#
 
@@ -96,7 +97,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Arch server/docker dependencies:
 [ -e /bin/pacman ] && {
-  $SUDO pacman -Sy     --noconfirm base-devel bat fzf lazygit libsixel lf ripgrep starship zellij unzip xclip zsh glibc || # glibc required by git
+  $SUDO pacman -Sy     --noconfirm --needed base-devel bat fzf lazygit libsixel lf ripgrep starship zellij unzip xclip zsh glibc || # glibc required by git
   {
     $SUDO pacman-key  --init
     $SUDO pacman-key  --populate
@@ -107,7 +108,7 @@ export DEBIAN_FRONTEND=noninteractive
   $SUDO curl -L https://github.com/neovim/neovim/releases/download/v0.9.2/nvim.appimage                                     --create-dirs --output "/usr/local/bin/nvim"    && $SUDO chmod +x /usr/local/bin/nvim
 
   # [ ! -e /.dockerenv ] && $SUDO pacman -S --noconfirm festival-us fakeroot python-gobject # ArchWSL uses fakeroot-tcp
-  $SUDO pacman -S --noconfirm ghostscript imagemagick mpv pipewire-pulse poppler stow
+  $SUDO pacman -S --noconfirm --needed ghostscript imagemagick mpv pipewire-pulse poppler stow
   git clone --depth=1                        https://github.com/zsh-users/zsh-autosuggestions                                "$HOME/.config/zsh-autosuggestions"
   git clone --depth=1                        https://github.com/zdharma-continuum/fast-syntax-highlighting                   "$HOME/.config/fast-syntax-highlighting"
 }
@@ -151,8 +152,8 @@ $SUDO locale-gen
   # [ -e /bin/apt ] && $SUDO eatmydata apt --only-upgrade full-upgrade
   # [ -e /bin/apt ] && $SUDO eatmydata apt install -y libgtk-3-dev # https://stackoverflow.com/questions/38752214/installing-libgtk-3-dev-unmet-dependencies
   [ -e /bin/apt ] && $SUDO curl -L https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage --create-dirs --output "/usr/local/bin/wezterm" && $SUDO chmod +x /usr/local/bin/wezterm
-  [ -e /bin/apt ] && $SUDO apt --no-install-recommends -y install cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler zsync; # mpc mpd ncmpcpp systemd-zram-generator # am requires zsync
-  [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm cronie dmenu light playerctl redshift sxhkd sxiv wezterm xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler zram-generator; # mpc mpd ncmpcpp gtk3
+  [ -e /bin/apt ] && $SUDO apt --no-install-recommends -y install python3-btrfsutil cron suckless-tools light playerctl redshift sxhkd sxiv xcape xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler zsync; # mpc mpd ncmpcpp systemd-zram-generator # am requires zsync # snapper-rollback requires python3-btrfsutil
+  [ -e /bin/pacman ] && $SUDO pacman -S --noconfirm --needed cronie dmenu light playerctl redshift sxhkd sxiv wezterm xcape xdo xdotool xorg-xmodmap xorg-xset xf86-input-synaptics zathura-pdf-poppler zram-generator; # mpc mpd ncmpcpp gtk3
 
   # git clone https://github.com/mwh/dragon                    && cd dragon            && $SUDO make NAME=dragon-drop PREFIX=/usr/local install && cd .. && $SUDO rm -rf dragon # dragon-drop depends on gtk3
   git clone https://github.com/ivan-hc/AM-application-manager && cd AM-application-manager && $SUDO chmod a+x INSTALL && $SUDO ./INSTALL && cd .. && $SUDO rm -rf AM-application-manager
