@@ -364,7 +364,7 @@ super + {_,shift +} r
 
 # browser
 super + {_,shift +} w
-  { google-chrome --process-per-tab, killall chrome}
+  { google-chrome --process-per-tab || google-chrome-stable --process-per-tab, killall chrome}
 
 # toggle background
 super + alt + ctrl + w
