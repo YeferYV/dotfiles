@@ -3,7 +3,7 @@
 # export PATH="$PATH:$HOME/.local/appimage:$HOME/.local/bin"
 # export PATH="$PATH:${$(find ~/.local/bin -type d -printf %p:)%%:}"
 # export PATH="$PATH:$(du "$HOME/.local/bin" | cut -f2 | paste -sd ':')"
-export PATH="$(du "$HOME/.local/bin" | cut -f2 | paste -sd ':'):$HOME/.local/share/npm/bin:$PATH"
+export PATH="$(du "$HOME/.local/bin" | cut -f2 | paste -sd ':'):$HOME/.local/share/sixelrice:$HOME/.local/share/npm/bin:$PATH"
 
 # unsetopt PROMPT_SP
 # export PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/~}\007"'
@@ -16,7 +16,7 @@ export TERM="xterm-256color" # inside docker TERM is xterm which makes tmux 8 co
 export BAT_THEME="base16"
 export BROWSER="google-chrome-stable"
 export EDITOR="nvim"
-export OPENER="$([ -e /bin/apt ] && echo 'xdg-open' || echo 'gio open')"
+export OPENER="gio open"
 export PAGER="less"
 export SHELL="$(which zsh)"
 export SURFRAW_graphical=no
