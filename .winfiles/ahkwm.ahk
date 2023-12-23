@@ -18,9 +18,15 @@ Browser_Back::
    return
 
 ;https://winaero.com/change-keyboard-repeat-delay-and-rate-in-windows-10
+;https://ludditus.com/2016/07/15/microsoft-the-keyboard-repeat-rate-and-sleeping-how-to-work-around-their-idiocy/
 #+z::
   Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Keyboard\' -Name KeyboardDelay -Value 0}"
   Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Keyboard\' -Name KeyboardSpeed -Value 31}"
+  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name AutoRepeatDelay       -Value 200}"
+  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name AutoRepeatRate        -Value 10}"
+  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name DelayBeforeAcceptance -Value 0}"
+  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name Flags                 -Value 27}"
+  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name BounceTime            -Value 0}"
   return
 
 ;https://www.maketecheasier.com/disable-lock-screen-shortcut-key-windows
@@ -61,8 +67,8 @@ Browser_Back::
 #f::SendInput {LWin down}{LCtrl down}{Right}{LCtrl up}{LWin up} ;desktop_switch_left
 #w::run C:\Users\yeste\scoop\apps\googlechrome\current\chrome.exe
 #+w::run pkill chrome
-#v::run C:\Users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe start -- pwsh -command "lf && pwsh"
-#+v::run C:\Users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe start -- arch run bash -c "source ~/.zprofile && cd ~ && lf && zsh"
+#v::run C:\Users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe start -- pwsh -command "lf && pwsh"
+#+v::run C:\Users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe start -- arch run bash -c "source ~/.zprofile && cd ~ && lf && zsh"
 #b::run explorer.exe
 #VKBA::send !{tab}
 ; #Space::send !{tab} ;keyboard layout
@@ -256,14 +262,14 @@ Browser_Back::
     return
 
 ;#+enter::run c:\users\yeste\scoop\apps\alacritty\current\alacritty.exe -e arch, \\wsl$\arch\home\drksl\docs
-;#enter::run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe,,max
+;#enter::run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe,,max
 #enter::
-    run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe,,max,process_id
+    run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe,,max,process_id
     WinWait, ahk_pid %process_id%
     WinActivate, ahk_pid %process_id%
   return
-#+enter::run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe
-#^enter::run c:\users\yeste\scoop\apps\wezterm-nightly\current\wezterm-gui.exe start -- arch ,,max ;arch config --default-user drksl
+#+enter::run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe
+#^enter::run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe start -- arch ,,max ;arch config --default-user drksl
 !enter::run c:\users\yeste\scoop\apps\windows-terminal\current\wt.exe pwsh -nologo, c:\users\yeste
 ^enter::run pkill wezterm
 
@@ -295,21 +301,28 @@ wheelleft::
 <!Space::Send {RAlt down}{RCtrl down}{RShift down}{Space}{RShift up}{RCtrl up}{RAlt up}
 
 ralt::send {rshift down}
-ralt up::send % (a_priorkey = "ralt") ? "{rshift up}{ralt up}{bs}" : "{rshift up}{ralt up}"
++ralt::send {rshift up} ; in case rshift gets stuck
+;ralt up::send % (a_priorkey = "ralt") ? "{rshift up}{ralt up}{bs}" : "{rshift up}{ralt up}" ; buggy rshift gets stuck when long press
+ralt up::
+  if instr(a_priorkey, "ralt")
+    send {bs}
+  send {rshift up}{ralt up}
+  return
+
 ;lwin & ralt::sendinput {lwin down}{lalt down}{lalt up}{lwin up} ;notworking
 ;ralt & space::send {enter}
 ;ralt & lalt::send ^{z}
 
 lwin::lwin
-;$~lwin up::send % instr(a_priorkey, "lwin") ? "{lbutton}" : "{lwin up}"
-lwin up::
-  if instr(a_priorkey, "lwin")
-    send {lbutton}
-  send {lwin up}
-  return
+$~lwin up::send % instr(a_priorkey, "lwin") ? "{lbutton}{lwin up}" : "{lwin up}"
+; lwin up::
+;   if instr(a_priorkey, "lwin")
+;     send {lbutton}
+;   send {lwin up}
+;   return
 
 ;lalt::lalt
-$~lalt up::send % instr(a_priorkey, "lalt") ? "{mbutton}" : "{lalt up}"
+$~lalt up::send % (a_priorkey = "lalt") ? "{mbutton}" : "{lalt up}"
 ;lalt up::
 ;  if instr(a_priorkey, "lalt")
 ;    send {mbutton}

@@ -10,7 +10,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
 
 # _buckets:
-scoop install git
+scoop install git # `scoop install busybox` will overwrite git `sh` for lf image preview
 scoop bucket add main
 scoop bucket add extras
 scoop bucket add nerd-fonts
@@ -46,7 +46,7 @@ sudo `
 touchcursor `
 vcredist2022 `
 vscode `
-wezterm-nightly `
+wezterm@20230712-072601-f4abf8fd `
 # 7zip `
 # archwsl `
 # bugn `
