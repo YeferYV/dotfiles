@@ -24,6 +24,11 @@ set scrolloff 10
 # which does not work with powershell. Therefore, you need to override these
 # keybindings with explicit choices accordingly.
 
+# shell scripts needs `busybox dos2unix lfrc lf_preview.sh lf_clean.sh`
+# to see the conversion `busybox cat -A lfrc lf_preview.sh lf_clean.sh`
+# image preview requires `scoop install wezterm@20230712-072601-f4abf8fd`
+# image preview uses `busybox shell` to resolve conflicts with `git shell` run `scoop reset busybox`
+# bat preview uses `scoop install less` to resolve conflicts with `busybox less` run `scoop reset less`
 set previewer "C:/Users/yeste/Appdata/Local/lf/lf_preview.cmd"
 set cleaner "C:/Users/yeste/Appdata/Local/lf/lf_clean.cmd"
 
@@ -32,6 +37,11 @@ cmd env $env | less
 
 # change 'doc' command to use a different pager
 cmd doc $lf -doc | bat
+
+cmd trash ${{
+  mkdir -p $HOME/.cache/Trash
+  basename -a $FX | xargs -I var mv var "$HOME/.cache/Trash/var-$(date '+%y%m%d-%H-%M-%S')"
+}}
 
 # cmd on-cd &{{
 #   lf -remote "send redraw"
@@ -103,7 +113,7 @@ map <enter> shell
 map i $echo $FX | xargs bat --paging=always --wrap=never
 
 # change the shell used in default shell keybinding
-map D $echo $FX | xargs recycle-bin
+map D trash
 
 # _lazygit:
 map gll $lazygit

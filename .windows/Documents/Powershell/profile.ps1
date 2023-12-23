@@ -18,6 +18,12 @@
         [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
     }
 
+    Set-PSReadLineKeyHandler -Chord Alt+y -ScriptBlock {
+        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('y')
+        [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+    }
+
     Set-PSReadlineKeyHandler -Chord Alt+h -Function ViBackwardChar -ViMode Command
     Set-PSReadlineKeyHandler -Chord Alt+h -Function ViCommandMode -ViMode Insert
 
@@ -48,9 +54,6 @@ Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
 
-# pwsh prompt
-Invoke-Expression (&starship init powershell)
-
 #
 # You may put this in one of the profiles found in $PROFILE.
 #
@@ -66,6 +69,12 @@ function lfcd {
 		    }
 		  }
 	}
+}
+
+function y() {
+  yazi --cwd-file=$HOME/.yazi;
+  cd $(cat $HOME/.yazi);
+  printf "\x1b[A\x1b[K";
 }
 
 function OnViModeChange {
@@ -110,3 +119,11 @@ Set-Alias -Name lfdir -Value lf_dir
 
 Set-Alias n nvim
 Set-Alias ll ls
+
+# pwsh prompt
+starship config format "(`$battery)(`$sudo)(`$username)(`$directory)(`$git_branch)(`$git_status)(`$cmd_duration)(`$status)(`$character)"
+starship config add_newline false
+starship config cmd_duration.min_time 60000
+starship config directory.style "bold fg:#5555cc"
+starship config directory.truncation_length 9
+Invoke-Expression (&starship init powershell)
