@@ -22,11 +22,8 @@ sxhkd &
 ## screen temperature
 bash -c "sleep 7 && redshift -O 2222" &
 
-## xmodmaps and xcapes
-bash -c "sleep 7 && remaps" &
-
-## space-leader remapping
-touchcursor &
+## touchcursor-like + xcapes-like remaps
+sudo kanata --cfg ~/.config/kanata/simple.kbd &
 
 ## Remove mouse when idle
 # unclutter --timeout 1 &
