@@ -19,10 +19,10 @@ end
 
 bufferline.setup {
   options = {
-    numbers = "none", -- | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string,
-    close_command = "bp | bd #", -- can be a string | function, see "Mouse actions"
-    right_mouse_command = "bp | bd #", -- can be a string | function, see "Mouse actions"
-    left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
+    numbers = "none",                   -- | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string,
+    close_command = "bp | bd #",        -- can be a string | function, see "Mouse actions"
+    right_mouse_command = "bp | bd #",  -- can be a string | function, see "Mouse actions"
+    left_mouse_command = "buffer %d",   -- can be a string | function, see "Mouse actions"
     middle_mouse_command = "bp | bd #", -- can be a string | function, see "Mouse actions"
     -- NOTE: this plugin is designed with this icon in mind,
     -- and so changing this is NOT recommended, this is intended
@@ -50,7 +50,7 @@ bufferline.setup {
     max_name_length = 30,
     max_prefix_length = 30, -- prefix used when a buffer is de-duplicated
     tab_size = 21,
-    diagnostics = false, -- | "nvim_lsp" | "coc",
+    diagnostics = false,    -- | "nvim_lsp" | "coc",
     diagnostics_update_in_insert = false,
     -- diagnostics_indicator = function(count, level, diagnostics_dict, context)
     --   return "("..count..")"
@@ -89,99 +89,4 @@ bufferline.setup {
     --   return buffer_a.modified > buffer_b.modified
     -- end
   },
-  -- highlights = {
-  --   fill = {
-  --     guifg = "none",
-  --     guibg = "none",
-  --   },
-  --   background = {
-  --     guifg = "#666666",
-  --     guibg = "#0b0b0b",
-  --   },
-  --
-  --   buffer_selected = {
-  --     guifg = '#4141ad',
-  --     guibg = '#111111',
-  --     gui = 'bold',
-  --   },
-  --   buffer_visible = {
-  --     guifg = "#a1a1ad",
-  --     guibg = "#111111",
-  --   },
-  --
-  --   close_button = {
-  --     guifg = "#666666",
-  --     guibg = "#0b0b0b",
-  --   },
-  --   close_button_selected = {
-  --     guifg = "#4141ad",
-  --     guibg = "#111111",
-  --   },
-  --   close_button_visible = {
-  --     guifg = "#a1a1ad",
-  --     guibg = "#111111",
-  --   },
-  --
-  --   tab = {
-  --     guifg = "#666666",
-  --     guibg = "none",
-  --   },
-  --   tab_close = {
-  --     guifg = "#666666",
-  --     guibg = "none",
-  --   },
-  --   tab_selected = {
-  --     guifg = "#4141ad",
-  --     guibg = "none",
-  --   },
-  --
-  --   duplicate = {
-  --     guifg = "#666666",
-  --     guibg = "#0b0b0b",
-  --     gui = "underline",
-  --     guisp = "#0b0b0b"
-  --   },
-  --   duplicate_selected = {
-  --     guifg = "#4141ad",
-  --     guibg = "#111111",
-  --     gui = "underline",
-  --     guisp = "#4141ad"
-  --   },
-  --   duplicate_visible = {
-  --     guifg = "#a1a1ad",
-  --     guibg = "#111111",
-  --     gui = "underline",
-  --     guisp = "#111111"
-  --   },
-  --
-  --   modified = {
-  --     guifg = "#666666",
-  --     guibg = "#0b0b0b",
-  --   },
-  --   modified_selected = {
-  --     guifg = "#4141ad",
-  --     guibg = "#111111",
-  --   },
-  --   modified_visible = {
-  --     guifg = "#a1a1ad",
-  --     guibg = "#111111",
-  --   },
-  --
-  --   separator = {
-  --     guifg = "#000000",
-  --     guibg = "none",
-  --   },
-  --   separator_selected = {
-  --     guifg = "#000000",
-  --     guibg = "none",
-  --   },
-  --   separator_visible = {
-  --     guifg = "#111111",
-  --     guibg = "#111111",
-  --   },
-  --   indicator_selected = {
-  --     guifg = "#111111",
-  --     guibg = "#111111",
-  --   },
-  -- },
 }

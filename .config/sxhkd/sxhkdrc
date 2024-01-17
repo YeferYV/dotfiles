@@ -53,6 +53,10 @@ super + {_,shift + }{1-9,0,minus,equal}
 	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11}'
 
 # focus relative desktop
+super + {h,l}
+	xdotool set_desktop --relative -- {-1,1}
+
+# focus relative desktop
 super + {s,f}
 	xdotool set_desktop --relative -- {-1,1}
 

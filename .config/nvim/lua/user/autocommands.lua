@@ -8,26 +8,6 @@ local create_command = vim.api.nvim_create_user_command
 ------------------------------------------------------------------------------------------------------------------------
 
 vim.cmd [[
-  " augroup _alpha
-  "   autocmd!
-  "   autocmd User AlphaReady set showtabline=0 | autocmd BufUnload <buffer> set showtabline=2
-  " augroup end
-
-  " augroup _autostart_codi
-  "   autocmd!
-  "   au BufEnter *.js Codi
-  "   au BufEnter *.py Codi
-  " augroup end
-
-  " augroup _auto_resize
-  "   autocmd!
-  "   autocmd VimResized * tabdo wincmd =
-  " augroup end
-
-  " augroup _disable_neotree_status
-  "   autocmd!
-  "   au BufEnter,BufWinEnter,WinEnter,CmdwinEnter * if bufname('%') == "neo-tree" | set laststatus=0 | else | set laststatus=2 | endif
-  " augroup end
 
   " augroup _enable_terminal_insert_and_hide_terminal_statusline
   "   autocmd!
@@ -45,37 +25,30 @@ vim.cmd [[
   "   autocmd TermClose          * if &filetype != 'toggleterm' | call feedkeys("i") | endif
   " augroup end
 
-  augroup _filetype_vimcommentary_support
+  augroup _filetype
     autocmd!
-    autocmd FileType sxhkd setlocal commentstring=#\ %s
-  augroup end
-
-  augroup _general_settings
-    autocmd!
+    autocmd FileType gitcommit           setlocal spell
+    autocmd FileType markdown            setlocal spell
+    autocmd FileType qf                  set      nobuflisted
     autocmd FileType qf,help,man,lspinfo nnoremap <silent> <buffer> q :close<CR>
+  augroup end
+
+  augroup _hightlight_yank
     autocmd TextYankPost * silent!lua require('vim.highlight').on_yank({higroup = 'Visual', timeout = 200})
-    autocmd BufWinEnter * :set formatoptions-=cro
-    autocmd FileType qf set nobuflisted
   augroup end
 
-  augroup _git
-    autocmd!
-    autocmd FileType gitcommit setlocal wrap
-    autocmd FileType gitcommit setlocal spell
-  augroup end
-
-  augroup _hightlight_whitespaces
-    autocmd!
-    autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
-    highlight ExtraWhitespace ctermbg=red guibg=red
-    autocmd InsertLeave * redraw!
-    match ExtraWhitespace /\s\+$\| \+\ze\t/
-    autocmd BufWritePre * :%s/\s\+$//e
-  augroup end
+  " augroup _hightlight_whitespaces
+  "   autocmd!
+  "   autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+  "   highlight ExtraWhitespace ctermbg=red guibg=red
+  "   autocmd InsertLeave * redraw!
+  "   match ExtraWhitespace /\s\+$\| \+\ze\t/
+  "   autocmd BufWritePre * :%s/\s\+$//e
+  " augroup end
 
   augroup _jump_to_last_position_on_reopen
     autocmd!
-    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
   augroup end
 
   " augroup _lsp_autoformat
@@ -85,12 +58,7 @@ vim.cmd [[
 
   augroup _lspsaga_highlights_overwrite
     autocmd!
-    au BufReadPost * hi LspSagaWinbarSep guifg=#495466
-  augroup end
-
-  augroup _markdown
-    autocmd!
-    autocmd FileType markdown setlocal spell
+    autocmd BufReadPost * hi LspSagaWinbarSep guifg=#495466
   augroup end
 
   " augroup _save_folding
@@ -101,15 +69,10 @@ vim.cmd [[
 
   augroup _stop_newlines_commented
     autocmd!
-  " au FileType * set fo-=c fo-=r fo-=o
+    " au BufWinEnter * :set formatoptions-=cro
+    " au FileType * set fo-=c fo-=r fo-=o
     au BufEnter * set fo-=c fo-=r fo-=o
   augroup end
-
-  " augroup _toogle_neotree_cursor
-  "   autocmd!
-  "   autocmd BufEnter * if &filetype == 'neo-tree' | hi Cursor guifg=none guibg=red blend=100 | setlocal guicursor=n:Cursor/lCursor | endif
-  "   autocmd BufEnter * if &filetype != 'neo-tree' | setlocal guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20 | endif
-  " augroup end
 
   augroup _mouse_menu
     aunmenu PopUp
@@ -135,116 +98,10 @@ vim.cmd [[
 
 ------------------------------------------------------------------------------------------------------------------------
 
--- Last Active Tab
-vim.cmd [[
-  function! LastActiveTab()
-    if !exists('g:lasttab')
-      let g:lasttab = 1
-    endif
-    au TabLeave * let g:lasttab = tabpagenr()
-    exe "tabn ".g:lasttab
-  endfunction
-    " nnoremap <C-z> :call LastActiveTab()<CR>
-]]
-
--- SwitchWindow
-vim.cmd [[
-  function! SwitchWindow(count) abort
-    let l:current_buf = winbufnr(0)
-    exe "buffer" . winbufnr(a:count)
-    exe a:count . "wincmd w"
-    exe "buffer" . l:current_buf
-    wincmd p
-  endfunction
-  " nnoremap <C-x> :call SwitchWindow(v:count1)<CR>
-  " tnoremap <C-x> <C-\><C-n>:call SwitchWindow(v:count1)<CR><Esc>
-]]
-
--- SwitchWindow2
-vim.cmd [[
-  function! SwitchWindow2()
-    let thiswin = winnr()
-    let thisbuf = bufnr("%")
-    let lastwin = winnr("#")
-    let lastbuf = winbufnr(lastwin)
-    exe "buffer" . lastbuf
-    wincmd p
-    exe "buffer" . thisbuf
-    wincmd p
-  endfunction
-  " nnoremap <C-x> :call SwitchWindow2()<CR>
-  " tnoremap <C-x> <C-\><C-n>:call WinBufSwap()<CR><Esc>
-]]
-
--- Window Buffer Swap
-vim.cmd [[
-  function! WinBufSwap()
-    let thiswin = winnr()
-    let thisbuf = bufnr("%")
-    let lastwin = winnr("#")
-    let lastbuf = winbufnr(lastwin)
-
-    exec  lastwin . " wincmd w" ."|".
-        \ "buffer ". thisbuf ."|".
-        \ thiswin ." wincmd w" ."|".
-        \ "buffer ". lastbuf
-  endfunction
-
-  command! Wswap :call WinBufSwap()
-  " map <C-v> :call WinBufSwap()<CR>
-]]
-
--- Window Swap
-vim.cmd [[
-  function! MarkWindowSwap()
-    let g:markedWinNum = winnr()
-  endfunction
-
-  function! DoWindowSwap()
-    "Mark destination
-    let curNum = winnr()
-    let curBuf = bufnr( "%" )
-    exe g:markedWinNum . "wincmd w"
-    "Switch to source and shuffle dest->source
-    let markedBuf = bufnr( "%" )
-    "Hide and open so that we aren't prompted and keep history
-    exe 'hide buf' curBuf
-    "Switch to dest and shuffle source->dest
-    exe curNum . "wincmd w"
-    "Hide and open so that we aren't prompted and keep history
-    exe 'hide buf' markedBuf
-  endfunction
-  " nmap <silent> <C-m> :call MarkWindowSwap()<CR>
-  " nmap <silent> <C-x> :call DoWindowSwap()<CR>
-]]
-
-------------------------------------------------------------------------------------------------------------------------
-
--- -- _toogle_neotree_cursor
--- local toogle_neotree_cursor = augroup("_toogle_neotree_cursor", { clear = true })
--- cmd({"BufEnter","Filetype"}, {
---   group = toogle_neotree_cursor,
---   callback = function()
---     if vim.bo.filetype ~= "neo-tree" then
---       vim.cmd[[setlocal guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20]]
---     end
---   end,
--- })
--- cmd({"BufEnter","Filetype"}, {
---   group = toogle_neotree_cursor,
---   callback = function()
---     if vim.bo.filetype == "neo-tree" then
---       vim.cmd[[hi Cursor guibg=red blend=100 | setlocal guicursor=n:Cursor/lCursor]]
---     end
---   end,
--- })
-
-------------------------------------------------------------------------------------------------------------------------
-
 -- _enable_terminal_insert_and_hide_terminal_statusline
 local hide_terminal_statusline = augroup("_enable_terminal_insert_and_hide_terminal_statusline", { clear = true })
 
--- cmd({ "BufEnter", "Filetype" }, {
+-- autocmd({ "BufEnter", "Filetype" }, {
 --   group = hide_terminal_statusline,
 --   pattern = "term://*",
 --   command = "startinsert"
@@ -260,23 +117,14 @@ autocmd({ "TermEnter", "TermOpen" }, {
   end,
 })
 
--- cmd({ "TermLeave" }, {
---   group = hide_terminal_statusline,
---   callback = function()
---     require('lualine').hide({ unhide = true })
---   end,
--- })
-
 ------------------------------------------------------------------------------------------------------------------------
 
--- _autoclose_tab-terminal_if_last_window
+-- _show_alpha_if_close_last_tab-terminal + _autoclose_tab-terminal_if_last_window
 autocmd({ "TermClose" }, {
   group = hide_terminal_statusline,
   callback = function()
-
     local type = vim.bo.filetype
     if type == "sp-terminal" or type == "vs-terminal" or type == "buf-terminal" or type == "tab-terminal" then
-
       -- if number of tabs is equal to 1 (last tab)
       if #vim.api.nvim_list_tabpages() == 1 then
         vim.cmd [[ Alpha ]]
@@ -294,95 +142,14 @@ autocmd({ "TermClose" }, {
 
       -- alternatively close the buffer instead of confirming
       -- vim.cmd [[ execute 'bdelete! ' . expand('<abuf>') ]]
-
     end
   end,
 })
 
 ------------------------------------------------------------------------------------------------------------------------
 
-M.EnableAutoNoHighlightSearch = function()
-  vim.on_key(function(char)
-    if vim.fn.mode() == "n" then
-      local new_hlsearch = vim.tbl_contains({ "<Up>", "<Down>", "<CR>", "n", "N", "*", "#", "?", "/" },
-        vim.fn.keytrans(char))
-      if vim.opt.hlsearch:get() ~= new_hlsearch then vim.cmd [[ noh ]] end
-    end
-  end, vim.api.nvim_create_namespace "auto_hlsearch")
-end
-
-M.DisableAutoNoHighlightSearch = function()
-  vim.on_key(nil, vim.api.nvim_get_namespaces()["auto_hlsearch"])
-  vim.cmd [[ set hlsearch ]]
-end
-
-M.EnableAutoNoHighlightSearch() -- autostart
-
-------------------------------------------------------------------------------------------------------------------------
-
-_G.FeedKeysCorrectly = function(keys)
-  local feedableKeys = vim.api.nvim_replace_termcodes(keys, true, false, true)
-  vim.api.nvim_feedkeys(feedableKeys, "n", true)
-end
-
-------------------------------------------------------------------------------------------------------------------------
-
-_G.GoToParentIndent = function()
-  local ok, start = require("indent_blankline.utils").get_current_context(
-    vim.g.indent_blankline_context_patterns,
-    vim.g.indent_blankline_use_treesitter_scope
-  )
-  if ok then
-    vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { start, 0 })
-    vim.cmd [[normal! _]]
-  end
-end
-
-------------------------------------------------------------------------------------------------------------------------
-
-function GotoTextObj_Callback()
-  FeedKeysCorrectly(vim.g.dotargs)
-end
-
-_G.GotoTextObj = function(action)
-  vim.g.dotargs = action
-  vim.o.operatorfunc = 'v:lua.GotoTextObj_Callback'
-  return "g@"
-end
-
-------------------------------------------------------------------------------------------------------------------------
-
-function WhichKeyRepeat_Callback()
-  if vim.g.dotfirstcmd ~= nil then vim.cmd(vim.g.dotfirstcmd) end
-  if vim.g.dotsecondcmd ~= nil then vim.cmd(vim.g.dotsecondcmd) end
-  if vim.g.dotthirdcmd ~= nil then vim.cmd(vim.g.dotthirdcmd) end
-end
-
-_G.WhichkeyRepeat = function(firstcmd, secondcmd, thirdcmd)
-  vim.g.dotfirstcmd = firstcmd
-  vim.g.dotsecondcmd = secondcmd
-  vim.g.dotthirdcmd = thirdcmd
-  vim.o.operatorfunc = 'v:lua.WhichKeyRepeat_Callback'
-  vim.cmd.normal { "g@l", bang = true }
-end
-
-------------------------------------------------------------------------------------------------------------------------
-
-function ShowBufferline()
-  require('bufferline').setup {
-    options = {
-      offsets = { { filetype = 'neo-tree', padding = 1 } },
-      show_close_icon = false
-    }
-  }
-end
-
-create_command("BufferlineShow", ShowBufferline, {})
-
-------------------------------------------------------------------------------------------------------------------------
-
 -- -- _json_to_jsonc
--- cmd({ "BufEnter", "BufWinEnter", "WinEnter" }, {
+-- autocmd({ "BufEnter", "BufWinEnter", "WinEnter" }, {
 --   -- pattern = "*.json",
 --   -- command = "set ft=jsonc"
 --   callback = function()
@@ -398,21 +165,218 @@ create_command("BufferlineShow", ShowBufferline, {})
 
 ------------------------------------------------------------------------------------------------------------------------
 
+function EnableAutoNoHighlightSearch()
+  vim.on_key(function(char)
+    if vim.fn.mode() == "n" then
+      local new_hlsearch = vim.tbl_contains({ "<Up>", "<Down>", "<CR>", "n", "N", "*", "#", "?", "/" },
+        vim.fn.keytrans(char))
+      if vim.opt.hlsearch:get() ~= new_hlsearch then vim.cmd [[ noh ]] end
+    end
+  end, vim.api.nvim_create_namespace "auto_hlsearch")
+end
+
+create_command("EnableAutoNoHighlightSearch", EnableAutoNoHighlightSearch, {})
+
+function DisableAutoNoHighlightSearch()
+  vim.on_key(nil, vim.api.nvim_get_namespaces()["auto_hlsearch"])
+  vim.cmd [[ set hlsearch ]]
+end
+
+create_command("DisableAutoNoHighlightSearch", DisableAutoNoHighlightSearch, {})
+
+EnableAutoNoHighlightSearch() -- autostart
+
+------------------------------------------------------------------------------------------------------------------------
+
+function GoToParentIndent()
+  local ok, start = require("indent_blankline.utils").get_current_context(
+    vim.g.indent_blankline_context_patterns,
+    vim.g.indent_blankline_use_treesitter_scope
+  )
+  if ok then
+    vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { start, 0 })
+    vim.cmd [[normal! _]]
+  end
+end
+
+create_command("GoToParentIndent", GoToParentIndent, {})
+
+------------------------------------------------------------------------------------------------------------------------
+
+function ShowBufferline()
+  require("bufferline").setup({
+    options = {
+      offsets = { { filetype = "neo-tree", padding = 1 } },
+      show_close_icon = false,
+    },
+  })
+end
+
+create_command("ShowBufferline", ShowBufferline, {})
+
+------------------------------------------------------------------------------------------------------------------------
+
+-- swap current window with the last visited window
+function SwapWindow()
+  local thiswin = vim.fn.winnr()
+  local thisbuf = vim.fn.bufnr("%")
+  local lastwin = vim.fn.winnr("#")
+  local lastbuf = vim.fn.winbufnr(lastwin)
+  vim.cmd("buffer " .. lastbuf) -- view lastbuf in current window
+  vim.cmd("wincmd p")           -- go to previous window
+  vim.cmd("buffer " .. thisbuf) -- view thisbuf in current window
+  vim.cmd("wincmd p")           -- go to previous window
+end
+
+create_command("SwapWindow", SwapWindow, {})
+
+------------------------------------------------------------------------------------------------------------------------
+
+function ToggleDiagnostics()
+  if vim.g.diagnostics_enabled then
+    vim.diagnostic.disable()
+    vim.g.diagnostics_enabled = false
+  else
+    vim.diagnostic.enable()
+    vim.g.diagnostics_enabled = true
+  end
+end
+
+create_command("ToggleDiagnostics", ToggleDiagnostics, {})
+
+------------------------------------------------------------------------------------------------------------------------
+
+function ToggleVirtualText()
+  local function bool2str(bool) return bool and "on" or "off" end
+
+  if vim.g.diagnostics_enabled then
+    vim.g.diagnostics_enabled = false
+  else
+    vim.g.diagnostics_enabled = true
+  end
+
+  vim.diagnostic.config(require("user.lsp.handlers").setup(bool2str(vim.g.diagnostics_enabled)))
+end
+
+create_command("ToggleVirtualText", ToggleDiagnostics, {})
+
+------------------------------------------------------------------------------------------------------------------------
+
+-- to support "<cmd>, <esc>..." (ctrl keys unsupported) alternatives:
+-- vim.api.nvim_feedkeys() -- accepts escape sequences
+-- vim.api.nvim_input() -- accepts ctrl keys and escape sequences
+-- vim.api.nvim_buf_set_keys(0, 0, 0, 0, '<C-V>') -- send keys at especific location
+_G.FeedKeysCorrectly = function(keys)
+  local feedableKeys = vim.api.nvim_replace_termcodes(keys, true, false, true)
+  vim.api.nvim_feedkeys(feedableKeys, "n", true)
+end
+
+------------------------------------------------------------------------------------------------------------------------
+-- select from the start of text object to cursor position
+function _G.__to_start_of_textobj(motion)
+  if motion == nil then
+    vim.o.operatorfunc = "v:lua.__to_start_of_textobj"
+    return "m'g@"
+  end
+
+  if motion == "char" then
+    vim.api.nvim_feedkeys("`[v`'", "n", true)
+  elseif motion == "line" then
+    vim.api.nvim_feedkeys("`[V`'", "n", true)
+  elseif motion == "block" then
+    vim.api.nvim_feedkeys("`[\22`'", "n", true)
+  end
+end
+
+-- select from cursor position to rest of text object
+function _G.__to_end_of_textobj(motion)
+  if motion == nil then
+    vim.o.operatorfunc = "v:lua.__to_end_of_textobj"
+    return "m'g@"
+  end
+
+  if motion == "char" then
+    vim.api.nvim_feedkeys("`'v`]", "n", true)
+  elseif motion == "line" then
+    vim.api.nvim_feedkeys("`'V`]", "n", true)
+  elseif motion == "block" then
+    vim.api.nvim_feedkeys("`'\22`]", "n", true)
+  end
+end
+
+------------------------------------------------------------------------------------------------------------------------
+
+function GotoTextObj_Callback()
+  -- vim.api.nvim_input(vim.g.dotargs) -- slow and has whichkey conflicts (to reproduce "vg<ii")
+  vim.api.nvim_feedkeys(vim.g.dotargs, "n", true)
+end
+
+_G.GotoTextObj = function(motion, selection_char, selection_line, selection_block)
+  vim.g.dotargs = motion
+
+  if vim.fn.mode() == "v" then
+    vim.g.dotargs = selection_char
+  end
+
+  if vim.fn.mode() == "V" then
+    vim.g.dotargs = selection_line
+  end
+
+  if vim.fn.mode() == "\22" then
+    vim.g.dotargs = selection_block
+  end
+
+  vim.o.operatorfunc = 'v:lua.GotoTextObj_Callback'
+  return "<esc>m'g@"
+end
+
+------------------------------------------------------------------------------------------------------------------------
+
+function WhichKeyRepeat_Callback()
+  if vim.g.dotfirstcmd ~= nil then vim.cmd(vim.g.dotfirstcmd) end
+  if vim.g.dotsecondcmd ~= nil then vim.cmd(vim.g.dotsecondcmd) end
+  if vim.g.dotthirdcmd ~= nil then vim.cmd(vim.g.dotthirdcmd) end
+end
+
+-- https://www.vikasraj.dev/blog/vim-dot-repeat
+_G.WhichkeyRepeat = function(firstcmd, secondcmd, thirdcmd)
+  vim.g.dotfirstcmd = firstcmd
+  vim.g.dotsecondcmd = secondcmd
+  vim.g.dotthirdcmd = thirdcmd
+  vim.o.operatorfunc = 'v:lua.WhichKeyRepeat_Callback'
+  vim.cmd.normal { "g@l", bang = true }
+end
+
+------------------------------------------------------------------------------------------------------------------------
+
 -- https://thevaluable.dev/vim-create-text-objects
 -- select indent by the same level:
-M.select_indent = function(check_blank_line)
+M.select_same_indent = function(skip_blank_line)
   local start_indent = vim.fn.indent(vim.fn.line('.'))
 
-  if check_blank_line then
-    match_blank_line = function(line) return string.match(vim.fn.getline(line), '^%s*$') end
-  else
+  function is_blank_line(line) return string.match(vim.fn.getline(line), '^%s*$') end
+
+  if skip_blank_line then
     match_blank_line = function(line) return false end
+  else
+    match_blank_line = function(line) return is_blank_line(line) end
   end
 
   local prev_line = vim.fn.line('.') - 1
   while vim.fn.indent(prev_line) == start_indent or match_blank_line(prev_line) do
     vim.cmd('-')
     prev_line = vim.fn.line('.') - 1
+
+    -- exit loop if there's no indentation
+    if skip_blank_line then
+      if vim.fn.indent(prev_line) == 0 and is_blank_line(prev_line) then
+        break
+      end
+    else
+      if vim.fn.indent(prev_line) < 0 then
+        break
+      end
+    end
   end
 
   vim.cmd('normal! 0V')
@@ -421,30 +385,77 @@ M.select_indent = function(check_blank_line)
   while vim.fn.indent(next_line) == start_indent or match_blank_line(next_line) do
     vim.cmd('+')
     next_line = vim.fn.line('.') + 1
+
+    -- exit loop if there's no indentation
+    if skip_blank_line then
+      if vim.fn.indent(next_line) == 0 and is_blank_line(next_line) then
+        break
+      end
+    else
+      if vim.fn.indent(prev_line) < 0 then
+        break
+      end
+    end
   end
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 
--- next/prev same level indent:
-M.next_indent = function(next)
+-- goto next/prev same/different level indent:
+M.next_indent = function(next, level)
   local start_indent = vim.fn.indent(vim.fn.line('.'))
-  local next_line = next and ( vim.fn.line('.') + 1 ) or ( vim.fn.line('.') - 1 )
+  local current_line = vim.fn.line('.')
+  local next_line = next and (vim.fn.line('.') + 1) or (vim.fn.line('.') - 1)
   local sign = next and '+' or '-'
 
-  while vim.fn.indent(next_line) == start_indent do
-    vim.cmd(sign)
-    next_line = next and ( vim.fn.line('.') + 1 ) or ( vim.fn.line('.') - 1 )
+  function is_blank_line(line) return string.match(vim.fn.getline(line), '^%s*$') end
+
+  -- scroll no_blanklines (indent = 0) when going down
+  if is_blank_line(current_line) == nil then
+    if sign == '+' then
+      while vim.fn.indent(next_line) == 0 and is_blank_line(next_line) == nil do
+        vim.cmd('+')
+        next_line = vim.fn.line('.') + 1
+      end
+    end
   end
 
-  while vim.fn.indent(next_line) > start_indent or string.match(vim.fn.getline(next_line), '^%s*$')  do
-    vim.cmd(sign)
-    next_line = next and ( vim.fn.line('.') + 1 ) or ( vim.fn.line('.') - 1 )
+  -- scroll same indentation (indent != 0)
+  if start_indent ~= 0 then
+    while vim.fn.indent(next_line) == start_indent do
+      vim.cmd(sign)
+      next_line = next and (vim.fn.line('.') + 1) or (vim.fn.line('.') - 1)
+    end
   end
 
+  if level == "same_level" then
+    -- scroll differrent indentation (supports indent = 0, skip blacklines)
+    while vim.fn.indent(next_line) ~= -1 and (vim.fn.indent(next_line) ~= start_indent or is_blank_line(next_line)) do
+      vim.cmd(sign)
+      next_line = next and (vim.fn.line('.') + 1) or (vim.fn.line('.') - 1)
+    end
+  else -- level == "different_level"
+    -- scroll blanklines (indent = -1 is when line is 0 or line is last+1 )
+    while vim.fn.indent(next_line) == 0 and is_blank_line(next_line) do
+      vim.cmd(sign)
+      next_line = next and (vim.fn.line('.') + 1) or (vim.fn.line('.') - 1)
+    end
+  end
+
+  -- scroll to next indentation
   vim.cmd(sign)
+
+  -- scroll to top of indentation no_blanklines
+  start_indent = vim.fn.indent(vim.fn.line('.'))
+  next_line = next and (vim.fn.line('.') + 1) or (vim.fn.line('.') - 1)
+  if sign == '-' then
+    -- next_line indent is start_indent, next_line is no_blankline
+    while vim.fn.indent(next_line) == start_indent and is_blank_line(next_line) == nil do
+      vim.cmd('-')
+      next_line = vim.fn.line('.') - 1
+    end
+  end
 end
 
 ------------------------------------------------------------------------------------------------------------------------
-
 return M
