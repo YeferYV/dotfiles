@@ -1,12 +1,8 @@
 # WSL:
 # wsl --install
 
-# _policies:
-# Set-ExecutionPolicy Bypass -Scope Process
+# Package Manager:
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# _package_manager:
-# iwr -useb get.scoop.sh | iex
 irm get.scoop.sh | iex
 
 # _buckets:
@@ -26,12 +22,12 @@ autohotkey1.1 `
 bat `
 busybox `
 CascadiaCode-NF `
-CascadiaCode-NF-Mono `
 file `
+firacode-NF `
 flux `
 fzf `
 gcc `
-googlechrome `
+kanata `
 lazygit `
 less `
 lf `
@@ -40,13 +36,12 @@ mpv `
 mupdf `
 neovim `
 pwsh `
-recycle-bin `
 starship `
 sudo `
-touchcursor `
 vcredist2022 `
 vscode `
 wezterm@20230712-072601-f4abf8fd `
+yazi `
 # 7zip `
 # archwsl `
 # bugn `
@@ -56,6 +51,7 @@ wezterm@20230712-072601-f4abf8fd `
 # ffmpeg `
 # gawk `
 # go `
+# googlechrome `
 # gzip `
 # lua `
 # mingw-winlibs-llvm-ucrt `
@@ -65,8 +61,9 @@ wezterm@20230712-072601-f4abf8fd `
 # windows-terminal `
 # winrar `
 
-# _winget_packages:
-# winget install --force `
+winget install --force `
+google.chrome `
+# vscode `
 # Elantech `
 # IObit.DriverBooster9 `
 # GWSL `
@@ -75,18 +72,21 @@ wezterm@20230712-072601-f4abf8fd `
 # LibreOffice `
 # Microsoft.VisualStudio.2022.Community # https://github.com/microsoft/vcpkg/issues/22074#issuecomment-1310105006
 
-# _startups_programs:
+# Powershell 5 ReadLine:
+Install-Module -Name PowerShellGet -Force
+Install-Module PSReadLine -AllowPrerelease -Force
+
+# _startups_programs: (.ahk needs `open with` to asociate a launcher)
 sudo ln -s "$PWD/ahkwm.ahk"                                        "C:/ProgramData/Microsoft/Windows/Start Menu/Programs/StartUp"
-sudo ln -s "$HOME/scoop/apps/flux/current/flux.exe"                "C:/ProgramData/Microsoft/Windows/Start Menu/Programs/StartUp"
-sudo ln -s "$HOME/scoop/apps/touchcursor/current/touchcursor.exe"  "C:/ProgramData/Microsoft/Windows/Start Menu/Programs/StartUp"
 
 # _links:
 test ! -e  "$HOME/.config"              && mkdir -p "$HOME/.config"
 test ! -e  "$HOME/Documents/Powershell" && mkdir -p "$HOME/Documents/Powershell"
-sudo ln -s "$PWD/.config/wezterm"                   "$HOME/.config/"
-sudo ln -s "$PWD/wslfiles/.config/nvim"             "$HOME/.config/"
+sudo ln -s "$PWD/../.config/kanata"                 "$HOME/.config/"
+sudo ln -s "$PWD/../.config/nvim"                   "$HOME/.config/"
+sudo ln -s "$PWD/../.config/wezterm"                "$HOME/.config/"
+sudo ln -s "$PWD/../.config/mpv"                    "$HOME/AppData/Roaming/"
 sudo ln -s "$PWD/AppData/Local/lf"                  "$HOME/AppData/Local"
-sudo ln -s "$PWD/AppData/Roaming/TouchCursor"       "$HOME/AppData/Roaming/"
-sudo ln -s "$PWD/AppData/Roaming/mpv"               "$HOME/AppData/Roaming/"
 sudo ln -s "$PWD/Documents/Powershell/profile.ps1"  "$HOME/Documents/Powershell/"
+sudo ln -s "$PWD/Documents/Powershell/profile.ps1"  "$HOME/Documents/WindowsPowerShell/"
 # sudo ln -s "$PWD/Documents/Powershell/profile.ps1"  $PROFILE.CurrentUserAllHosts

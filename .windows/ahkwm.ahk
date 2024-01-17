@@ -1,5 +1,5 @@
-run, C:\Users\yeste\scoop\apps\flux\current\flux.exe
-run, C:\Users\yeste\scoop\apps\touchcursor\current\touchcursor.exe
+run, conhost --headless flux
+run, conhost --headless powershell -c "kanata.exe --cfg $HOME/.config/kanata/simple.kbd"
 
 Browser_Forward::
    loop,3
@@ -22,8 +22,8 @@ Browser_Back::
 #+z::
   Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Keyboard\' -Name KeyboardDelay -Value 0}"
   Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Keyboard\' -Name KeyboardSpeed -Value 31}"
-  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name AutoRepeatDelay       -Value 200}"
-  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name AutoRepeatRate        -Value 10}"
+  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name AutoRepeatDelay       -Value 210}"
+  Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name AutoRepeatRate        -Value 7}"
   Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name DelayBeforeAcceptance -Value 0}"
   Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name Flags                 -Value 27}"
   Run, powershell -command "&{set-itemproperty 'HKCU:\Control Panel\Accessibility\Keyboard Response\' -Name BounceTime            -Value 0}"
@@ -65,12 +65,10 @@ Browser_Back::
 #d::SendInput {LWin down}{down}{LWin up}                        ;minimize_windows
 #s::SendInput {LWin down}{LCtrl down}{Left}{LCtrl up}{LWin up}  ;desktop_switch_right
 #f::SendInput {LWin down}{LCtrl down}{Right}{LCtrl up}{LWin up} ;desktop_switch_left
-#w::run C:\Users\yeste\scoop\apps\googlechrome\current\chrome.exe
+#w::run "C:\Program Files\Google\Chrome\Application\chrome.exe"
 #+w::run pkill chrome
-#v::run C:\Users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe start -- pwsh -command "lf && pwsh"
-#+v::run C:\Users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe start -- arch run bash -c "source ~/.zprofile && cd ~ && lf && zsh"
 #b::run explorer.exe
-#VKBA::send !{tab}
+; #VKBA::send !{tab}
 ; #Space::send !{tab} ;keyboard layout
 
 #+b::
@@ -261,17 +259,15 @@ Browser_Back::
     winmove, ahk_id %active_id%, , 200, 15, 1155, 743
     return
 
-;#+enter::run c:\users\yeste\scoop\apps\alacritty\current\alacritty.exe -e arch, \\wsl$\arch\home\drksl\docs
-;#enter::run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe,,max
+;#+enter::run /Users/%A_UserName%/scoop/apps/alacritty/current/alacritty.exe -e arch, \\wsl$\arch\home\drksl
+;!enter::run /Users/%A_UserName%/scoop/apps/windows-terminal/current/wt.exe pwsh -nologo, /Users/%A_UserName%
 #enter::
-    run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe,,max,process_id
+    run /Users/%A_UserName%/scoop/apps/wezterm/current/wezterm-gui.exe,,max,process_id
     WinWait, ahk_pid %process_id%
     WinActivate, ahk_pid %process_id%
   return
-#+enter::run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe
-#^enter::run c:\users\yeste\scoop\apps\wezterm\current\wezterm-gui.exe start -- arch ,,max ;arch config --default-user drksl
-!enter::run c:\users\yeste\scoop\apps\windows-terminal\current\wt.exe pwsh -nologo, c:\users\yeste
-^enter::run pkill wezterm
+#^enter::run /Users/%A_UserName%/scoop/apps/wezterm/current/wezterm-gui.exe start -- arch ,,max ;arch config --default-user drksl
+#+enter::run pkill wezterm
 
 wheelright::
     send ^{tab}
@@ -294,27 +290,27 @@ wheelleft::
 ;>!d::send {end}
 ;>!+s::send {home}
 ;>!+d::send {end}
-<!e::sendinput {wheelup}
-<!d::sendinput {wheeldown}
-<!s::send ^+{tab}
-<!f::send ^{tab}
-<!Space::Send {RAlt down}{RCtrl down}{RShift down}{Space}{RShift up}{RCtrl up}{RAlt up}
+;<!e::sendinput {wheelup}
+;<!d::sendinput {wheeldown}
+;<!s::send ^+{tab}
+;<!f::send ^{tab}
+;<!Space::Send {RAlt down}{RCtrl down}{RShift down}{Space}{RShift up}{RCtrl up}{RAlt up}
 
-ralt::send {rshift down}
-+ralt::send {rshift up} ; in case rshift gets stuck
+;ralt::send {rshift down}
+;+ralt::send {rshift up} ; in case rshift gets stuck
 ;ralt up::send % (a_priorkey = "ralt") ? "{rshift up}{ralt up}{bs}" : "{rshift up}{ralt up}" ; buggy rshift gets stuck when long press
-ralt up::
-  if instr(a_priorkey, "ralt")
-    send {bs}
-  send {rshift up}{ralt up}
-  return
+;ralt up::
+;  if instr(a_priorkey, "ralt")
+;    send {bs}
+;  send {rshift up}{ralt up}
+;  return
 
 ;lwin & ralt::sendinput {lwin down}{lalt down}{lalt up}{lwin up} ;notworking
 ;ralt & space::send {enter}
 ;ralt & lalt::send ^{z}
 
-lwin::lwin
-$~lwin up::send % instr(a_priorkey, "lwin") ? "{lbutton}{lwin up}" : "{lwin up}"
+;lwin::lwin
+;$~lwin up::send % instr(a_priorkey, "lwin") ? "{lbutton}{lwin up}" : "{lwin up}"
 ; lwin up::
 ;   if instr(a_priorkey, "lwin")
 ;     send {lbutton}
@@ -322,7 +318,7 @@ $~lwin up::send % instr(a_priorkey, "lwin") ? "{lbutton}{lwin up}" : "{lwin up}"
 ;   return
 
 ;lalt::lalt
-$~lalt up::send % (a_priorkey = "lalt") ? "{mbutton}" : "{lalt up}"
+;$~lalt up::send % (a_priorkey = "lalt") ? "{mbutton}" : "{lalt up}"
 ;lalt up::
 ;  if instr(a_priorkey, "lalt")
 ;    send {mbutton}
@@ -331,11 +327,11 @@ $~lalt up::send % (a_priorkey = "lalt") ? "{mbutton}" : "{lalt up}"
 
 ;capslock::send {lctrl down}
 ;capslock up::send % (a_priorkey = "capslock ") ? "{lctrl up}{capslock up}{esc}" : "{lctrl up}{capslock up}"
-capslock::lctrl
-appskey::rctrl
-vke2::\
-numpadins::space
-numpadend::c
+;capslock::lctrl
+;appskey::rctrl
+;vke2::\
+;numpadins::space
+;numpadend::c
 numpadleft::controlsend,, {<}, ahk_exe mpv.exe
 numpadright::controlsend,, {>}, ahk_exe mpv.exe
 numpadclear::controlsend,, {space}, ahk_exe mpv.exe
@@ -346,6 +342,5 @@ numpadup::controlsend,, {*}, ahk_exe mpv.exe
 #numpadclear::controlsend,, {space}, ahk_exe vlc.exe
 #numpaddown::controlsend,, {down}, ahk_exe vlc.exe
 #numpadup::controlsend,, {up}, ahk_exe vlc.exe
-numpaddel::volume_down
-numpadenter::volume_up
-
+;numpaddel::volume_down
+;numpadenter::volume_up
