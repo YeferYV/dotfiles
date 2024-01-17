@@ -1,0 +1,10 @@
+[user]
+	email = yucrayeff36@gmail.com
+	name = Yefer YV
+[diff]
+	tool = nvimdiff
+[core]
+	autocrlf = input
+	filemode = false
+	symlinks = false
+	ignorecase = true
