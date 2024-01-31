@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 #====================================== Docker run arch-ricenix ======================================#
 
 # xhost +
@@ -51,36 +50,35 @@
 #========================================== rollback layout ==========================================#
 
 # ● home》
-# ○ snapper-rollback to "base-install"
+# ○ snapper-rollback to "appman code google-chrome wezterm whiskermenu sysclean.sh"
 # ○ snapper delete old snapshots
 # ○ git pull
 # ○ ./RiceNix
-# ○ check google-chrome.appimage
 # ○ check vscode.appimage
-# ○ check broadcom-sta-dkms
+# ○ check google-chrome.appimage
+# ○ check wezterm.appimage
+# ○ check whiskermenu/sxhkd
+# ○ check syscleah.sh installed packages
 # ○ check /etc/apt/sources.list unstable
 # ○ check apt autoremove
-# ○ check nix-env working
 # ○ check neovim plugins
 # ○ check systemctl .services
 # ○ check audio
-# ○ snapper -c home create -d "after-RiceNix(commit 124)"
-# ○ ./Rice
-# ○ snapper -c home create -d "after-Rice(commit 120)"
+# ○ check brightnessctl
+# ○ snapper create -d "After RiceNix(commit 137) sixelrice(commit 131)"
 
 # ● root 》
-# ○ snapper-rollback to "base-install"
+# ○ snapper-rollback to "base base-devel broadcom-wl btrfs-progs efibootmgr fuse2 grub linux linux-firmware networkmanager snapper sudo synaptics zram-generator"
 # ○ snapper delete old snapshots
-# ○ delete btrfs snapshots created by snapper-rollback
-# ○ ./RiceNix
+# ○ check broadcom-sta-dkms
+# ○ check pacman parallel downloads
 # ○ check sudoers
-# ○ check snapper-rollback.conf
-# ○ check touchpad
+# ○ check synaptics touchpad
 # ○ check zram
-# ○ snapper create -d "after-RiceNix(commit 124)"
-# ○ ./Rice
+# ○ git clone https://gitlab.com/yucrayeff36/sixelrice ~/.config/nvim
 # ○ check neovim plugins
-# ○ snapper create -d "after-Rice(commit 120)"
+# ○ check nixpkgs.yazi
+# ○ snapper create -d "After RiceNix(commit 137) sixelrice(commit 131)"
 
 #================================= Post-Install: Run it inside zellij may restart gdm/lighdm =================================#
 
@@ -89,146 +87,153 @@ set -eu
 
 export DEBIAN_FRONTEND=noninteractive
 
-#------------------------------------- Appimage/Bin dependencies -------------------------------------#
+printf "Enter sudo password to install dependencies: " && read -s PASSWORD
 
-[ ! -e $HOME/.local/share/sixelrice ] && {
+#---------------------------------------- Non Gui Dependencies ---------------------------------------#
 
-  printf "Enter sudo password to install dependencies (deps are only installed on archlinux and debian based systems): " && read -s PASSWORD
-  [ -e /bin/pacman ] && echo $PASSWORD | su -c "pacman -Sy --needed --noconfirm base-deve fuse2 git less libsixel stow unzip xclip zsh" # npm required by Mason.nvim
-  [ -e /bin/apt    ] && echo $PASSWORD | su -c "apt update -y && apt install -y curl file fuse gcc g++ git less libarchive-tools libglib2.0-bin libsixel-bin locales make stow sudo unzip xclip xz-utils zsh" # xz-utils required by nixpkgs
-	curl -L https://github.com/jtroo/kanata/releases/download/v1.5.0/kanata_cmd_allowed                                      --create-dirs --output    "$HOME/.local/share/sixelrice/kanata" && chmod +x "$HOME/.local/share/sixelrice/kanata"
-	curl -L https://github.com/neovim/neovim/releases/download/v0.9.4/nvim.appimage                                          --create-dirs --output    "$HOME/.local/share/sixelrice/nvim"   && chmod +x "$HOME/.local/share/sixelrice/nvim"
-	curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.zsh                                     --create-dirs --output    "$HOME/.local/share/sixelrice/fzf-key-bindings/key-bindings.zsh"
-	curl -L https://github.com/junegunn/fzf/releases/download/0.42.0/fzf-0.42.0-linux_amd64.tar.gz                          | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/zellij-org/zellij/releases/download/v0.39.2/zellij-x86_64-unknown-linux-musl.tar.gz          | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.40.2/lazygit_0.40.2_Linux_x86_64.tar.gz           | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/gokcehan/lf/releases/download/r31/lf-linux-amd64.tar.gz                                      | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/Aloxaf/fzf-tab/archive/refs/heads/master.zip                                                 | bsdtar -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/zsh-users/zsh-autosuggestions/archive/refs/tags/v0.7.0.tar.gz                                | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/jeffreytse/zsh-vi-mode/archive/refs/tags/v0.10.0.tar.gz                                      | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/zdharma-continuum/fast-syntax-highlighting/archive/refs/tags/v1.55.tar.gz                    | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/starship/starship/releases/download/v1.16.0/starship-x86_64-unknown-linux-gnu.tar.gz         | tar    -xzf- --directory="$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-gnu.tar.gz            | tar    -xzf- --directory="/tmp" && cp "/tmp/bat-v0.23.0-x86_64-unknown-linux-gnu/bat"    "$HOME/.local/share/sixelrice/"
-	curl -L https://github.com/BurntSushi/ripgrep/releases/download/14.0.3/ripgrep-14.0.3-x86_64-unknown-linux-musl.tar.gz  | tar    -xzf- --directory="/tmp" && cp "/tmp/ripgrep-14.0.3-x86_64-unknown-linux-musl/rg" "$HOME/.local/share/sixelrice/"
-	rm -rf /tmp/bat* /tmp/ripgrep* # /tmp inside docker doesn't get removed
+install_non_gui_dependencies() {
 
-  # locales for zsh-autosuggestions:
-  echo $PASSWORD | su -c "sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen"
+  echo $PASSWORD | su -c "curl -L https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage --output /usr/local/bin/nvim && chmod +x /usr/local/bin/nvim"
 
-  # use zsh as default shell:
-  [ "$(id -u)" = 0 ] && export USER="root"
-  echo $PASSWORD | su -c "chsh -s $(which zsh) $USER"
+	[ -e /bin/pacman ] && echo $PASSWORD | su -c "curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory=/usr/local/bin yay_12.1.2_x86_64/yay"
+  [ -e /bin/pacman ] && echo $PASSWORD | su -c "pacman -Sy --needed --noconfirm \
+    base-devel \
+    fuse2 \
+    git \
+    less \
+	  xclip \
+    "
 
-} && $MULTIMEDIA && {
+  [ -e /bin/apt    ] && echo $PASSWORD | su -c "apt update -y && apt install -y \
+    curl \
+    file \
+    libfuse2 \
+    libsixel-bin \
+    gcc \
+    g++ \
+    git \
+    less \
+    make \
+    sudo \
+    xz-utils \
+	  xclip \
+    "
 
-	[ ! -e /nix             ] && [ -e /bin/apt  ] && yes | sh <(curl -L https://nixos.org/nix/install) --daemon;
-  # echo $PASSWORD | su -c "source ~/.nix-profile/etc/profile.d/nix.sh; nix-env --install     -E 'f: (import <nixpkgs> {}).mpv-unwrapped.override  { sixelSupport = true; }'" # nixpkgs doesn't support gpu
-  # echo $PASSWORD | su -c "source ~/.nix-profile/etc/profile.d/nix.sh; nix-build -o /tmp/mpv -E 'with import <nixpkgs> {}; mpv-unwrapped.override { sixelSupport = true; }' && nix-env --install $(readlink /tmp/mpv) "
-  # [ -e /bin/apt         ] && echo $PASSWORD | su -c "apt install -y broadcom-sta-dkms festvox-us-slt-hts python3-gi"
-  # [ -e /bin/pacman      ] && echo $PASSWORD | su -c "pacman -S --noconfirm broadcom-wl festival-us fakeroot python-gobject" # ArchWSL uses fakeroot-tcp
-	[ -e /bin/pacman        ] && echo $PASSWORD | su -c "curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory=/usr/local/bin yay_12.1.2_x86_64/yay"
-  [ -e /bin/pacman        ] && echo $PASSWORD | su -c "pacman -Sy --needed --noconfirm imagemagick ghostscript mpv pipewire-pulse poppler && yes | pacman -Scc" # xdg-open ffmpegthumbnailer required by yazi
-  [ -e /bin/apt           ] && echo $PASSWORD | su -c "apt install -y imagemagick ghostscript mpv pipewire-pulse poppler-utils && apt autoremore -y"            # pipewire-pulse is only required by mpv outside docker
-  [ -e /etc/ImageMagick-6 ] && echo $PASSWORD | su -c "mv /etc/ImageMagick-6/policy.xml /etc/ImageMagick-6/policy.xml.old"                                      # ubuntu's imagemagick pdf-conversion is old and restricted
-
+	[ ! -e /nix ] && yes | sh <(curl -L https://nixos.org/nix/install) --daemon;
+  bash --login <<'===='
+    nix-env -iA \
+	  bat \
+    blesh \
+    eza \
+    fzf \
+    kanata \
+    lazygit \
+    lf \
+	  ripgrep \
+	  starship \
+	  stow \
+    -f https://github.com/NixOS/nixpkgs/archive/149a14557b855adc35171d6a0e2a26649f02ead5.tar.gz # NixOS/nixpkgs/pull/285000/commits
+====
 }
 
-# GUI dependencies:
-[ ! -e /.dockerenv ] && {
+#------------------------------------------ Gui Dependencies -----------------------------------------#
 
-  # [ -e /bin/apt  ] && echo $PASSWORD | su -c "eatmydata apt --only-upgrade full-upgrade"
-	# [ -e /bin/apt  ] && echo $PASSWORD | su -c "source ~/.nix-profile/etc/profile.d/nix.sh; nix-shell -p cargo ronn --command 'git clone https://github.com/systemd/zram-generator && cd zram-generator && make build && sudo make install NOBUILD=true && cd .. && rm -rf zram-generator'"
-  [ -e /bin/apt    ] && echo $PASSWORD | su -c "curl -L https://github.com/wez/wezterm/releases/download/20230712-072601-f4abf8fd/WezTerm-20230712-072601-f4abf8fd-Ubuntu20.04.AppImage --create-dirs --output /usr/local/bin/wezterm && chmod +x /usr/local/bin/wezterm"
-  [ -e /bin/apt    ] && echo $PASSWORD | su -c "apt --no-install-recommends -y install python3-btrfsutil cron suckless-tools light redshift sxhkd sxiv xdo xdotool x11-xserver-utils xserver-xorg-input-synaptics zathura-pdf-poppler zsync" # mpc mpd ncmpcpp playerctl # systemd-zram-generator available on rolling release # zsync required by am # python3-btrfsutil required by snapper-rollback
-  [ -e /bin/pacman ] && echo $PASSWORD | su -c "pacman -S --noconfirm --needed cronie dmenu light redshift sxhkd sxiv wezterm xdo xdotool xorg-xset xf86-input-synaptics zathura-pdf-poppler zram-generator"                                 # mpc mpd ncmpcpp playerctl
+install_gui_dependencies() {
 
-	curl -L https://github.com/fernzi/dragdrop/releases/download/v1.1.0/DragDrop-1.1.0-x86_64.AppImage                       --create-dirs --output    "$HOME/.local/share/sixelrice/dragon-drop"                 && chmod +x "$HOME/.local/share/sixelrice/dragon-drop"
-  git clone https://github.com/ivan-hc/AM-application-manager && cd AM-application-manager && echo $PASSWORD | su -c "chmod a+x INSTALL && ./INSTALL"                                                           && cd .. && rm -rf AM-application-manager
-  git clone https://github.com/jrabinow/snapper-rollback.git  && cd snapper-rollback       && echo $PASSWORD | su -c "cp snapper-rollback.py /usr/local/sbin/snapper-rollback && cp snapper-rollback.conf /etc" && cd .. && rm -rf snapper-rollback
+  # [ -e /bin/pacman ] && echo $PASSWORD | su -c "pacman -Syu --needed --noconfirm \
+  #   awesome \
+  #   broadcom-wl \
+  #   btrfs-progs \
+  #   festival-us \
+  #   fakeroot \
+  #   networkmanager \
+  #   python-gobject \
+  #   snapper \
+  #   xorg-server \
+  #   xorg-xinit \
+  #   zram-generator \
+  #   "
 
-  # sudo -u "root" -i -- <<'===='
-  # nix-env -iA \
-  # dmenu \     # suckless-tools
-  # devour \    # curl devour.sh
-  # light \     # light
-  # mpc_cli \
-  # mpd \
-  # ncmpcpp \
-  # playerctl \
-  # redshift \
-  # sxhkd \
-  # sxiv \
-  # xcape \
-  # xdo \
-  # xdotool \
-  # xdragon \      # git clone and make
-  # xorg.xmodmap \ #x11-xserver-utils
-  # xorg.xset \    #x11-xserver-utils
-  # zathura \
-  # -f https://github.com/NixOS/nixpkgs/archive/f3841aa99b019e827633141317ee504a50c8c936.tar.gz # NixOS/nixpkgs/pull/253000/commits
-  # btrfs-progs \
-  # bspwm \
-  # cron \
-  # dosfstools \
-  # dunst \
-  # exfat \
-  # gnome.gnome-keyring \
-  # google-chrome \
-  # libnotify \
-  # man \
-  # mediainfo \
-  # mimic \
-  # moreutils \
-  # mpvScripts.mpris \
-  # mupdf \
-  # networkmanagerapplet \
-  # ntfs3g \
-  # perl534Packages.FileMimeInfo \
-  # picom \
-  # pywal \
-  # polybar \
-  # snapper \
-  # unclutter \
-  # xorg.xorgserver \
-  # xorg.xinit
-  # ====
+  [ -e /bin/pacman ] && echo $PASSWORD | su -c "pacman -S --needed --noconfirm \
+    cronie \
+    gtk3 \
+    libnotify \
+    mpv \
+    pipewire-pulse \
+    wget \
+    xdg-user-dirs \
+    xf86-input-synaptics \
+    xorg-xset \
+    "
+
+  # [ -e /bin/apt    ] && echo $PASSWORD | su -c "eatmydata apt --only-upgrade full-upgrade && apt install -y
+  #   awesome \
+  #   broadcom-sta-dkms \
+  #   btrfs-progs \
+  #   festvox-us-slt-hts \
+  #   network-manager \
+  #   python3-gi \
+  #   snapper \
+  #   systemd-zram-generator \
+  #   xserver-xorg \
+  #   xinit \
+  #   "
+
+  [ -e /bin/apt    ] && echo $PASSWORD | su -c "apt --no-install-recommends install -y \
+    cron \
+    ffmpeg \
+    libgtk-3-0 \
+    libnotify-bin \
+    mpv \
+    pipewire-pulse \
+    wget \
+    xdg-user-dirs \
+    x11-xserver-utils \
+    xserver-xorg-input-synaptics \
+    "
+
+  # bash --login -c "nix-env --install     -E 'f: (import <nixpkgs> {}).mpv-unwrapped.override  { sixelSupport = true; }'" # nixpkgs doesn't support gpu
+  # bash --login -c "nix-build -o /tmp/mpv -E 'with import <nixpkgs> {}; mpv-unwrapped.override { sixelSupport = true; }' && nix-env --install $(readlink /tmp/mpv) "
+  [ -e /nix ] && bash --login <<'===='
+    nix-env -iA \
+    brightnessctl \
+    devour \
+    dmenu \
+    fira-code-symbols \
+    ghostscript \
+    imagemagick \
+    poppler \
+    redshift \
+    sxhkd \
+    sxiv \
+    xdo \
+    xdotool \
+    xdragon \
+    zathura \
+    -f https://github.com/NixOS/nixpkgs/archive/149a14557b855adc35171d6a0e2a26649f02ead5.tar.gz # NixOS/nixpkgs/pull/285000/commits
+    # btrfs-progs \
+    # efibootmgr \
+    # grub2 \
+    # networkmanager \
+    # snapper \
+    # xorg.xset \
+    # zram-generator
+    nix-collect-garbage -d
+====
+
+	# curl -L https://github.com/fernzi/dragdrop/releases/download/v1.1.0/DragDrop-1.1.0-x86_64.AppImage -o ~/.local/bin/dragon-drop && chmod +x ~/.local/bin/dragon-drop
+	curl -L https://raw.githubusercontent.com/ivan-hc/AM-Application-Manager/main/APP-MANAGER            -o ~/.local/bin/appman      && chmod +x ~/.local/bin/appman && mkdir -p ~/.config/appman && echo ".local/appimage" > ~/.config/appman/appman-config
+  [ -e ~/.local/appimage ]  && echo "skipping appman install ..." || ~/.local/bin/appman install \
+    code \
+    google-chrome \
+    wezterm
 
 }
-
-# Non GUI dependencies:
-  # sudo -u "root" -i -- <<'===='
-  # nix-env -iA \
-  # ffmpeg \
-  # ghostscript \
-  # imagemagick \
-  # mpv \
-  # pipewire \
-  # poppler \
-  # stow \
-  # zsh-autosuggestions \
-  # zsh-fast-syntax-highlighting \
-  # -f https://github.com/NixOS/nixpkgs/archive/f3841aa99b019e827633141317ee504a50c8c936.tar.gz # NixOS/nixpkgs/pull/253000/commits
-  # bat \
-  # cht-sh \
-  # fzf \
-  # lazygit \
-  # lf \
-  # libsixel \
-  # kitty \
-  # neovim \
-  # ripgrep \
-  # starship \
-  # unzip \
-  # xclip \
-  # wezterm \
-  # zsh \
-  # ====
 
 #------------------------------------------ Packages Snapshot ----------------------------------------#
 
 install_snapshot(){
 
-  # nix-collect-garbage -d
   if [ -e /bin/apt ]; then
 
     echo $PASSWORD | su -c "apt-mark minimize-manual -y"
@@ -247,103 +252,36 @@ install_snapshot(){
 #---------------------------------------------- User Configs ---------------------------------------------#
 
 install_dotfiles() {
-  # git clone https://gitlab.com/yucrayeff36/dotfiles "$HOME"/.config/dotfiles/dotfiles
-  # cd "$HOME"/.config/dotfiles/dotfiles/.local/bin/
+
+  # Symlinks:
   cd "$(git rev-parse --show-toplevel)"
   mkdir -p "$HOME"/.config
   mkdir -p "$HOME"/.local
-  stow --restow --verbose --target="$HOME"/.config .config
-  stow --restow --verbose --target="$HOME"/.local  .local
-  ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
+  bash --login -c "stow --restow --verbose --target=$HOME/.config .config"
+  bash --login -c "stow --restow --verbose --target=$HOME/.local  .local"
+  ln -sf "$HOME"/.config/shell/.bashrc   "$HOME"/.bash_profile
+  ln -sf "$HOME"/.config/shell/.bashrc   "$HOME"/.bashrc
+  ln -sf "$HOME"/.config/shell/.profile  "$HOME"/.profile
   ln -sf "$HOME"/.config/shell/.xprofile "$HOME"/.xprofile
-}
-
-install_fonts() {
-  mkdir -p "$HOME"/.local/share/fonts
-
-  # Nerd-Fonts:
-  git clone --depth=1 --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts /tmp/nerd-fonts
-  cd /tmp/nerd-fonts
-  git sparse-checkout add patched-fonts/3270
-  git sparse-checkout add patched-fonts/CascadiaCode
-  git sparse-checkout add patched-fonts/FiraCode
-  # git sparse-checkout add patched-fonts/Terminus
-  cp -r patched-fonts/3270         "$HOME"/.local/share/fonts
-  cp -r patched-fonts/CascadiaCode "$HOME"/.local/share/fonts
-  cp -r patched-fonts/FiraCode     "$HOME"/.local/share/fonts
-  # cp -r patched-fonts/Terminus     "$HOME"/.local/share/fonts
-
-  # Font-Awesome:
-  git clone --depth=1 --filter=blob:none --sparse https://github.com/FortAwesome/Font-Awesome /tmp/Font-Awesome
-  cd /tmp/Font-Awesome
-  git sparse-checkout add otfs
-  git sparse-checkout add webfonts
-  mkdir -p        "$HOME"/.local/share/fonts/Font-Awesome
-  cp -r otfs/     "$HOME"/.local/share/fonts/Font-Awesome
-  cp -r webfonts/ "$HOME"/.local/share/fonts/Font-Awesome
-
-  # Noto Sans/Serif/Mono:
-  # git clone --depth=1 --filter=blob:none --sparse https://github.com/notofonts/notofonts.github.io /tmp/notofonts.github.io
-  # cd /tmp/notofonts.github.io
-  # git sparse-checkout add fonts/NotoSans/googlefonts
-  # git sparse-checkout add fonts/NotoSansMono/googlefonts
-  # git sparse-checkout add fonts/NotoSerif/googlefonts
-  # mkdir -p                             "$HOME"/.local/share/fonts/NotoSans
-  # mkdir -p                             "$HOME"/.local/share/fonts/NotoSansMono
-  # mkdir -p                             "$HOME"/.local/share/fonts/NotoSerif
-  # cp -r fonts/NotoSans/googlefonts     "$HOME"/.local/share/fonts/NotoSans
-  # cp -r fonts/NotoSansMono/googlefonts "$HOME"/.local/share/fonts/NotoSansMono
-  # cp -r fonts/NotoSerif/googlefonts    "$HOME"/.local/share/fonts/NotoSerif
-
-  # Noto CJK:
-  # git clone --depth=1 --filter=blob:none --sparse https://github.com/notofonts/noto-cjk /tmp/noto-cjk
-  # cd /tmp/noto-cjk
-  # git sparse-checkout add google-fonts
-  # mkdir -p           "$HOME"/.local/share/fonts/NotoCJK
-  # cp -r google-fonts "$HOME"/.local/share/fonts/NotoCJK
-
-  # Noto Color-Emoji:
-  git clone --depth=1 --filter=blob:none --sparse https://github.com/googlefonts/noto-emoji /tmp/noto-emoji
-  cd /tmp/noto-emoji
-  git sparse-checkout add fonts
-  mkdir -p                    "$HOME"/.local/share/fonts/Noto-Emoji
-  cp fonts/NotoColorEmoji.ttf "$HOME"/.local/share/fonts/Noto-Emoji
-
-  # Bedstead Font:
-  # curl -L https://bjh21.me.uk/bedstead/bedstead-002.004.zip --output /tmp/bedstead-002.004.zip
-  # unzip /tmp/bedstead-002.004.zip -d "$HOME"/.local/share/fonts
-
-  # rofimoji version 6.0.0 depends on python version 3.10:
-  # pip install --user --upgrade git+https://github.com/fdw/rofimoji@6.0.0
-  # nix-shell -p python310Packages.pipx --command "pipx install https://github.com/fdw/rofimoji/archive/refs/tags/6.0.0.zip"
-  # nix-env -iA nixpkgs.python310Packages.pipx nixpkgs.rofi
-}
-
-#-------------------------------------------- System Configs -----------------------------------------#
-
-install_configs () {
 
   # Services:
-  # mpc --port=6601 update
-  # sudo systemctl enable --now NetworkManager
-  # sudo systemctl enable --now cron
-  # systemctl --user enable --now mpd
-  # mkdir -p "$HOME"/.local/share/mpd
+  [ -e /bin/apt    ] && sudo systemctl enable --now cron
+  [ -e /bin/pacman ] && sudo systemctl enable --now cronie
+  sudo systemctl enable --now NetworkManager
+  systemctl --user enable --now pipewire-pulse
   echo $PASSWORD | su -c "[ -e /etc/X11/xorg.conf.d ]   && mv /etc/X11/xorg.conf.d /etc/X11/xorg.conf.d.synapticsconflicts"
-  echo $PASSWORD | su -c "mkdir -p /etc/X11/xorg.conf.d && cp ~~/.config/shell/10-synaptics.conf /etc/X11/xorg.conf.d"
+  echo $PASSWORD | su -c "mkdir -p /etc/X11/xorg.conf.d && cp .config/shell/10-synaptics.conf /etc/X11/xorg.conf.d"
+  echo $PASSWORD | su -c "echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL' > /etc/sudoers.d/sudo"
+  echo $PASSWORD | su -c "echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/wheel"
   command -v crontab                                    && crontab ~/.local/bin/cron/lowbatnotificationcron
 
   # GWSL:
-  # echo "export LIBGL_ALWAYS_INDIRECT=1" >>"$HOME"/.zshenv #GWSL
-  # echo "export DISPLAY=\$(cat /etc/resolv.conf | grep nameserver | awk '{print \$2; exit;}'):0.0" >>"$HOME"/.zshenv #GWSL
-  # echo "export PULSE_SERVER=tcp:\$(cat /etc/resolv.conf | grep nameserver | awk '{print \$2; exit;}')" >>"$HOME"/.zshenv #GWSL
+  # echo "export LIBGL_ALWAYS_INDIRECT=1"        >>"$HOME"/.bash_profile
+  # echo "export DISPLAY=localhost:0.0"          >>"$HOME"/.bash_profile
+  # echo "export PULSE_SERVER=tcp:localhost"     >>"$HOME"/.bash_profile
+  # echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.bash_profile
 
-  # Pipewire:
-  # echo "export DISPLAY=localhost:0.0" >>"$HOME"/.zshenv #WSL
-  # echo "export PULSE_SERVER=tcp:localhost" >>"$HOME"/.zshenv #WSL
-  # echo "export XDG_RUNTIME_DIR=/run/user/1000" >>"$HOME"/.zshenv #Docker Audio
-
-  # Blacklisting beep sound (there is no beep in docker):
+  # Blacklist Beep:
   # xset b off
   # sudo rmmod pcspkr
   # echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
@@ -352,10 +290,10 @@ install_configs () {
 
 #------------------------------------------------ main -----------------------------------------------#
 
-install_snapshot                                                       || ( echo $(tput -T ansi setaf 1) install_snapshot failed    && exit 1; )
-install_dotfiles                                                       || ( echo $(tput -T ansi setaf 1) install_dotfiles failed    && exit 1; )
-[ ! -e /.dockerenv ] && [ "$(id -u)" != 0 ] && ( install_fonts         || ( echo $(tput -T ansi setaf 1) install_fonts failed       && exit 1; ))
-install_configs                                                        || ( echo $(tput -T ansi setaf 1) install_configs failed     && exit 1; )
+install_non_gui_dependencies  || ( echo $(tput -T ansi setaf 1) install_non_gui_dependencies failed && exit 1; )
+install_gui_dependencies      || ( echo $(tput -T ansi setaf 1) install_gui_dependencies failed     && exit 1; )
+install_snapshot              || ( echo $(tput -T ansi setaf 1) install_snapshot failed             && exit 1; )
+install_dotfiles              || ( echo $(tput -T ansi setaf 1) install_dotfiles failed             && exit 1; )
 
 printf "\e[1;32m ln -sf ~/.config/shell/.xprofile ~/.xsessionrc #if lightDM (xfce) \e[0m\n"
 printf "\e[1;32m Done! \e[0m\n"

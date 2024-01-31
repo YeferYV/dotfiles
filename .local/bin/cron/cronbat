@@ -1,4 +1,4 @@
-#!/bin/env zsh
+#!/bin/bash
 
 # cat /sys/class/power_supply/BAT0/{status,capacity} | {
 # 	read -d "\n" status capacity
@@ -38,10 +38,10 @@ date +%T | awk -F ':' '($1 >= 22 && $2 == 20)' | xargs -I_ [ -z _ ] || (echo "22
 # date +%T | awk -F ':' '($1 >= 22 && $2 == 10)' | xargs -I_ [ -z _ ] || (echo "22:10 hours 🛌 " | tee >(mimic -voice slt_hts)  && countdown 600 && sudo -i poweroff)
 # date +%T | awk -F ':' '($1 >= 22 && $2 == 00)' | xargs -I_ [ -z _ ] || (echo "22:00 hours 🛌 " | tee >(mimic -voice slt_hts) && countdown 600 && sudo -i poweroff)
 # date +%T | awk -F ':' '($1 >= 21 && $2 == 50)' | xargs -I_ [ -z _ ] || (echo "21:50 hours 🛌 " | tee >(mimic -voice slt_hts) && countdown 600 && sudo -i poweroff)
-date +%T | awk -F ':' '($1 >= 21 && $2 == 50) {exit 1}' || (mimic -voice slt_hts -t "21:50 hours 💤 " && notify-send -u low "21:50 hours 💤")
+date +%T | awk -F ':' '($1 >= 21 && $2 == 50) {exit 1}'        || (mimic -voice slt_hts -t "21:50 hours 💤 " && notify-send -u low "21:50 hours 💤")
 date +%T | awk -F ':' '($1 >= 21 && $2 ~".0") {print $1":"$2}' | mimic -voice slt_hts
 date +%T | awk -F ':' '($1 ~ "." && $2 == 00) {print $1":"$2}' | mimic -voice slt_hts
-cat /sys/class/power_supply/BAT0/status | awk '$1 == "Discharging" {exit 1}' &&
-cat /sys/class/power_supply/BAT0/capacity | awk ' $1 >= 95 {system("mimic -voice slt_hts -t complete-charge") }'
-cat /sys/class/power_supply/BAT0/status | awk '$1 == "Charging" {exit 1}' &&
+cat /sys/class/power_supply/BAT0/status   | awk '$1 == "Discharging" {exit 1}' &&
+cat /sys/class/power_supply/BAT0/capacity | awk '$1 >= 95 {system("mimic -voice slt_hts -t complete-charge") }'
+cat /sys/class/power_supply/BAT0/status   | awk '$1 == "Charging" {exit 1}' &&
 cat /sys/class/power_supply/BAT0/capacity | awk '$1 <= 15 {system("mimic -voice slt_hts -t "$1"-percent") } ; $1 <= 5 {system("notify-send -u critical " $1 "% discharging\n") }'

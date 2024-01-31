@@ -27,29 +27,19 @@ RUN if [[ -e /bin/pacman ]]; then useradd -mG wheel drksl; fi; \
 
 # Arch dependencies:
 RUN if [[ -e /bin/pacman ]]; then  \
-  pacman -Sy --noconfirm bat fzf lazygit libsixel lf ripgrep starship unzip xclip zsh glibc zellij \
+  pacman -Sy --noconfirm git less \
   && curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory="/usr/local/bin" "yay_12.1.2_x86_64/yay" \
-  && curl -L https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage                               --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim; \
+  && curl -L https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
+  && yes | pacman -Scc; \
   fi
 
 # Debian dependencies:
 RUN if [[ -e /bin/apt ]]; then \
   apt update \
-  && DEBIAN_FRONTEND=noninteractive apt install -y curl file git gcc libglib2.0-bin libsixel-bin locales make ripgrep sudo unzip xclip xz-utils zsh \
-  && curl -L https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-gnu.tar.gz    | $SUDO tar -xzf- --directory="/tmp"  && $SUDO cp "/tmp/bat-v0.23.0-x86_64-unknown-linux-gnu/bat" "/usr/local/bin" \
-  && curl -L https://github.com/starship/starship/releases/download/v1.16.0/starship-x86_64-unknown-linux-gnu.tar.gz | $SUDO tar -xzf- --directory="/usr/local/bin/" \
-  && curl -L https://github.com/jesseduffield/lazygit/releases/download/v0.40.2/lazygit_0.40.2_Linux_x86_64.tar.gz   | $SUDO tar -xzf- --directory="/usr/local/bin/" \
-  && curl -L https://github.com/zellij-org/zellij/releases/download/v0.38.2/zellij-x86_64-unknown-linux-musl.tar.gz  | $SUDO tar -xzf- --directory="/usr/local/bin/" \
-  && curl -L https://github.com/gokcehan/lf/releases/download/r30/lf-linux-amd64.tar.gz                              | $SUDO tar -xzf- --directory="/usr/local/bin/" \
-  && curl -L https://github.com/junegunn/fzf/releases/download/0.42.0/fzf-0.42.0-linux_amd64.tar.gz                  | $SUDO tar -xzf- --directory="/usr/local/bin/" \
-  && curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/completion.zsh                                     --create-dirs --output "/usr/share/fzf/completion.zsh" \
-  && curl -L https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.zsh                                   --create-dirs --output "/usr/share/fzf/key-bindings.zsh" \
-  && curl -L https://github.com/neovim/neovim/releases/download/v0.9.1/nvim.appimage                                        --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
-  && chmod o+rx "/usr/share/fzf"; \
+  && DEBIAN_FRONTEND=noninteractive apt install -y curl file gcc g++ git less make sudo xz-utils \
+  && curl -L https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
+  && apt autoremove -y; \
   fi
-
-# locales for zsh-autosuggestions:
-RUN sed -i 's/#en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen && locale-gen
 
 USER drksl
 WORKDIR /home/drksl
@@ -57,43 +47,44 @@ EXPOSE 22/tcp
 EXPOSE 8080/tcp
 ENV HOME="/home/drksl"
 ENV USER="drksl"
-ENV SHELL="/bin/zsh"
+ENV SHELL="/bin/bash"
 ENV DISPLAY=:0
 ENV XDG_RUNTIME_DIR=/run/user/1000
-SHELL ["/bin/zsh","-c"]
+SHELL ["/bin/bash","-c"]
 
 # install nixpkgs:
-RUN curl -L https://nixos.org/nix/install | sh \
-  && . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
-  && nix-channel --update \
-  && nix-env -iA \
-  ffmpeg \
-  ghostscript \
-  imagemagick \
-  mpv \
-  pipewire \
-  poppler \
-  stow \
-  zsh-autosuggestions \
-  zsh-fast-syntax-highlighting \
-  -f https://github.com/NixOS/nixpkgs/archive/f3841aa99b019e827633141317ee504a50c8c936.tar.gz # NixOS/nixpkgs/pull/253000/commits
+RUN yes | sh <(curl -L https://nixos.org/nix/install) --daemon; \
+  sudo --login --user=drksl -- <<'===='
+    ln -s /nix/var/nix/profiles/per-user/root/profile $HOME/.nix-profile;
+    sudo --login nix-env -iA \
+      bat \
+      blesh \
+      eza \
+      fzf \
+      kanata \
+      lazygit \
+      lf \
+      libsixel \
+      ripgrep \
+      starship \
+      stow \
+      xclip \
+      xorg.xset \
+    -f https://github.com/NixOS/nixpkgs/archive/149a14557b855adc35171d6a0e2a26649f02ead5.tar.gz;
+    sudo su - -c 'nix-collect-garbage -d'
+====
 
 # Dotfiles:
 COPY --chown=drksl . /home/drksl/.config/dotfiles
 
 # stow:
-RUN . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
-  && cd /home/drksl/.config/dotfiles \
-  && stow --restow --verbose --target="$HOME"/.config .config \
-  && stow --restow --verbose --target="$HOME"/.local .local \
-  && ln -sf "$HOME"/.config/shell/.zprofile "$HOME"/.zprofile
+RUN sudo --login --user=drksl -- bash <<'===='
+  mkdir -p $HOME/.local/bin
+  cd $HOME/.config/dotfiles
+  stow --restow --verbose --target="$HOME"/.config .config
+  stow --restow --verbose --target="$HOME"/.local .local
+  ln -sf "$HOME"/.config/shell/.profile "$HOME"/.profile
+  ln -sf "$HOME"/.config/shell/.bashrc "$HOME"/.bash_profile
+====
 
-# clean:
-RUN . "$HOME"/.nix-profile/etc/profile.d/nix.sh \
-  && mkdir /home/drksl/.cache/zsh \
-  && rm -rf /home/drksl/{.bash_logout,.bash_profile,.bashrc} \
-  && yes | yay -Scc \
-  && nix-collect-garbage -d \
-  && printf "\e[1;32m Done! \e[0m\n"
-
-ENTRYPOINT ["/bin/zsh","-l"]
+ENTRYPOINT ["/bin/bash","-l"]
