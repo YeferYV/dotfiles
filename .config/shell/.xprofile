@@ -1,13 +1,13 @@
-#!/bin/env zsh
+#!/bin/bash
 
 ## env
-. $HOME/.config/shell/.zprofile
+# . $HOME/.config/shell/.zprofile
 
 ## enable docker/root's nvim clipboard
 # xhost +
 
 ## disable annoying beep
-xset -b
+xset b off
 
 ## music player daemon
 # mpd &
@@ -17,13 +17,13 @@ xset -b
 # pipewire-pulse &
 
 ## simple hotkey daemon
-sxhkd &
+bash --login -c "sleep 7 && sxhkd" &
 
 ## screen temperature
-bash -c "sleep 7 && redshift -O 2222" &
+bash --login -c "sleep 7 && redshift -O 2222" &
 
 ## touchcursor-like + xcapes-like remaps
-sudo kanata --cfg ~/.config/kanata/simple.kbd &
+[ -e ~/.nix-profile/bin/kanata ] && sudo ~/.nix-profile/bin/kanata --cfg ~/.config/kanata/simple.kbd &
 
 ## Remove mouse when idle
 # unclutter --timeout 1 &
@@ -74,3 +74,4 @@ bash -c 'sleep 7 && xrdb -merge <<<"Xcursor.theme: Adwaita"' & # wezterm cursor
 # exec i3
 # exec dwm
 # exec bspwm
+# exec awesome
