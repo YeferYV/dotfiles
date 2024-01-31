@@ -237,11 +237,11 @@ XF86AudioMicMute
 
 # backlight
 XF86MonBrightness{Down,Up}
-  light -{U,A} .11
+  brightnessctl set 1{-,+}
 
 # super backlight
 super + XF86MonBrightness{Down,Up}
-  light -{U,A} 2
+  brightnessctl set 5%{-,+}
 
 # dimmer
 shift + XF86MonBrightness{Down,Up}
@@ -338,7 +338,7 @@ super + shift + b
   wezterm start ncmpcpp
 
 # dmenu launcher
-super + {_,shift +,alt +} p
+super + {ctrl, shift, alt} + p
 	{ \
 		dmenu_run; \
 	, wezterm start $(dmenu_path | dmenu); \
