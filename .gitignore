@@ -14,8 +14,12 @@
 !.local/bin/cron/
 !.local/bin/borderless
 !.local/bin/dmenupass
-!.local/bin/devour
 !.local/bin/maimpick
-!.local/bin/remaps
 !.local/bin/RiceNix
+!.local/bin/snapper-rollback
 !.local/bin/sysclean.sh
+
+# symlinks for neovim
+colors
+lua
+init.lua
