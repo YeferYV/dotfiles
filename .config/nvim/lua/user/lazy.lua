@@ -61,8 +61,8 @@ local plugins = {
   -- Bufferline/ScopeBuffer
   {
     "akinsho/bufferline.nvim",
-    lazy = false,
-    tag = "v2.7.0", -- Icon bg color linked to selected buffer color #137
+    event = "VeryLazy",
+    commit = "b15c6daf5a64426c69732b31a951f4e438cb6590",
     dependencies = { { "tiagovla/scope.nvim", commit = "2db6d31de8e3a98d2b41c0f0d1f5dc299ee76875", config = true } },
     config = function() require("user.bufferline") end
   },
@@ -82,7 +82,7 @@ local plugins = {
       { "rafamadriz/friendly-snippets", commit = "8d91ba2dc2421a54981115f61b914974f938fa77" }, -- a bunch of snippets to use
       {
         "roobert/tailwindcss-colorizer-cmp.nvim",
-        commit = "8d91ba2dc2421a54981115f61b914974f938fa77",
+        commit = "bc25c56083939f274edcfe395c6ff7de23b67c50",
         config = function()
           -- require("cmp").config.formatting = { format = require("tailwindcss-colorizer-cmp").formatter }     -- from doc but not working
           -- require("cmp").setup({ formatting = { format = require("tailwindcss-colorizer-cmp").formatter } }) -- from issue #5 but not working
@@ -176,9 +176,9 @@ local plugins = {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    commit = "c36681bb496ebce2946867459ed08774cb61788c",
+    commit = "5a713474e38a3999b85c6cb3f5cac3248a16c7d0",
     dependencies = {
-      { "nvim-treesitter/nvim-treesitter-textobjects", commit = "e69a504baf2951d52e1f1fbb05145d43f236cbf1" },
+      { "nvim-treesitter/nvim-treesitter-textobjects", commit = "95933e762e28f9d38b572d65e7e4da9d2f4d90cb" },
       -- { "RRethy/nvim-treesitter-textsubjects",         commit = "b913508f503527ff540f7fe2dcf1bf1d1f259887" },
     }
   },
