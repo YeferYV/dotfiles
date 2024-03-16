@@ -1,5 +1,5 @@
 #
-# wm independent hotkeys
+# reopen/reload
 #
 
 # terminal emulator
@@ -10,14 +10,6 @@ super + {_, shift, alt, shift + alt } + Return
 	, wezterm --config "window_decorations='NONE'" ; \
   , wezterm --config window_background_opacity=0.0 --config text_background_opacity=0.3; \
 	}
-
-# terminal emulator
-mod1 + {_, shift, ctrl, shift + ctrl} + Return
-  {neovide, kitty, cool-retro-term -e tmux, alacritty -e tmux}
-
-# toggle borderless window
-super + alt + b
-  borderless toggle
 
 # dunst close/reopen notification
 ctrl + {_, shift } + Return
@@ -32,7 +24,7 @@ super + shift + Escape
 	pkill -USR1 -x sxhkd
 
 #
-# window-manager
+# windows flags/state
 #
 
 # xdo close
@@ -40,75 +32,17 @@ super + x
 	xdo close
 
 # toggle fullscreen
-super + {e,d}
+super + control + f; {f, shift + f}
   xdotool windowstate --{add,remove}=FULLSCREEN $(xdo id)
 
 # toggle maximized window
-super + m
+super + control + f; m
   xdotool windowstate --toggle=MAXIMIZED_HORZ $(xdo id); \
   xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id);
 
-# focus/send to the given desktop
-super + {_,shift + }{1-9,0,minus,equal}
-	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11}'
-
-# focus relative desktop
-super + {h,l}
-	xdotool set_desktop --relative -- {-1,1}
-
-# focus relative desktop
-super + {s,f}
-	xdotool set_desktop --relative -- {-1,1}
-
-# swap relative desktop
-super + shift + {s,f}
-  { sign="-", sign="+" }; \
-  xdotool getactivewindow set_desktop_for_window $(($(xdotool get_desktop) $sign 1)) && xdotool set_desktop --relative -- "$sign"1
-
-# rofi drun (dmenu for .desktop apps)
-super + ctrl + d
-  A='rofimoji --action clipboard copy print --files fontawesome nerd_font gitmoji emojis latin-1'; \
-  COL=10 \
-  ICON=10% \
-  ENTRY=true \
-  SWITCHER=true \
-  XDG_DATA_DIRS=$HOME/.nix-profile/share:/usr/local/share:/usr/share:$HOME/.local/share:$XDG_DATA_DIRS \
-  rofi -modi "window,run,drun,emoji:$A,ssh" -show drun -theme Monokai
-
-# rofi emoji
-super + {alt,ctrl} + e
-  LOCALE_ARCHIVE=/lib/locale/locale-archive \
-  rofimoji \
-    --action clipboard copy print \
-    { \
-      --selector-args="-theme Monokai -theme-str 'window \{width:90%; height:50%;\}' " \
-      --files all \
-    , --selector-args="-theme Monokai" \
-      --files fontawesome nerd_font gitmoji emojis latin-1 \
-    }
-
-# rofi focus last window
-super + ctrl + semicolon
-  RHEIGHT=33% \
-  LOCALE_ARCHIVE=/lib/locale/locale-archive \
-  rofi \
-    -show window  -window-thumbnail -show-icons \
-    -kb-cancel "Escape" \
-    -kb-accept-entry "!space,Return" \
-    -selected-row 1; \
-  xdotool search --sync --class Rofi key --delay 0 --clearmodifiers space;
-
-# xdo focus last window
-{shift + space, super + semicolon}
-  WINID=$(xdo id | tr '[:upper:]' '[:lower:]' | sed -r 's/^0x0+/0x/g'); \
-  WINDOWS=($(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," " " | sed -r "s/$WINID.*//g")); \
-  xdo activate $\{WINDOWS[-1]\}
-  # IDS=($((xdo id -D; xdo id -d) | tr "\n" " ")) && xdo activate $\{IDS[-2]\}
-
-# fzf alt-tab
-super + alt + z
-  wezterm --config "window_decorations='NONE'" start --always-new-process -- bash -c \
-  'test=$((xdo id -D & xdo id -d) | xargs -I var xprop -id var _NET_WM_NAME | cut -d"\"" -f2 | fzf); xdo activate $( xdo id -a "$test");'
+#
+# Rofi
+#
 
 # rofi alt-tab like
 super + Tab
@@ -125,8 +59,81 @@ super + Tab
   xdotool keyup Tab; \
   xdotool key Tab
 
+# rofi drun (dmenu for .desktop apps)
+super + control + r; d
+  A='rofimoji --action clipboard copy print --files fontawesome nerd_font gitmoji emojis latin-1'; \
+  COL=10 \
+  ICON=10% \
+  ENTRY=true \
+  SWITCHER=true \
+  XDG_DATA_DIRS=$HOME/.nix-profile/share:/usr/local/share:/usr/share:$HOME/.local/share:$XDG_DATA_DIRS \
+  rofi -modi "window,run,drun,emoji:$A,ssh" -show drun -theme Monokai
+
+# rofi emoji
+super + control + r; {e, shift + e}
+  LOCALE_ARCHIVE=/lib/locale/locale-archive \
+  rofimoji \
+    --action clipboard copy print \
+    { \
+      --selector-args="-theme Monokai" \
+      --files fontawesome nerd_font gitmoji emojis latin-1 \
+    , --selector-args="-theme Monokai -theme-str 'window \{width:90%; height:50%;\}' " \
+      --files all \
+    }
+
+# rofi focus last window
+super + control + r; semicolon
+  RHEIGHT=33% \
+  LOCALE_ARCHIVE=/lib/locale/locale-archive \
+  rofi \
+    -show window  -window-thumbnail -show-icons \
+    -kb-cancel "Escape" \
+    -kb-accept-entry "!space,Return" \
+    -selected-row 1; \
+  xdotool search --sync --class Rofi key --delay 0 --clearmodifiers space;
+
+#
+# swap/focus window
+#
+
+# focus/send to the given desktop
+super + {_, shift +} {1-9,0,minus,equal}
+	xdotool {set_desktop, getactivewindow set_desktop_for_window} '{0-9,10,11,12}'
+
+# xdo focus last window
+super + {semicolon,grave}
+  WINID=$(xdo id | tr '[:upper:]' '[:lower:]' | sed -r 's/^0x0+/0x/g'); \
+  WINDOWS=($(xprop -root _NET_CLIENT_LIST_STACKING | cut -d"#" -f2 | tr "," " " | sed -r "s/$WINID.*//g")); \
+  xdo activate $\{WINDOWS[-1]\}
+  # IDS=($((xdo id -D; xdo id -d) | tr "\n" " ")) && xdo activate $\{IDS[-2]\}
+
+# focus relative desktop
+super + {h,l}
+	xdotool set_desktop --relative -- {-1,1}
+
+# focus relative desktop
+super + {s,f}
+	xdotool set_desktop --relative -- {-1,1}
+
+# swap relative desktop
+super + shift + {s,f}
+  { sign="-", sign="+" }; \
+  xdotool getactivewindow set_desktop_for_window $(($(xdotool get_desktop) $sign 1)) && xdotool set_desktop --relative -- "$sign"1
+
+#
+# Toggles
+#
+
+# toggle borderless window/node
+super + control + t; n
+  borderless toggle
+
+#
+# move/resize windows
+#
+
 # increase/decrease window size (zoom in/out)
-super + alt + {i,o}
+super + control + w; {minus,plus}
   DECORATION_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $5 \}' | awk -F',' '\{ print $1\}'); \
   BORDER_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $4 \}' | awk -F',' '\{ print $1\}'); \
 	{ \
@@ -135,7 +142,7 @@ super + alt + {i,o}
 	}
 
 # hover window to left/down/up/right
-super + alt + shift + {u,i,o,p}
+super + control + w; {h,j,k,l}
   xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read B D;\
   xprop -root _NET_WORKAREA  | awk -F ',' '\{print $2\}' | xargs -I var echo "(var + 1)/2" | bc | read S;\
   xdotool getdisplaygeometry | awk '\{print $1" "$2\}' | read W H;\
@@ -148,7 +155,7 @@ super + alt + shift + {u,i,o,p}
   xdo resize -w $w -h $h; xdo move -x $x -y $y
 
 # move floating window by 10px
-super + alt + {h,j,k,l}
+super + control + w; shift + {h,j,k,l}
   DECORATION_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $5 \}' | awk -F',' '\{ print $1\}'); \
   BORDER_SIZE=$(xprop -id $(xdo id) | awk '/_NET_FRAME/ \{ print $4 \}' | awk -F',' '\{ print $1\}'); \
   xdotool getactivewindow windowmove --relative -- \
@@ -159,8 +166,9 @@ super + alt + {h,j,k,l}
   ,  $((10 - BORDER_SIZE)) -$DECORATION_SIZE ; \
   }
 
+
 # hover window to corner
-super + alt + shift + {h,j,k,l}
+super + control + w; {Left, Down, Up, Right}
   xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read BORDER DECORATION; \
   xdotool getwindowfocus getwindowgeometry | awk -F'x' '/Geometry/ \{print $1" "$2\}' | read G W H; \
   xdotool getdisplaygeometry | awk '\{print $1" "$2\}' | read W_SCREEN H_SCREEN; \
@@ -173,8 +181,30 @@ super + alt + shift + {h,j,k,l}
 	, $((W_SCREEN - W - BORDER - BORDER)) y; \
 	}
 
+# xdo fixedscreen 75%/50% (small/medium)
+super + control + w; {s,m}
+  xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read B D;\
+  xprop -root _NET_WORKAREA  | awk -F ',' '\{print $2\}' | xargs -I var echo "(var + 1)/2" | bc | read S;\
+  xdotool getdisplaygeometry | awk '\{print $1" "$2\}' | read W H;\
+  { \
+    xdo resize -w $((W / 2 - B)) -h $((H / 2 - S - D)); \
+  , xdotool getactivewindow windowsize 75% 75%; \
+  }
+
+# xdo fixedscreen 1366x768 (min-max window)
+super + control + w; {m, shift + m}
+  xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id); \
+  { \
+	  borderless disable; xdotool getactivewindow windowsize 100% y windowmove 0% 0%; \
+	, borderless enable; xdotool getactivewindow windowsize 100% y windowmove 0% 0%; \
+  }
+
+#
+# Smart resize
+#
+
 # increase/expand/grow window edges by 10px
-super + alt + {m,comma,period,slash}
+super + {Left,Down,Up,Right}
   xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read BORDER DECORATION; \
 	{ \
     xdotool getactivewindow windowmove --relative -- $((-10 - BORDER)) -$DECORATION; xdo resize -w +10; \
@@ -184,7 +214,7 @@ super + alt + {m,comma,period,slash}
 	}
 
 # decrease/contract/shrink window edges by 10px
-super + alt + shift + {m,comma,period,slash}
+super + shift + {Left,Down,Up,Right}
   xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read BORDER DECORATION; \
 	{ \
     xdotool getactivewindow windowmove --relative --  $((10 - BORDER)) -$DECORATION; xdo resize -w -10; \
@@ -193,31 +223,9 @@ super + alt + shift + {m,comma,period,slash}
 	,	                                                                                 xdo resize -w -10; \
 	}
 
-# xdo fixedscreen 75%/50% (medium/small)
-super + alt + {_,shift + } n
-  xprop -id $(xdo id) | awk -F',' '/_NET_FRAME/ \{print $2" "$3\}' | read B D;\
-  xprop -root _NET_WORKAREA  | awk -F ',' '\{print $2\}' | xargs -I var echo "(var + 1)/2" | bc | read S;\
-  xdotool getdisplaygeometry | awk '\{print $1" "$2\}' | read W H;\
-  { \
-    xdotool getactivewindow windowsize 75% 75%; \
-  , xdo resize -w $((W / 2 - B)) -h $((H / 2 - S - D)); \
-  }
-
-# xdo fixedscreen 1366x768 (min-max window)
-super + {_,shift + }n
-  xdotool windowstate --toggle=MAXIMIZED_VERT $(xdo id); \
-  { \
-	  borderless disable; xdotool getactivewindow windowsize 100% y windowmove 0% 0%; \
-	, borderless enable; xdotool getactivewindow windowsize 100% y windowmove 0% 0%; \
-  }
-
 ########################################
 ###      alphabetic_hotkeys          ###
 #######################################
-
-# signs
-#F{1,2,3,4,5,6,7,8,9,10}
-#	xdotool key {exclam,at,numbersign,dollar,percent,asciicircum,ampersand,asterisk,parenleft,parenright}
 
 # super volume
 super + XF86Audio{Raise,Lower}Volume
@@ -255,16 +263,12 @@ super + {F11,F12}
 super + KP_{Right,Begin,Left}
   playerctl --player=chromium {next,play-pause,previous}
 
-# chromium play-pause
-XF86Shop
-  playerctl --player=chromium play-pause
-
 # mpv next-toggle-prev
-mod1 + KP_{Right,Begin,Left}
+alt + KP_{Right,Begin,Left}
   playerctl --player=mpv {next,play-pause,previous}
 
 # mpv vol (down,up)
-mod1 + KP_{Down,Up}
+alt + KP_{Down,Up}
 	{ \
 	  playerctl --player=mpv volume 0.1-; \
 	, [[ "$(playerctl -p mpv volume)" < 1 ]]&& playerctl --player=mpv volume 0.1+; \
@@ -274,20 +278,12 @@ mod1 + KP_{Down,Up}
 KP_{Right,Begin,Left,Down,Up}
   mpc --port=6601 {next,toggle,prev,volume -2,volume +2}
 
-# mpc next-toggle-prev
-mod1 + XF86Audio{RaiseVolume,Mute,LowerVolume}
-  mpc --port=6601 {next,toggle,prev}
-
 # screenshot (fullscreen,_)
-{super,alt} + Print
+{Print, super + Print}
 	maimpick {fullscreen,_}
 
-# redshift
-mod1 + ctrl + {1,2,3,4,5}
-  redshift {-x, -O 2222, -O 3333, -O 4444, -O 5555}
-
 # compositor wallpaper background
-super + BackSpace
+super + control + c; w
 	{\
 		picom --transparent-clipping \
 		      --shadow-radius=10 \
@@ -305,7 +301,7 @@ super + BackSpace
 	}
 
 # compositor blur background
-super + alt + BackSpace
+super + control + c; b
 	{ \
 	  picom --blur-method="dual_kawase" \
 	        --backend="glx" \
@@ -318,53 +314,51 @@ super + alt + BackSpace
 	}
 
 # compositor keep background
-super + ctrl + BackSpace
+super + control + c; b
 	{picom --fade-delta=0, killall picom}
 
 # compositor no shadow
-super + shift + BackSpace
+super + control + c; s
 	{picom --shadow-opacity=0 --transparent-clipping --fade-delta=0, killall picom}
 
 # compositor decrease/increase transparency (picom-trans requires xorg-xwininfo)
-super + ctrl + {minus,equal}
+super + control + c; {minus,equal}
   xdo id -d -c | xargs -I id -n 1 picom-trans -w id {-2,+4}
+  # bspc query -N -d | xargs -I id -n 1 picom-trans -w id {-2,+4}
+  # xdo pid $ID  		# xdotool getactivewindow getwindowpid
+  # xdo id -p $PID  # xdotool getactivewindow
 
-# TextToSpeech
-super + {_,shift,ctrl} + Next
-  {xclip -o | mimic, xsel -b | festival --tts, killall mimic festival}
+# night light
+super + control + n; {1,2,3,4,5}
+  redshift {-x, -O 2222, -O 3333, -O 4444, -O 5555}
 
-# browser media
-super + shift + b
-  wezterm start ncmpcpp
-
-# dmenu launcher
-super + {ctrl, shift, alt} + p
-	{ \
-		dmenu_run; \
-	, wezterm start $(dmenu_path | dmenu); \
-  , source $HOME/.config/shell/aliasrc && \
-		alias | dmenu -i -l 10 | awk -F'=' '\{print $2\}' | xargs -I_ wezterm start -- bash -c "_"; \
-	}
-
-# lf user/root
-super + {_,shift +} r
-	{LF_CD=true wezterm, sudo -i LF_CD=true LS_COLORS="" wezterm}
-
-# browser
-super + {_,shift +} w
-  { google-chrome --process-per-tab || google-chrome-stable --process-per-tab, killall chrome}
-
-# toggle background
-super + alt + ctrl + w
+# toggle terminal background
+super + control + p; t
   (printf "\x1b]11;{#0c0c0c,#000000}\x1b\\\\") > $(find /dev/pts -iname '[0-9]')
 
 # pywal offline wallpaper
-super + alt + {_, shift +} w
+super + control + p; o
   wal --cols16 -s -e -i { "$HOME/bgs/bgi/eyelust/eyelust", "/tmp/pywal" } -o ~/.config/wal/postrun
 
 # pywal online wallpaper
-super + ctrl + {_, shift +} w
+super + control + p; {w,r}
   { curl -s "https://wallhaven.cc/api/v1/search?sorting=toplist&page=$(shuf --head-count=1 --input-range=1-10)" | jq ".data[$(shuf --head-count=1 --input-range=1-24)].path" | xargs curl -LO --output-dir /tmp/pywal --create-dirs;\
   , curl -H "User-agent: 'your bot 0.1'" "https://www.reddit.com/r/wallpaper.json?limit=100" | jq ".data.children[$(shuf --head-count=1 --input-range=1-100)].data.url_overridden_by_dest" | xargs curl -LO --output-dir /tmp/pywal --create-dirs;\
   } wal --iterative --cols16 -s -i /tmp/pywal;
   # curl -s "https://wallhaven.cc/api/v1/search?sorting=random&q=4k" | jq '.data[0].path' | xargs curl -LO --output-dir /tmp/pywal --create-dirs; \
+
+# dmenu launcher
+super + {_, shift} + p
+	{ \
+		dmenu_run; \
+	, wezterm start $(dmenu_path | dmenu); \
+	}
+
+# lf user/root
+super + {_, shift} + r
+	{LF_CD=true wezterm, sudo -i LF_CD=true LS_COLORS="" $TERMINAL}
+
+# browser
+super + {_, shift} + w
+  { google-chrome-stable --process-per-tab || google-chrome --process-per-tab, killall chrome}
+  # { google-chrome-stable --process-per-site, killall chrome}
