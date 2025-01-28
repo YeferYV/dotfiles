@@ -95,44 +95,40 @@ install_non_gui_dependencies() {
 
   echo $PASSWORD | su -c "curl -L https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage --output /usr/local/bin/nvim && chmod +x /usr/local/bin/nvim"
 
-	[ -e /bin/pacman ] && echo $PASSWORD | su -c "curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory=/usr/local/bin yay_12.1.2_x86_64/yay"
+	[ -e /bin/pacman ] && echo $PASSWORD | su -c "curl -L https://github.com/Jguer/yay/releases/download/v12.4.2/yay_12.4.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory=/usr/local/bin yay_12.1.2_x86_64/yay"
   [ -e /bin/pacman ] && echo $PASSWORD | su -c "pacman -Sy --needed --noconfirm \
     base-devel \
     fuse2 \
     git \
     less \
-	  xclip \
+    zsh \
     "
 
   [ -e /bin/apt    ] && echo $PASSWORD | su -c "apt update -y && apt install -y \
     curl \
     file \
     libfuse2 \
-    libsixel-bin \
     gcc \
-    g++ \
     git \
     less \
-    make \
     sudo \
     xz-utils \
-	  xclip \
+    zsh \
     "
 
 	[ ! -e /nix ] && yes | sh <(curl -L https://nixos.org/nix/install) --daemon;
   bash --login <<'===='
     nix-env -iA \
 	  bat \
-    blesh \
     eza \
     fzf \
     kanata \
     lazygit \
-    lf \
 	  ripgrep \
 	  starship \
-	  stow \
-    -f https://github.com/NixOS/nixpkgs/archive/149a14557b855adc35171d6a0e2a26649f02ead5.tar.gz # NixOS/nixpkgs/pull/285000/commits
+	  xclip \
+    yazi \
+    -f https://github.com/NixOS/nixpkgs/archive/e16e376ee3ece686725bbf454255a5dcc9a40c7a.tar.gz # https://github.com/NixOS/nixpkgs/commits
 ====
 }
 
@@ -147,6 +143,7 @@ install_gui_dependencies() {
   #   festival-us \
   #   fakeroot \
   #   networkmanager \
+  #   ntfs-3g \
   #   python-gobject \
   #   snapper \
   #   xorg-server \
@@ -156,12 +153,13 @@ install_gui_dependencies() {
 
   [ -e /bin/pacman ] && echo $PASSWORD | su -c "pacman -S --needed --noconfirm \
     cronie \
-    gtk3 \
     libnotify \
+    mpc \
+    mpd \
     mpv \
+    ncmpcpp \
     pipewire-pulse \
-    wget \
-    xdg-user-dirs \
+    wezterm \
     xf86-input-synaptics \
     xorg-xset \
     "
@@ -172,7 +170,6 @@ install_gui_dependencies() {
   #   btrfs-progs \
   #   festvox-us-slt-hts \
   #   network-manager \
-  #   python3-gi \
   #   snapper \
   #   systemd-zram-generator \
   #   xserver-xorg \
@@ -181,13 +178,13 @@ install_gui_dependencies() {
 
   [ -e /bin/apt    ] && echo $PASSWORD | su -c "apt --no-install-recommends install -y \
     cron \
-    ffmpeg \
-    libgtk-3-0 \
     libnotify-bin \
+    mpc \
+    mpd \
     mpv \
+    ncmpcpp \
     pipewire-pulse \
-    wget \
-    xdg-user-dirs \
+    wezterm \
     x11-xserver-utils \
     xserver-xorg-input-synaptics \
     "
@@ -200,17 +197,14 @@ install_gui_dependencies() {
     devour \
     dmenu \
     fira-code-symbols \
-    ghostscript \
-    imagemagick \
-    poppler \
     redshift \
     sxhkd \
     sxiv \
     xdo \
     xdotool \
-    xdragon \
+    ripdrag \
     zathura \
-    -f https://github.com/NixOS/nixpkgs/archive/149a14557b855adc35171d6a0e2a26649f02ead5.tar.gz # NixOS/nixpkgs/pull/285000/commits
+    -f https://github.com/NixOS/nixpkgs/archive/e16e376ee3ece686725bbf454255a5dcc9a40c7a.tar.gz # https://github.com/NixOS/nixpkgs/commits
     # btrfs-progs \
     # efibootmgr \
     # grub2 \
@@ -221,12 +215,8 @@ install_gui_dependencies() {
     nix-collect-garbage -d
 ====
 
-	# curl -L https://github.com/fernzi/dragdrop/releases/download/v1.1.0/DragDrop-1.1.0-x86_64.AppImage -o ~/.local/bin/dragon-drop && chmod +x ~/.local/bin/dragon-drop
-	curl -L https://raw.githubusercontent.com/ivan-hc/AM-Application-Manager/main/APP-MANAGER            -o ~/.local/bin/appman      && chmod +x ~/.local/bin/appman && mkdir -p ~/.config/appman && echo ".local/appimage" > ~/.config/appman/appman-config
-  [ -e ~/.local/appimage ]  && echo "skipping appman install ..." || ~/.local/bin/appman install \
-    code \
-    google-chrome \
-    wezterm
+  # curl -L https://raw.githubusercontent.com/ivan-hc/AM-Application-Manager/main/APP-MANAGER            -o ~/.local/bin/appman      && chmod +x ~/.local/bin/appman && mkdir -p ~/.config/appman && echo ".local/appimage" > ~/.config/appman/appman-config
+  # [ -e ~/.local/appimage ]  && echo "skipping appman install ..." || ~/.local/bin/appman install code google-chrome wezterm
 
 }
 
@@ -256,24 +246,27 @@ install_dotfiles() {
   # Symlinks:
   cd "$(git rev-parse --show-toplevel)"
   mkdir -p "$HOME"/.config
-  mkdir -p "$HOME"/.local
-  bash --login -c "stow --restow --verbose --target=$HOME/.config .config"
-  bash --login -c "stow --restow --verbose --target=$HOME/.local  .local"
-  ln -sf "$HOME"/.config/shell/.bashrc   "$HOME"/.bash_profile
-  ln -sf "$HOME"/.config/shell/.bashrc   "$HOME"/.bashrc
-  ln -sf "$HOME"/.config/shell/.profile  "$HOME"/.profile
-  ln -sf "$HOME"/.config/shell/.xprofile "$HOME"/.xprofile
+  mkdir -p "$HOME"/.local/share/mpd
+  ln -sf ./.local/*                 ~/.local
+  ln -sf ./.config/*                ~/.config
+  ln -sf ./.config/shell/.gitconfig ~/.gitconfig
+  ln -sf ./.config/shell/.xinitrc   ~/.xinitrc
+  ln -sf ./.config/shell/.zprofile  ~/.zprofile
+  ln -sf ./.config/zsh/.zshrc       ~/.zshrc
 
   # Services:
   [ -e /bin/apt    ] && sudo systemctl enable --now cron
   [ -e /bin/pacman ] && sudo systemctl enable --now cronie
-  sudo systemctl enable --now NetworkManager
-  systemctl --user enable --now pipewire-pulse
+  sudo systemctl        enable --now NetworkManager
+       systemctl --user enable --now pipewire-pulse
   echo $PASSWORD | su -c "[ -e /etc/X11/xorg.conf.d ]   && mv /etc/X11/xorg.conf.d /etc/X11/xorg.conf.d.synapticsconflicts"
   echo $PASSWORD | su -c "mkdir -p /etc/X11/xorg.conf.d && cp .config/shell/10-synaptics.conf /etc/X11/xorg.conf.d"
   echo $PASSWORD | su -c "echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL' > /etc/sudoers.d/sudo"
   echo $PASSWORD | su -c "echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/wheel"
   command -v crontab                                    && crontab ~/.local/bin/cron/lowbatnotificationcron
+
+  # use zsh as default shell:
+  echo $PASSWORD | su -c "chsh -s $(which zsh) $USER"
 
   # GWSL:
   # echo "export LIBGL_ALWAYS_INDIRECT=1"        >>"$HOME"/.bash_profile

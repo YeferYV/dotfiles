@@ -1,0 +1,11 @@
+[user]
+	email = yucrayeff36@gmail.com
+	name = Yefer YV
+[diff]
+	tool = nvimdiff
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential

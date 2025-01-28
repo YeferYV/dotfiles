@@ -12,7 +12,7 @@ super + {_, shift, alt, shift + alt } + Return
 	}
 
 # dunst close/reopen notification
-ctrl + {_, shift } + Return
+ctrl + {_, shift } + Escape
 	dunstctl {close, history-pop}
 
 # stop cronbat
@@ -276,7 +276,7 @@ alt + KP_{Down,Up}
 
 # mpc next-toggle-prev-vol
 KP_{Right,Begin,Left,Down,Up}
-  mpc --port=6601 {next,toggle,prev,volume -2,volume +2}
+  mpc {next,toggle,prev,volume -2,volume +2} # --port=6601
 
 # screenshot (fullscreen,_)
 {Print, super + Print}
@@ -353,10 +353,6 @@ super + {_, shift} + p
 		dmenu_run; \
 	, wezterm start $(dmenu_path | dmenu); \
 	}
-
-# lf user/root
-super + {_, shift} + r
-	{LF_CD=true wezterm, sudo -i LF_CD=true LS_COLORS="" $TERMINAL}
 
 # browser
 super + {_, shift} + w

@@ -27,7 +27,7 @@ RUN if [[ -e /bin/pacman ]]; then useradd -mG wheel drksl; fi; \
 
 # Arch dependencies:
 RUN if [[ -e /bin/pacman ]]; then  \
-  pacman -Sy --noconfirm git less \
+  pacman -Sy --noconfirm fuse2 git less zsh \
   && curl -L https://github.com/Jguer/yay/releases/download/v12.1.2/yay_12.1.2_x86_64.tar.gz | tar -xzf- --strip-components=1 --directory="/usr/local/bin" "yay_12.1.2_x86_64/yay" \
   && curl -L https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
   && yes | pacman -Scc; \
@@ -36,7 +36,7 @@ RUN if [[ -e /bin/pacman ]]; then  \
 # Debian dependencies:
 RUN if [[ -e /bin/apt ]]; then \
   apt update \
-  && DEBIAN_FRONTEND=noninteractive apt install -y curl file gcc g++ git less make sudo xz-utils \
+  && DEBIAN_FRONTEND=noninteractive apt install -y curl file libfuse2 gcc git less sudo xz-utils zsh \
   && curl -L https://github.com/neovim/neovim/releases/download/v0.9.5/nvim.appimage  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
   && apt autoremove -y; \
   fi
@@ -58,33 +58,30 @@ RUN yes | sh <(curl -L https://nixos.org/nix/install) --daemon; \
     ln -s /nix/var/nix/profiles/per-user/root/profile $HOME/.nix-profile;
     sudo --login nix-env -iA \
       bat \
-      blesh \
       eza \
       fzf \
       kanata \
       lazygit \
-      lf \
-      libsixel \
       ripgrep \
       starship \
-      stow \
       xclip \
-      xorg.xset \
-    -f https://github.com/NixOS/nixpkgs/archive/149a14557b855adc35171d6a0e2a26649f02ead5.tar.gz;
+      yazi \
+    -f https://github.com/NixOS/nixpkgs/archive/e16e376ee3ece686725bbf454255a5dcc9a40c7a.tar.gz;
     sudo su - -c 'nix-collect-garbage -d'
 ====
 
 # Dotfiles:
-COPY --chown=drksl . /home/drksl/.config/dotfiles
+COPY --chown=drksl . /home/drksl/.config/.files
 
 # stow:
 RUN sudo --login --user=drksl -- bash <<'===='
-  mkdir -p $HOME/.local/bin
-  cd $HOME/.config/dotfiles
-  stow --restow --verbose --target="$HOME"/.config .config
-  stow --restow --verbose --target="$HOME"/.local .local
-  ln -sf "$HOME"/.config/shell/.profile "$HOME"/.profile
-  ln -sf "$HOME"/.config/shell/.bashrc "$HOME"/.bash_profile
+  mkdir -p $HOME/.local
+  ln -sf ~/.config/.files/dotfiles/.local/*                 ~/.local
+  ln -sf ~/.config/.files/dotfiles/.config/*                ~/.config
+  ln -sf ~/.config/.files/dotfiles/.config/shell/.gitconfig ~/.gitconfig
+  ln -sf ./.config/.files/dotfiles/.config/shell/.xinitrc   ~/.xinitrc
+  ln -sf ./.config/.files/dotfiles/.config/shell/.zprofile  ~/.zprofile
+  ln -sf ~/.config/.files/dotfiles/.config/zsh/.zshrc       ~/.zshrc
 ====
 
-ENTRYPOINT ["/bin/bash","-l"]
+ENTRYPOINT ["/bin/zsh","-l"]

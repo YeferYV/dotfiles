@@ -1,14 +1,4 @@
-.windows/AppData/Roaming/mpv/gallery-thumbs-dir
-.windows/AppData/Local/lf/marks
-.windows/AppData/Local/lf/history
-.windows/Documents/Powershell/Modules
-.windows/Documents/Powershell/Scripts
-
-.config/lazygit/state.yml
 .config/mpv/playlists
-.config/ncmpcpp/lyrics/
-.config/ncmpcpp/error.log
-.config/zsh/.zcompdump
 
 .local/bin/*
 !.local/bin/cron/
@@ -18,8 +8,3 @@
 !.local/bin/RiceNix
 !.local/bin/snapper-rollback
 !.local/bin/sysclean.sh
-
-# symlinks for neovim
-colors
-lua
-init.lua
