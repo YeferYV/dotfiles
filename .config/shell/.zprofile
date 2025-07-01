@@ -14,7 +14,6 @@ export FZF_DEFAULT_OPTS='--color "hl:-1:reverse,hl+:-1:reverse" --preview "bat -
 export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
 export HISTFILE="$HOME/.cache/.zsh_history"
 export LESSHISTFILE="-"
-export LESSKEYIN="$HOME/.config/shell/lesskey"
 export NPM_CONFIG_PREFIX="${XDG_DATA_HOME:-$HOME/.local/share}/npm"
 export PATH="$HOME/.pixi/bin:$HOME/.local/share/pnpm:$HOME/.local/share/npm/bin:$HOME/.local/bin:$HOME/.console-ninja/.bin:$PATH"
 export PNPM_HOME=$HOME/.local/share/pnpm
@@ -24,8 +23,10 @@ export SUDO_ASKPASS="$HOME/.local/bin/dmenupass"
 export SWALLOWER="devour"
 export TERM="xterm-256color" # inside docker terminal
 export VISUAL="code"
-export XDG_DATA_HOME="$HOME/.local/share"
-export ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+export WEZTERM_CONFIG_FILE="$(dirname $(dirname $(realpath .zprofile)))/_gitmodules/retronvim/zsh/wezterm.lua"
+export ZDOTDIR="$(dirname $(dirname $(realpath .zprofile)))/_gitmodules/retronvim/zsh/.zshrc"
+export XINITRC="$(dirname $(realpath .zprofile))/.xinitrc"
+export _JAVA_AWT_WM_NONREPARENTING=1 # Fix white screen on Java applications in window managers https://wiki.archlinux.org/title/Java#Gray_window,_applications_not_resizing_with_WM,_menus_immediately_closing
 
 # export MANPAGER="less -R --use-color -Dd+r -Du+b"
 export MANROFFOPT="-P -c"
@@ -62,7 +63,6 @@ if [ -e /.dockerenv ]; then export APPIMAGE_EXTRACT_AND_RUN=1; fi
 if [ -e /.dockerenv ]; then sudo chown $USER:$USER /run/user/1000; fi
 if [ -e /.dockerenv ]; then alias mpv="XDG_RUNTIME_DIR=/run/user/1000 mpv"; fi
 if [ -e /.dockerenv ] && [ -e /bin/sshd ]; then sudo ssh-keygen -A && sudo /bin/sshd; fi
-if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then . $HOME/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
 # Start graphical server on user's current tty if not already running.
 [ "$(tty)" = "/dev/tty1" ] && ! pidof -s Xorg >/dev/null 2>&1 && exec startx "$XINITRC"
