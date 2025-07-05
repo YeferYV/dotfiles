@@ -1,1 +1,0 @@
-../../.gitmodules/mpv-gallery-view/scripts/gallery-thumbgen.lua

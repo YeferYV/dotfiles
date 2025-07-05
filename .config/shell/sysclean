@@ -1,0 +1,76 @@
+#!/bin/sh
+
+read -p "reset to essential packages? [y/N]" ans
+[ "$ans" != "y" ] && exit
+
+# https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#List_of_installed_packages
+# pacman -Qqe
+
+# https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Removing_everything_but_essential_packages
+sudo pacman -D --asdeps $(pacman -Qqe)
+sudo pacman -D --asexplicit \
+base \
+base-devel \
+brightnessctl \
+broadcom-wl \
+dosfstools \
+dunst \
+exfat-utils \
+gammastep \
+git \
+gnome-keyring \
+grim \
+grub \
+libnotify \
+linux \
+linux-firmware \
+mpc \
+mpd \
+mpv-mpris \
+ncmpcpp \
+network-manager-applet \
+noto-fonts \
+noto-fonts-emoji \
+ntfs-3g \
+pipewire-pulse \
+slurp \
+sway \
+swaybg \
+ttf-firacode-nerd \
+wezterm \
+wl-clipboard \
+wmenu \
+zathura-pdf-poppler \
+zram-generator \
+zsh
+
+# https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Removing_unused_packages_(orphans)
+sudo pacman -Rscn $(pacman -Qtdq)
+sudo pacman -Fy
+yes | pacman -Scc
+
+# install dotfiles
+(
+  ln -sf $(git rev-parse --show-toplevel)/.config/shell/.zprofile  ~/.zprofile
+  mkdir -p ~/.local/share/mpd
+
+  # systemctl --user enable --now pipewire-pulse
+  # systemctl --user enable --now mpd
+  # sudo systemctl   enable --now NetworkManager
+
+  echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/sudo
+  echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/wheel
+  echo 'Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch' | sudo tee /etc/pacman.d/mirrorlist
+
+  sudo chsh --shell /bin/zsh $USER
+)
+
+# AUR
+(
+  git clone https://aur.archlinux.org/yay-bin.git
+  cd yay-bin
+  yes | makepkg -si
+  yay -S visual-studio-code-bin google-chrome
+  yay -Ps
+  code --install-extension yeferyv.retronvim
+)
