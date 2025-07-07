@@ -1,0 +1,86 @@
+// https://github.com/Alexays/Waybar/wiki/Module:-Hyprland
+{
+  // "layer": "top", // Waybar at top layer
+  // "position": "bottom", // Waybar position (top|bottom|left|right)
+  // "height": 30, // Waybar height (to be removed for auto height)
+  // "width": 1280, // Waybar width
+  "margin-bottom": -15, // gap between Waybar and window (removed for sway)
+  "spacing": 10, // Gaps between modules (10px)
+  "modules-left": ["hyprland/workspaces"],  // "sway/workspace"
+  // "modules-center": ["mpd"],
+  "modules-right": [
+    "pulseaudio",
+    "network",
+    "memory",
+    "backlight",
+    "battery",
+    "clock",
+    "tray",
+  ],
+  "hyprland/workspaces": { // "sway/workspace"
+    // "persistent-workspaces": {
+    //     "1": [], // Always show a workspace with name '1', on all outputs if it does not exists
+    //     "2": [],
+    //     "3": [],
+    //     "4": [],
+    //     "5": []
+    // },
+    "format": "{name}: {icon}",
+    "format-icons": {
+      "urgent": "",
+      "focused": "", // sway
+      "active": "",  // hyprland
+      "default": "⭘",
+    },
+  },
+  "mpd": {
+    "format": "{filename} ",
+  },
+  "pulseaudio": {
+    "format": "{volume}% {icon}",
+    "format-icons": {
+      "headphone": "",
+      "default": ["", "", ""],
+    },
+    "on-click": "pavucontrol",
+  },
+  "network": {
+    // "interface": "wlp2*", // (Optional) To force the use of this interface
+    "format-wifi": "{essid} ({signalStrength}%) ",
+    "format-ethernet": "{ipaddr}/{cidr} ",
+    "tooltip-format": "{ifname} via {gwaddr} ",
+    "format-linked": "{ifname} (No IP) ",
+    // "format-disconnected": "Disconnected ⚠",
+    "format-alt": "{ifname}: {ipaddr}/{cidr}",
+  },
+  "memory": {
+    "interval": 30,
+    "format": "{used:0.1f}G/{total:0.1f}G ",
+  },
+  "backlight": {
+    // "device": "acpi_video1",
+    "format": "{percent}% {icon}",
+    "format-icons": ["", "", "", "", "", "", "", "", ""],
+  },
+  "battery": {
+    "interval": 10,
+    "states": {
+      "warning": 30,
+      "critical": 15,
+    },
+    "format": "{capacity}% {icon}",
+    "format-full": "{capacity}% {icon}",
+    "format-charging": "{capacity}% ",
+    "format-plugged": "{capacity}% ",
+    "format-alt": "{time} {icon}",
+    "format-icons": ["", "", "", "", ""],
+  },
+  "clock": {
+    // "timezone": "America/New_York",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "format-alt": "{:%Y-%m-%d}",
+  },
+  "tray": {
+    "spacing": 10,
+  },
+}

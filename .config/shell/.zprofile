@@ -17,7 +17,7 @@ export _JAVA_AWT_WM_NONREPARENTING=1 # Fix white screen on Java applications in 
 $DOTFILES/shell/battery &
 sudo $(which kanata) --cfg $DOTFILES/_gitmodules/retronvim/kanata/simple.kbd &
 mpd $DOTFILES/mpd/mpd.conf &
-[ -z "$WAYLAND_DISPLAY" ] && exec sway --config $DOTFILES/sway/config
+[ -z "$WAYLAND_DISPLAY" ] && exec hyprland --config $DOTFILES/hypr/hyprland.conf
 
 ###############################################################################
 # see https://bbs.archlinux.org/viewtopic.php?id=273011

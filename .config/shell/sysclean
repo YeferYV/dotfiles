@@ -21,6 +21,7 @@ git \
 gnome-keyring \
 grim \
 grub \
+hyprland \
 libnotify \
 linux \
 linux-firmware \
@@ -34,9 +35,9 @@ noto-fonts-emoji \
 ntfs-3g \
 pipewire-pulse \
 slurp \
-sway \
 swaybg \
 ttf-firacode-nerd \
+waybar \
 wezterm \
 wl-clipboard \
 wmenu \
