@@ -25,10 +25,9 @@ hyprland \
 libnotify \
 linux \
 linux-firmware \
-mpc \
 mpd \
 mpv-mpris \
-ncmpcpp \
+rmpc \
 network-manager-applet \
 noto-fonts \
 noto-fonts-emoji \
