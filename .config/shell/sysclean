@@ -43,6 +43,8 @@ wmenu \
 zathura-pdf-poppler \
 zram-generator \
 zsh
+# playerctl \
+# xdg-desktop-portal-wlr\
 
 # https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Removing_unused_packages_(orphans)
 sudo pacman -Rscn $(pacman -Qtdq)
@@ -57,6 +59,7 @@ yes | pacman -Scc
   # systemctl --user enable --now pipewire-pulse
   # systemctl --user enable --now mpd
   # sudo systemctl   enable --now NetworkManager
+  # sudo systemctl   enable --now xdg-desktop-portal-wlr # to share screen on meet.google.com
 
   echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/sudo
   echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/wheel
