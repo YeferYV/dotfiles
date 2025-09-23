@@ -44,8 +44,12 @@ wmenu \
 zathura-pdf-poppler \
 zram-generator \
 zsh
-# playerctl \
-# xdg-desktop-portal-wlr\
+# playerctl \             # for chrome player
+# xdg-desktop-portal-wlr\ # for meet.google.com
+# vulkan-intel \          # for zed
+# vulkan-radeon \         # DRI_PRIME=1 windsurf
+# zed \
+# radeontop \
 
 # https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Removing_unused_packages_(orphans)
 sudo pacman -Rscn $(pacman -Qtdq)
