@@ -64,12 +64,12 @@
 
 ## Dependencies
 
-```sh
+```shell
   archinstall   # https://www.youtube.com/watch?v=4dKzYmhcGEU
 
   git clone https://aur.archlinux.org/yay-bin && cd yay-bin && sudo makepkg -si
 
-  yay -S
+  yay -S \
     base base-devel brightnessctl broadcom-wl \
     dosfstools dunst \
     exfat-utils \
@@ -93,7 +93,7 @@
 
 ## Installation
 
-```sh
+```shell
   git clone --recursive https://github.com/yeferyv/dotfiles
   ln -s dotfiles/.config/shell/.zprofile ~/.zprofile
 ```
