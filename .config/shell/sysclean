@@ -34,6 +34,7 @@ noto-fonts \
 noto-fonts-emoji \
 ntfs-3g \
 pipewire-pulse \
+playerctl \
 slurp \
 swaybg \
 ttf-firacode-nerd \
@@ -61,10 +62,10 @@ yes | pacman -Scc
   ln -sf $(git rev-parse --show-toplevel)/.config/shell/.zprofile  ~/.zprofile
   mkdir -p ~/.local/share/mpd
 
-  # systemctl --user enable --now pipewire-pulse
-  # systemctl --user enable --now mpd
-  # sudo systemctl   enable --now NetworkManager
-  # sudo systemctl   enable --now xdg-desktop-portal-wlr # to share screen on meet.google.com
+  systemctl --user enable pipewire-pulse
+  systemctl --user enable mpd
+  sudo systemctl   enable NetworkManager
+  # sudo systemctl   enable xdg-desktop-portal-wlr # to share screen on meet.google.com
 
   echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/sudo
   echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/wheel
