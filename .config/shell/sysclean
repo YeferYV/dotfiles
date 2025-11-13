@@ -19,6 +19,7 @@ exfat-utils \
 gammastep \
 git \
 gnome-keyring \
+google-chrome \
 grim \
 grub \
 hyprland \
@@ -38,10 +39,12 @@ playerctl \
 slurp \
 swaybg \
 ttf-firacode-nerd \
+visual-studio-code-bin \
 waybar \
 wezterm \
 wl-clipboard \
 wmenu \
+yay \
 zathura-pdf-poppler \
 zram-generator \
 zsh
@@ -56,6 +59,10 @@ zsh
 sudo pacman -Rscn $(pacman -Qtdq)
 sudo pacman -Fy
 yes | pacman -Scc
+
+## keyring required if long time not updating archlinux
+# sudo pacman -Sy archlinux-keyring
+# sudo pacman -Syu
 
 # install dotfiles
 (
@@ -75,6 +82,7 @@ yes | pacman -Scc
 )
 
 # AUR
+[ ! yay ] &&
 (
   git clone https://aur.archlinux.org/yay-bin.git
   cd yay-bin

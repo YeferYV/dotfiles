@@ -4,7 +4,7 @@ export CARGO_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/cargo"
 export DOTFILES="$(dirname $(dirname $(realpath .zprofile)))"
 export GIT_CONFIG_GLOBAL="$DOTFILES/shell/.gitconfig"
 export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
-export MPV_HOME="$DOTFILES/mpv" # for playerctl copy mpris.so to $MPV_HOME/scripts/
+export MPV_HOME="$DOTFILES/mpv"
 export NPM_CONFIG_PREFIX="${XDG_DATA_HOME:-$HOME/.local/share}/npm"
 export PATH="$HOME/.pixi/bin:$HOME/.local/share/pnpm:$HOME/.local/share/npm/bin:$HOME/.local/bin:$PATH"
 export RETRONVIM_PATH=$(print -l $HOME/.vscode/extensions/yeferyv.retronvim* | head -n1)
@@ -15,6 +15,7 @@ export ZDOTDIR="$RETRONVIM_PATH/zsh"
 export _JAVA_AWT_WM_NONREPARENTING=1 # Fix white screen on Java applications in window managers https://wiki.archlinux.org/title/Java#Gray_window,_applications_not_resizing_with_WM,_menus_immediately_closing
 
 # startup programs
+cp /etc/mpv/scripts/mpris.so $MPV_HOME/scripts/ # for playerctl (every update mpris.so changes)
 $DOTFILES/shell/battery &
 sudo $RETRONVIM_PATH/bin/env/bin/kanata --cfg $RETRONVIM_PATH/kanata/simple.kbd &
 mpd $DOTFILES/mpd/mpd.conf &

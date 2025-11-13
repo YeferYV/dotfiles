@@ -97,3 +97,8 @@
   git clone --recursive https://github.com/yeferyv/dotfiles
   ln -s dotfiles/.config/shell/.zprofile ~/.zprofile
 ```
+
+## Related projects
+
+- [yeferyv/retronvim](https://github.com/yeferyv/retronvim) vscode extension with neovim text objects from A-Z + LSP whichkey + touchcursor keyboard layout
+- [LukeSmithxyz/voidrice](https://github.com/LukeSmithxyz/voidrice) arch linux rice with dwm + lf [see dependencies](https://github.com/LukeSmithxyz/LARBS/blob/master/static/progs.csv)
