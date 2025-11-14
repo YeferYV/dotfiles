@@ -40,7 +40,7 @@ RUN if [[ -e /bin/pacman ]]; then  \
     pacman -Sy --noconfirm fuse2 openssh \
     && version=$(curl -s "https://api.github.com/repos/Jguer/yay/releases/latest" | grep tag_name | cut --delimiter='"' --fields=4 | cut --delimiter='v' --fields=2) \
     && curl -L "https://github.com/Jguer/yay/releases/download/v${version}/yay_${version}_x86_64.tar.gz" | tar -xzf- --strip-components=1 --directory=/usr/local/bin "yay_${version}_x86_64/yay" \
-    && curl -L "https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.appimage"  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
+    && curl -L "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage"  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
     && yes | pacman -Scc; \
   fi
 
@@ -49,7 +49,7 @@ RUN if [[ -e /bin/pacman ]]; then  \
 RUN if [[ -e /bin/apt ]]; then \
     apt update \
     && DEBIAN_FRONTEND=noninteractive apt install -y curl file libfuse2 sudo openssh-client openssh-server \
-    && curl -L "https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.appimage"  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
+    && curl -L "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage"  --create-dirs --output "/usr/local/bin/nvim" && chmod +x /usr/local/bin/nvim \
     && apt autoremove -y; \
   fi
 
@@ -90,7 +90,7 @@ RUN sudo --login --user=drksl -- bash <<'===='
   sudo /sbin/sshd
   sudo chown $USER:$USER /run/user/1000
   mkdir -p ~/.vscode/extensions
-  ln    -s ~/.config/.files/dotfiles/.config/_gitmodules/retronvim   ~/.vscode/extensions/yeferyv.retronvim
+  git clone https://github.com/yeferyv/retronvim  ~/.vscode/extensions/yeferyv.retronvim
 ====
 
 ENTRYPOINT ["/home/drksl/.pixi/bin/zsh","-l"]
