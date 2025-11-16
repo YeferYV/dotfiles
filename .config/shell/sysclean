@@ -38,13 +38,12 @@ pipewire-pulse \
 playerctl \
 slurp \
 swaybg \
-ttf-firacode-nerd \
 visual-studio-code-bin \
 waybar \
-wezterm \
+wezterm-nightly-bin \
 wl-clipboard \
 wmenu \
-yay \
+yay-bin \
 zathura-pdf-poppler \
 zram-generator \
 zsh
@@ -58,7 +57,7 @@ zsh
 # https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Removing_unused_packages_(orphans)
 sudo pacman -Rscn $(pacman -Qtdq)
 sudo pacman -Fy
-yes | pacman -Scc
+yes | sudo pacman -Scc
 
 ## keyring required if long time not updating archlinux
 # sudo pacman -Sy archlinux-keyring
@@ -70,8 +69,8 @@ yes | pacman -Scc
   mkdir -p ~/.local/share/mpd
 
   systemctl --user enable pipewire-pulse
-  systemctl --user enable mpd
   sudo systemctl   enable NetworkManager
+  # systemctl --user enable mpd                    # mpd $DOTFILES/mpd/mpd.conf &
   # sudo systemctl   enable xdg-desktop-portal-wlr # to share screen on meet.google.com
 
   echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/sudo
@@ -82,12 +81,12 @@ yes | pacman -Scc
 )
 
 # AUR
-[ ! yay ] &&
+[ ! -e /bin/yay ] &&
 (
-  git clone https://aur.archlinux.org/yay-bin.git
-  cd yay-bin
+  git clone https://aur.archlinux.org/yay-bin.git /tmp/yay
+  cd /tmp/yay
   yes | makepkg -si
-  yay -S visual-studio-code-bin google-chrome
+  yay -S --noconfirm visual-studio-code-bin google-chrome wezterm-nightly-bin
   yay -Ps
   code --install-extension yeferyv.retronvim
 )

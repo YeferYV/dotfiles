@@ -67,7 +67,7 @@
 ```shell
   archinstall   # https://www.youtube.com/watch?v=4dKzYmhcGEU
 
-  git clone https://aur.archlinux.org/yay-bin && cd yay-bin && sudo makepkg -si
+  git clone https://aur.archlinux.org/yay-bin && cd yay-bin && makepkg -si
 
   yay -S \
     base base-devel brightnessctl broadcom-wl \
