@@ -15,10 +15,7 @@ export ZDOTDIR="$RETRONVIM_PATH/zsh"
 export _JAVA_AWT_WM_NONREPARENTING=1 # Fix white screen on Java applications in window managers https://wiki.archlinux.org/title/Java#Gray_window,_applications_not_resizing_with_WM,_menus_immediately_closing
 
 # startup programs
-cp /etc/mpv/scripts/mpris.so $MPV_HOME/scripts/ # for playerctl (every update mpris.so changes)
-$DOTFILES/shell/battery &
 sudo $RETRONVIM_PATH/bin/env/bin/kanata --cfg $RETRONVIM_PATH/kanata/simple.kbd &
-mpd $DOTFILES/mpd/mpd.conf &
 [ -z "$WAYLAND_DISPLAY" ] && exec hyprland --config $DOTFILES/hypr/hyprland.conf
 
 ###############################################################################

@@ -27,9 +27,6 @@ intel-ucode \
 libnotify \
 linux \
 linux-firmware \
-mpd \
-mpv-mpris \
-rmpc \
 network-manager-applet \
 noto-fonts \
 noto-fonts-emoji \
@@ -39,6 +36,8 @@ playerctl \
 slurp \
 swaybg \
 visual-studio-code-bin \
+vlc \
+vlc-plugin-ffmpeg \
 waybar \
 wezterm-nightly-bin \
 wl-clipboard \

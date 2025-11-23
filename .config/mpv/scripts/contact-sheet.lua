@@ -1,1 +1,0 @@
-../../_gitmodules/mpv-gallery-view/scripts/contact-sheet.lua
