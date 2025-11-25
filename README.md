@@ -73,15 +73,16 @@
     base base-devel brightnessctl broadcom-wl \
     dosfstools dunst \
     exfat-utils \
-    gammastep git gnome-keyring google-chrome grim \
+    gammastep git gnome-keyring google-chrome grim grub \
     hyprland \
     intel-ucode \
     libnotify linux linux-firmware \
     network-manager-applet noto-fonts noto-fonts-emoji ntfs-3g \
     pipewire-pulse playerctl \
     slurp swaybg \
-    visual-studio-code-bin vlc vlc-plugin-ffmpeg \
+    visual-studio-code-bin vlc vlc-plugin-ffmpeg vlc-plugin-freetype \
     waybar wezterm-nightly-bin wl-clipboard wmenu \
+    xdg-desktop-portal-hyprland \
     zathura-pdf-poppler zram-generator zsh
 
   sudo chsh --shell /bin/zsh $USER

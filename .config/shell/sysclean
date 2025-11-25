@@ -38,16 +38,17 @@ swaybg \
 visual-studio-code-bin \
 vlc \
 vlc-plugin-ffmpeg \
+vlc-plugin-freetype \
 waybar \
 wezterm-nightly-bin \
 wl-clipboard \
 wmenu \
+xdg-desktop-portal-hyprland \
 yay-bin \
 zathura-pdf-poppler \
 zram-generator \
 zsh
 # playerctl \             # for chrome player
-# xdg-desktop-portal-wlr\ # for meet.google.com
 # vulkan-intel \          # for zed
 # vulkan-radeon \         # DRI_PRIME=1 windsurf
 # zed \
@@ -65,12 +66,10 @@ yes | sudo pacman -Scc
 # install dotfiles
 (
   ln -sf $(git rev-parse --show-toplevel)/.config/shell/.zprofile  ~/.zprofile
-  mkdir -p ~/.local/share/mpd
 
-  systemctl --user enable pipewire-pulse
-  sudo systemctl   enable NetworkManager
-  # systemctl --user enable mpd                    # mpd $DOTFILES/mpd/mpd.conf &
-  # sudo systemctl   enable xdg-desktop-portal-wlr # to share screen on meet.google.com
+  sudo systemctl     enable NetworkManager       # wifi
+  systemctl   --user enable pipewire-pulse       # audio
+  # systemctl --user enable xdg-desktop-portal   # to share screen on meet.google.com (not required anymore)
 
   echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/sudo
   echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/wheel
