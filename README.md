@@ -2,65 +2,65 @@
 
 ## Hyprland keybindings
 
-| keymaps                  | description                                    |
-| :----------------------- | :--------------------------------------------- |
-| `super + Return`         | open terminal                                  |
-| `super + w`              | open chrome                                    |
-| `super + W`              | close chrome                                   |
-| `super + x`              | close window                                   |
-| `super + X`              | exit hyprland                                  |
-| `super + v`              | float window                                   |
-| `super + r`              | open program                                   |
-| `super + F`              | fullscreen                                     |
-| `super + t`              | toggle window layout                           |
-| `super + escape`         | close notification                             |
-| `super + shift + escape` | reopen notification                            |
-| `super + left`           | focus left window                              |
-| `super + down`           | focus down window                              |
-| `super + up`             | focus up window                                |
-| `super + right`          | focus right window                             |
-| `super + shift + right`  | increase window size horizontal                |
-| `super + shift + left`   | decrease window size horizontal                |
-| `super + shift + up`     | increase window size vertical                  |
-| `super + shift + down`   | decrease window size vertical                  |
-| `super + ctrl + left`    | swap window left                               |
-| `super + ctrl + down`    | swap window down                               |
-| `super + ctrl + up`      | swap window up                                 |
-| `super + ctrl + right`   | swap window right                              |
-| `super + 1...9`          | switch to workspace 1...9                      |
-| `super + 0`              | switch to workspace 10                         |
-| `super + shift + tab`    | previous active workspace                      |
-| `super + tab`            | next active workspace                          |
-| `super + h`              | previous active workspace                      |
-| `super + l`              | next active workspace                          |
-| `super + s`              | previous workspace                             |
-| `super + f`              | next workspace                                 |
-| `super + semicolon`      | recent workspace                               |
-| `super + equal`          | disable gaps                                   |
-| `super + minus`          | enable gaps                                    |
-| `super + shift + 1...9`  | move to workspace 1...9                        |
-| `super + shift + 0`      | move to workspace 10                           |
-| `super + d`              | toggle scratchpad (swallow window)             |
-| `super + D`              | move window to scratchpad                      |
-| `super + right click`    | move window                                    |
-| `super + left click`     | resize window                                  |
-| `super + space`          | chrome play-pause                              |
-| `super + m`              | chrome rewind                                  |
-| `super + p`              | chrome forward                                 |
-| `super + KP_Begin`       | chrome play-pause                              |
-| `super + KP_Right`       | chrome next                                    |
-| `super + KP_Left`        | chrome previous                                |
-| `KP_Right`               | vlc next                                       |
-| `KP_Begin`               | vlc play-pause or play ~/bgs/bgm/playlist.xspf |
-| `KP_Left`                | vlc previous                                   |
-| `KP_Down`                | vlc volume -2                                  |
-| `KP_Up`                  | vlc volume +2                                  |
-| `Print`                  | screenshot                                     |
-| `shift + Print`          | screenshot select area                         |
-| `super + ctrl + 1`       | night light stop                               |
-| `super + ctrl + 2`       | night light temperature 2222                   |
-| `super + ctrl + 3`       | night light temperature 3333                   |
-| `super + ctrl + 4`       | night light temperature 4444                   |
+| keymaps                  | description                                       |
+| :----------------------- | :------------------------------------------------ |
+| `super + Return`         | open terminal                                     |
+| `super + w`              | open chrome                                       |
+| `super + W`              | close chrome                                      |
+| `super + x`              | close window                                      |
+| `super + X`              | exit hyprland                                     |
+| `super + v`              | float window                                      |
+| `super + r`              | open program                                      |
+| `super + F`              | fullscreen                                        |
+| `super + t`              | toggle window layout                              |
+| `super + escape`         | close notification                                |
+| `super + shift + escape` | reopen notification                               |
+| `super + left`           | focus left window                                 |
+| `super + down`           | focus down window                                 |
+| `super + up`             | focus up window                                   |
+| `super + right`          | focus right window                                |
+| `super + shift + right`  | increase window size horizontal                   |
+| `super + shift + left`   | decrease window size horizontal                   |
+| `super + shift + up`     | increase window size vertical                     |
+| `super + shift + down`   | decrease window size vertical                     |
+| `super + ctrl + left`    | swap window left                                  |
+| `super + ctrl + down`    | swap window down                                  |
+| `super + ctrl + up`      | swap window up                                    |
+| `super + ctrl + right`   | swap window right                                 |
+| `super + 1...9`          | switch to workspace 1...9                         |
+| `super + 0`              | switch to workspace 10                            |
+| `super + shift + tab`    | previous active workspace                         |
+| `super + tab`            | next active workspace                             |
+| `super + h`              | previous active workspace                         |
+| `super + l`              | next active workspace                             |
+| `super + s`              | previous workspace                                |
+| `super + f`              | next workspace                                    |
+| `super + semicolon`      | recent workspace                                  |
+| `super + equal`          | disable gaps                                      |
+| `super + minus`          | enable gaps                                       |
+| `super + shift + 1...9`  | move to workspace 1...9                           |
+| `super + shift + 0`      | move to workspace 10                              |
+| `super + d`              | toggle scratchpad (swallow window)                |
+| `super + D`              | move window to scratchpad                         |
+| `super + right click`    | move window                                       |
+| `super + left click`     | resize window                                     |
+| `super + m`              | rewind vlc (second instance) otherwise chrome     |
+| `super + p`              | forward vlc (second instance) otherwise chrome    |
+| `super + space`          | play-pause vlc (second instance) otherwise chrome |
+| `super + numpad5`        | play-pause all players                            |
+| `super + numpad4`        | next vlc (second instance) otherwise chrome       |
+| `super + numpad6`        | previous vlc (second instance) otherwise chrome   |
+| `numpad4`                | vlc previous                                      |
+| `numpad5`                | vlc play-pause or play ~/bgs/bgm/playlist.xspf    |
+| `numpad6`                | vlc next                                          |
+| `numpad2`                | vlc volume -2                                     |
+| `numpad8`                | vlc volume +2                                     |
+| `Print`                  | screenshot                                        |
+| `shift + Print`          | screenshot select area                            |
+| `super + ctrl + 1`       | night light stop                                  |
+| `super + ctrl + 2`       | night light temperature 2222                      |
+| `super + ctrl + 3`       | night light temperature 3333                      |
+| `super + ctrl + 4`       | night light temperature 4444                      |
 
 ## Dependencies
 
