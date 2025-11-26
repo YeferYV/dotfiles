@@ -14,7 +14,7 @@ export ZDOTDIR="$RETRONVIM_PATH/zsh"
 export _JAVA_AWT_WM_NONREPARENTING=1 # Fix white screen on Java applications in window managers https://wiki.archlinux.org/title/Java#Gray_window,_applications_not_resizing_with_WM,_menus_immediately_closing
 
 # startup programs
-sudo $RETRONVIM_PATH/bin/env/bin/kanata --cfg $RETRONVIM_PATH/kanata/simple.kbd &
+sudo $RETRONVIM_PATH/bin/env/bin/kanata --cfg $RETRONVIM_PATH/kanata/simple.kbd & # requires disabling sudo password otherwise it's skipped
 [ -z "$WAYLAND_DISPLAY" ] && exec hyprland --config $DOTFILES/hypr/hyprland.conf
 
 ###############################################################################

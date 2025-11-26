@@ -67,8 +67,8 @@ yes | sudo pacman -Scc
 (
   ln -sf $(git rev-parse --show-toplevel)/.config/shell/.zprofile  ~/.zprofile
 
-  sudo systemctl     enable NetworkManager       # wifi
-  systemctl   --user enable pipewire-pulse       # audio
+  sudo systemctl     enable NetworkManager       # autostart wifi
+  # systemctl --user enable pipewire-pulse       # autostart audio, enabled in hyprland.conf
   # systemctl --user enable xdg-desktop-portal   # to share screen on meet.google.com (not required anymore)
 
   echo '%sudo ALL=(ALL:ALL)  NOPASSWD: ALL'                             | sudo tee /etc/sudoers.d/sudo
