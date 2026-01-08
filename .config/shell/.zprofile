@@ -15,7 +15,7 @@ export _JAVA_AWT_WM_NONREPARENTING=1 # Fix white screen on Java applications in 
 
 # startup programs
 sudo $RETRONVIM_PATH/bin/env/bin/kanata --cfg $RETRONVIM_PATH/kanata/simple.kbd & # requires disabling sudo password otherwise it's skipped
-[ -z "$WAYLAND_DISPLAY" ] && exec hyprland --config $DOTFILES/hypr/hyprland.conf
+[ -z "$WAYLAND_DISPLAY" ] && exec start-hyprland -- --config $DOTFILES/hypr/hyprland.conf
 
 ###############################################################################
 # see https://bbs.archlinux.org/viewtopic.php?id=273011

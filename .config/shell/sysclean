@@ -48,6 +48,7 @@ yay-bin \
 zathura-pdf-poppler \
 zram-generator \
 zsh
+# way-displays \          # for monitors
 # playerctl \             # for chrome player
 # vulkan-intel \          # for zed
 # vulkan-radeon \         # DRI_PRIME=1 windsurf
