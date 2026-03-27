@@ -78,16 +78,16 @@
     intel-ucode \
     libnotify linux linux-firmware \
     network-manager-applet noto-fonts noto-fonts-emoji ntfs-3g \
-    pipewire-pulse playerctl \
+    pipewire-pulse pixi playerctl \
     slurp swaybg \
     visual-studio-code-bin vlc vlc-plugin-ffmpeg vlc-plugin-freetype \
-    waybar wezterm-nightly-bin wl-clipboard wmenu \
+    waybar wl-clipboard wmenu \
     xdg-desktop-portal-hyprland \
     zathura-pdf-poppler zram-generator zsh
 
   sudo chsh --shell /bin/zsh $USER
 
-  code --install-extension yeferyv.retronvim
+  pixi g install wezterm -c retronvim -c conda-forge
 ```
 
 ## Installation
