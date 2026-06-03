@@ -81,13 +81,13 @@
     pipewire-pulse pixi playerctl \
     slurp swaybg \
     visual-studio-code-bin vlc vlc-plugin-ffmpeg vlc-plugin-freetype \
-    waybar wl-clipboard wmenu \
+    waybar webkit2gtk-4.1 wl-clipboard wmenu \
     xdg-desktop-portal-hyprland \
     zathura-pdf-poppler zram-generator zsh
 
   sudo chsh --shell /bin/zsh $USER
 
-  pixi g install wezterm -c retronvim -c conda-forge
+  pixi g install retronvim -c retronvim -c conda-forge
 ```
 
 ## Installation
