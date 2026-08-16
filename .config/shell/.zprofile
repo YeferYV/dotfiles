@@ -13,7 +13,7 @@ export _JAVA_AWT_WM_NONREPARENTING=1 # Fix white screen on Java applications in 
 # export TERAX_USER_ZDOTDIR="/home/drksl/.pixi/envs/wezterm/opt/retronvim/zsh"
 
 # startup programs
-~/.pixi/envs/retronvim/bin/kanata_touchcursor # requires disabling sudo password otherwise it will ask for password after login
+[ -z "$WAYLAND_DISPLAY" ] && ~/.pixi/envs/retronvim/bin/kanata_touchcursor # requires disabling sudo password otherwise it will ask for password after login
 [ -z "$WAYLAND_DISPLAY" ] && exec start-hyprland -- --config $DOTFILES/hypr/hyprland.conf
 
 ###############################################################################

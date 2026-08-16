@@ -73,13 +73,14 @@
     base base-devel brightnessctl broadcom-wl \
     dosfstools dunst \
     exfat-utils \
-    gammastep git gnome-keyring google-chrome grim grub \
-    hyprland \
+    gammastep git gnome-keyring google-chrome grub \
+    hyprland hyprshot \
     intel-ucode \
     libnotify linux linux-firmware \
     network-manager-applet noto-fonts noto-fonts-emoji ntfs-3g \
     pipewire-pulse pixi playerctl \
-    slurp swaybg \
+    swaybg \
+    ueberzugpp \
     visual-studio-code-bin vlc vlc-plugin-ffmpeg vlc-plugin-freetype \
     waybar webkit2gtk-4.1 wl-clipboard wmenu \
     xdg-desktop-portal-hyprland \
