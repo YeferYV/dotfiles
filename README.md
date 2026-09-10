@@ -12,7 +12,7 @@
 | `super + v`              | float window                                      |
 | `super + r`              | open program                                      |
 | `super + F`              | fullscreen                                        |
-| `super + t`              | toggle window layout                              |
+| `super + e`              | open vscode                                       |
 | `super + escape`         | close notification                                |
 | `super + shift + escape` | reopen notification                               |
 | `super + left`           | focus left window                                 |
@@ -88,7 +88,7 @@
 
   sudo chsh --shell /bin/zsh $USER
 
-  pixi g install retronvim -c retronvim -c conda-forge
+  pixi g install retrovim -c retronvim -c conda-forge
 ```
 
 ## Installation
@@ -100,5 +100,6 @@
 
 ## Related projects
 
-- [yeferyv/retronvim](https://github.com/yeferyv/retronvim) vscode extension with neovim text objects from A-Z + LSP whichkey + touchcursor keyboard layout
+- [yeferyv/RetroVim](https://github.com/yeferyv/retrovim)
+  neovim IDE using 01 plugins + yazi builtin plugins + zsh builtin plugins + kanata keyboard layout
 - [LukeSmithxyz/voidrice](https://github.com/LukeSmithxyz/voidrice) arch linux rice with dwm + lf [see dependencies](https://github.com/LukeSmithxyz/LARBS/blob/master/static/progs.csv)
